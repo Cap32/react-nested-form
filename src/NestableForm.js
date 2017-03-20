@@ -1,7 +1,9 @@
 
 import React, { Component, PropTypes } from 'react';
 import { emptyFunction, returnsArgument } from 'empty-functions';
-import { CONTEXT_NAME } from './constants';
+import { ValidationPropType, isValidChild } from './utils';
+import Emitter from 'emit-lite';
+import { CONTEXT_NAME, VALIDATION_STATE_CHANGE } from './constants';
 
 const parseName = (name = '') => {
 	const regExp = /\[\]$/;
@@ -19,14 +21,13 @@ export default class NestableForm extends Component {
 		onSubmit: PropTypes.func,
 		onValid: PropTypes.func,
 		onInvalid: PropTypes.func,
-		validator: PropTypes.func,
+		validations: ValidationPropType,
 	};
 
 	static defaultProps = {
 		onSubmit: emptyFunction,
 		onValid: emptyFunction,
 		onInvalid: emptyFunction,
-		validator: returnsArgument,
 	};
 
 	static contextTypes = {
@@ -56,20 +57,23 @@ export default class NestableForm extends Component {
 		form && form.detach(this);
 	}
 
+	_emitter = new Emitter();
+
 	_childrens = [];
-	_value = undefined;
+
+	isValid = true;
+
+	value = undefined;
 
 	hasChanged = false;
 
 	attach(child) {
-		if (child && child.props && child.props.name && child.getValue &&
-			this._childrens.indexOf(child) < 0
-		) {
+		if (isValidChild(child) && this._childrens.indexOf(child) < 0) {
 			this._childrens.push(child);
+			this._offChildValidStateChange =
+				child.onValidStateChange(this._handleChildValidStateChange)
+			;
 			this.handleChange();
-		}
-		else {
-			console.warn('"attach()" argument is INVALID');
 		}
 	}
 
@@ -77,6 +81,7 @@ export default class NestableForm extends Component {
 		if (child) {
 			const index = this._childrens.indexOf(child);
 			if (index > -1) {
+				this._offChildValidStateChange();
 				this._childrens.splice(index, 1);
 				this.handleChange();
 			}
@@ -85,10 +90,11 @@ export default class NestableForm extends Component {
 
 	handleChange() {
 		this.hasChanged = true;
+		this.validate();
 	}
 
 	getValue() {
-		if (!this.hasChanged) { return this._value; }
+		if (!this.hasChanged) { return this.value; }
 
 		const newValue = this._childrens.reduce((data, child) => {
 			const { props: { name } } = child;
@@ -111,16 +117,36 @@ export default class NestableForm extends Component {
 			return data;
 		}, {});
 
-		this._value = newValue;
+		this.value = newValue;
 		this.hasChanged = false;
 
 		return newValue;
 	}
 
+	_handleChildValidStateChange = ({ isValid }) => {
+		this.validate();
+	};
+
+	onValidStateChange(fn) {
+		this._emitter.on(VALIDATION_STATE_CHANGE, fn);
+	}
+
+	validate() {
+		const isValid = this._childrens.every((child) => child.isValid);
+		if (isValid !== this.isValid) {
+			this.isValid = isValid;
+			this._emitter.emit(VALIDATION_STATE_CHANGE, { isValid });
+			this.forceUpdate();
+		}
+	}
+
 	_handleSubmit = (ev) => {
 		ev.preventDefault();
+		const { isValid } = this;
 		const value = this.getValue();
-		this.props.onSubmit(ev, value);
+		this.props.onSubmit(ev, value, {
+			isValid,
+		});
 		console.log('submit value:', value);
 	};
 
@@ -131,7 +157,7 @@ export default class NestableForm extends Component {
 				/* eslint-disable */
 				onValid,
 				onInvalid,
-				validator,
+				validations,
 				/* eslint-enable */
 
 				...other,
@@ -141,7 +167,10 @@ export default class NestableForm extends Component {
 		const Comp = context[CONTEXT_NAME] ? 'div' : 'form';
 
 		return (
-			<Comp {...other} onSubmit={this._handleSubmit} />
+			<Comp
+				{...other}
+				onSubmit={this._handleSubmit}
+			/>
 		);
 	}
 }

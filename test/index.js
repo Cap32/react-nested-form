@@ -86,4 +86,33 @@ describe('library', function () {
 		const wrapper = mount(<App />);
 		wrapper.find('[type="submit"]').get(0).click();
 	});
+
+	it('validation', function (done) {
+		const handleSubmit = (ev, data, { isValid }) => {
+			try {
+				assert(!isValid);
+				done();
+			}
+			catch (err) {
+				done(err);
+			}
+		};
+		const App = () => (
+			<Form onSubmit={handleSubmit}>
+				<Input
+					name="numbers"
+					defaultValue="hello"
+					validations={[
+						{
+							validator: (val) => /^\d*$/.test(val),
+							message: 'Not a number.',
+						},
+					]}
+				/>
+				<button type="submit" />
+			</Form>
+		);
+		const wrapper = mount(<App />);
+		wrapper.find('[type="submit"]').get(0).click();
+	});
 });

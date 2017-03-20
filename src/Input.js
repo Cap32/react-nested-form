@@ -13,8 +13,18 @@ class Input extends Component {
 	};
 
 	render() {
+		const {
+
+			/* eslint-disable */
+			errorMessage,
+			isValid,
+			/* eslint-enable */
+
+			...other,
+		} = this.props;
+
 		return (
-			<input {...this.props} onChange={this._handleChange} />
+			<input {...other} onChange={this._handleChange} />
 		);
 	}
 }

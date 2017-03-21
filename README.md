@@ -1,10 +1,6 @@
 # react-nestable-form
 
-## Installations
-
-```bash
-$ yarn add react-nestable-form
-```
+**This repo is under developing.**
 
 ## License
 

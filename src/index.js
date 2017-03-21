@@ -1,4 +1,4 @@
 
-export default from './NestableForm';
+export default from './NestedForm';
 export Submit from './Submit';
 export Input from './Input';

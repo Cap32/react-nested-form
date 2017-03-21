@@ -7,7 +7,7 @@ import { CONTEXT_NAME } from './constants';
 
 export default function nestify(options) {
 	return (WrappedComponent) => {
-		class Nestable extends Component {
+		class Nestle extends Component {
 			static propTypes = {
 				name: PropTypes.string.isRequired,
 				defaultValue: PropTypes.any,
@@ -199,6 +199,6 @@ export default function nestify(options) {
 			}
 		}
 
-		return hoistStatics(Nestable, WrappedComponent);
+		return hoistStatics(Nestle, WrappedComponent);
 	};
 }

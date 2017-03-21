@@ -24,7 +24,7 @@ export const isValidChild = function isValidChild(c) {
 		return true;
 	}
 	else {
-		console.warn('[ReactNestableForm]: child is INVALID.');
+		console.warn('[ReactNestedForm]: child is INVALID.');
 		return false;
 	}
 };

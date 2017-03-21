@@ -14,7 +14,7 @@ const parseName = (name = '') => {
 	return { isArray, realName: name };
 };
 
-export default class NestableForm extends Component {
+export default class NestedForm extends Component {
 	static propTypes = {
 		name: PropTypes.string,
 		onSubmit: PropTypes.func,
@@ -112,7 +112,7 @@ export default class NestableForm extends Component {
 			else {
 				if (dataValue) {
 					console.warn(
-						`[ReactNestableForm]: Multi names called \`${realName}\`! ` +
+						`[ReactNestedForm]: Multi names called \`${realName}\`! ` +
 						`If you wanna use array, please use \`${realName}[]\` instead.`
 					);
 				}

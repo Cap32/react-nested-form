@@ -1,4 +1,4 @@
-# react-nestable-form
+# react-nested-form
 
 **This repo is under developing.**
 

@@ -1,8 +1,8 @@
 {
-  "name": "react-nestable-form",
+  "name": "react-nested-form",
   "version": "0.0.0",
-  "description": "react-nestable-form",
-  "repository": "cap32/react-nestable-form",
+  "description": "react-nested-form",
+  "repository": "cap32/react-nested-form",
   "scripts": {
     "prebuild": "rimraf ./dist ./lib ./es && mkdirp ./dist ./lib ./es",
     "build:cjs": "cross-env BABEL_ENV=cjs babel src -d lib",

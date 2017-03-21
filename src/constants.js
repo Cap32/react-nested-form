@@ -1,2 +1,2 @@
 
-export const CONTEXT_NAME = 'nestableForm';
+export const CONTEXT_NAME = 'nestedForm';

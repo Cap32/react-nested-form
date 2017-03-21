@@ -170,45 +170,35 @@ describe('library', function () {
 		wrapper.find('[type="submit"]').get(0).click();
 	});
 
-	it('nested validation', function (done) {
-		const handleSubmit = (data, { isInvalid }) => {
-			try {
-				assert.equal(!isInvalid, data.a === 'a' && data.b.c === 'c');
-				done();
-			}
-			catch (err) {
-				done(err);
-			}
+	it('`onValid` and `onInvalid` prop', function (done) {
+		let hasCallInvalid = false;
+
+		const handleValid = () => {
+			hasCallInvalid && done();
 		};
-		const App = () => (
-			<Form onSubmit={handleSubmit}>
+
+		const handleInvalid = () => {
+			hasCallInvalid = true;
+		};
+
+		const wrapper = mount(
+			<Form onValid={handleValid} onInvalid={handleInvalid}>
 				<Input
-					name="a"
-					defaultValue="a"
+					name="numbers"
+					defaultValue="hello"
 					validations={[
 						{
-							validator: (a) => a === 'a',
-							message: 'Not "a".',
+							validator: (val) => /^\d*$/.test(val),
+							message: 'Not a number.',
 						},
 					]}
 				/>
-				<Form name="b">
-					<Input
-						name="c"
-						defaultValue="c"
-						validations={[
-							{
-								validator: (c) => c === 'c',
-								message: 'Not "c".',
-							},
-						]}
-					/>
-				</Form>
 				<button type="submit" />
 			</Form>
 		);
-		const wrapper = mount(<App />);
-		wrapper.find('[type="submit"]').get(0).click();
+		const input = wrapper.find('input');
+		input.node.value = '666666';
+		input.simulate('change');
 	});
 
 	it('required field', function (done) {

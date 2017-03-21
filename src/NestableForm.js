@@ -64,7 +64,7 @@ export default class NestableForm extends Component {
 
 	_childrens = [];
 
-	isInvalid = true;
+	isInvalid = false;
 
 	value = undefined;
 
@@ -126,10 +126,15 @@ export default class NestableForm extends Component {
 		const isInvalid = this._childrens.every(
 			(child) => child.isInvalid || child.isRequired
 		);
+
 		if (isInvalid !== this.isInvalid) {
+			const { onValid, onInvalid } = this.props;
 			this.isInvalid = isInvalid;
 			this._contextForm.validate();
 			this.forceUpdate();
+
+			if (isInvalid) { onInvalid(); }
+			else { onValid(); }
 		}
 	}
 
@@ -141,14 +146,18 @@ export default class NestableForm extends Component {
 		this._childrens.forEach((child) => child.setAsPristine());
 	}
 
-	_handleSubmit = (ev) => {
-		ev.preventDefault();
+	submit(callback = emptyFunction) {
 		const { isInvalid } = this;
 		const value = this.getValue();
-		this.props.onSubmit(value, {
-			isInvalid,
-		});
+		const state = { isInvalid };
+		this.props.onSubmit(value, state);
+		callback(value, state);
 		console.log('submit value:', value);
+	}
+
+	_handleSubmit = (ev) => {
+		ev.preventDefault();
+		this.submit();
 	};
 
 	render() {

@@ -27,7 +27,6 @@
   "author": "cap32",
   "license": "MIT",
   "dependencies": {
-    "emit-lite": "^2.0.0",
     "empty-functions": "^1.0.2",
     "hoist-non-react-statics": "^1.2.0"
   },

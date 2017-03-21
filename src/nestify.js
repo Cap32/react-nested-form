@@ -3,8 +3,7 @@ import React, { Component, PropTypes } from 'react';
 import hoistStatics from 'hoist-non-react-statics';
 import { ValidationPropType, isFunction } from './utils';
 import { emptyFunction, returnsTrue, returnsArgument } from 'empty-functions';
-import Emitter from 'emit-lite';
-import { CONTEXT_NAME, VALIDATION_STATE_CHANGE } from './constants';
+import { CONTEXT_NAME } from './constants';
 
 export default function nestify(options) {
 	return (WrappedComponent) => {
@@ -14,11 +13,11 @@ export default function nestify(options) {
 				defaultValue: PropTypes.any,
 				validations: ValidationPropType,
 				defaultErrorMessage: PropTypes.string,
-				required: PropTypes.bool,
+				isRequired: PropTypes.bool,
 			};
 
 			static defaultProps = {
-				required: false,
+				isRequired: false,
 				defaultErrorMessage: 'Error',
 			};
 
@@ -28,7 +27,6 @@ export default function nestify(options) {
 
 			isValid = true;
 			errorMessage: '';
-			_emitter = new Emitter();
 
 			prevValue = undefined;
 			value = this.props.defaultValue;
@@ -55,12 +53,6 @@ export default function nestify(options) {
 				return this.value;
 			}
 
-			_emitChangeValidState = emptyFunction;
-
-			onValidStateChange(fn) {
-				return this._emitter.on(VALIDATION_STATE_CHANGE, fn);
-			}
-
 			// TODO: should use bounce/throttle
 			_setStateSync(state) {
 
@@ -84,7 +76,8 @@ export default function nestify(options) {
 
 			validate() {
 				const {
-					props: { validations, defaultErrorMessage, required },
+					props: { validations, defaultErrorMessage, isRequired },
+					context: { [CONTEXT_NAME]: form },
 					value, isValid,
 				} = this;
 
@@ -113,16 +106,12 @@ export default function nestify(options) {
 				const errorMessage = getErrorMessage();
 
 				if (errorMessage) {
-					if (isValid) {
-						this._emitter.emit(VALIDATION_STATE_CHANGE, { isValid: false });
-					}
+					if (isValid && form) { form.validate(); }
 					this._setErrorMessage(errorMessage);
 					return false;
 				}
 				else {
-					if (!isValid) {
-						this._emitter.emit(VALIDATION_STATE_CHANGE, { isValid: true });
-					}
+					if (!isValid && form) { form.validate(); }
 					this._clearErrorMessage();
 					return true;
 				}
@@ -139,7 +128,7 @@ export default function nestify(options) {
 						/* eslint-disable */
 						validations,
 						defaultErrorMessage,
-						required,
+						isRequired,
 						/* eslint-enable */
 
 						...other,

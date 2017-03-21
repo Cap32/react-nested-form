@@ -2,8 +2,7 @@
 import React, { Component, PropTypes } from 'react';
 import { emptyFunction, returnsArgument } from 'empty-functions';
 import { ValidationPropType, isValidChild } from './utils';
-import Emitter from 'emit-lite';
-import { CONTEXT_NAME, VALIDATION_STATE_CHANGE } from './constants';
+import { CONTEXT_NAME } from './constants';
 
 const parseName = (name = '') => {
 	const regExp = /\[\]$/;
@@ -43,6 +42,7 @@ export default class NestableForm extends Component {
 			[CONTEXT_NAME]: {
 				attach: this.attach.bind(this),
 				detach: this.detach.bind(this),
+				validate: this.validate.bind(this),
 			},
 		};
 	}
@@ -57,8 +57,6 @@ export default class NestableForm extends Component {
 		form && form.detach(this);
 	}
 
-	_emitter = new Emitter();
-
 	_childrens = [];
 
 	isValid = true;
@@ -70,9 +68,6 @@ export default class NestableForm extends Component {
 	attach(child) {
 		if (isValidChild(child) && this._childrens.indexOf(child) < 0) {
 			this._childrens.push(child);
-			this._offChildValidStateChange =
-				child.onValidStateChange(this._handleChildValidStateChange)
-			;
 			this.handleChange();
 		}
 	}
@@ -81,7 +76,6 @@ export default class NestableForm extends Component {
 		if (child) {
 			const index = this._childrens.indexOf(child);
 			if (index > -1) {
-				this._offChildValidStateChange();
 				this._childrens.splice(index, 1);
 				this.handleChange();
 			}
@@ -123,19 +117,12 @@ export default class NestableForm extends Component {
 		return newValue;
 	}
 
-	_handleChildValidStateChange = ({ isValid }) => {
-		this.validate();
-	};
-
-	onValidStateChange(fn) {
-		this._emitter.on(VALIDATION_STATE_CHANGE, fn);
-	}
-
 	validate() {
 		const isValid = this._childrens.every((child) => child.isValid);
 		if (isValid !== this.isValid) {
+			const form = this.context[CONTEXT_NAME];
 			this.isValid = isValid;
-			this._emitter.emit(VALIDATION_STATE_CHANGE, { isValid });
+			if (form) { form.validate(); }
 			this.forceUpdate();
 		}
 	}

@@ -1,6 +1,6 @@
 
 import React, { Component, PropTypes } from 'react';
-import { emptyFunction, returnsTrue, returnsArgument } from 'empty-functions';
+import { emptyFunction, returnsTrue } from 'empty-functions';
 import { ValidationPropType, isValidChild } from './utils';
 import { CONTEXT_NAME } from './constants';
 
@@ -163,7 +163,6 @@ export default class NestableForm extends Component {
 		};
 		this.props.onSubmit(value, state);
 		callback(value, state);
-		console.log('submit value:', value);
 
 		if (!state.isStoppedPropagation) {
 			this._contextForm.submit();

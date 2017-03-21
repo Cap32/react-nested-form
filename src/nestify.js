@@ -3,7 +3,6 @@ import React, { Component, PropTypes } from 'react';
 import hoistStatics from 'hoist-non-react-statics';
 import { ValidationPropType, isFunction } from './utils';
 import find from 'array-find';
-import { emptyFunction, returnsTrue, returnsArgument } from 'empty-functions';
 import { CONTEXT_NAME } from './constants';
 
 export default function nestify(options) {

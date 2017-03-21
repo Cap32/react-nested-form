@@ -38,11 +38,10 @@ describe('library', function () {
 		const input = wrapper.find('input').first();
 		input.node.value = value;
 		input.simulate('change');
-		// wrapper.find(Submit).first().simulate('click');
 		wrapper.find(Submit).first().simulate('click');
 	});
 
-	it('remove field', function (done) {
+	it('`remove` field', function (done) {
 		const handleSubmit = (data) => {
 			try {
 				assert.deepEqual(data, {});
@@ -278,6 +277,43 @@ describe('library', function () {
 		const wrapper = mount(
 			<Form onSubmit={handleSubmit}>
 				<Form name="a" onSubmit={handleSubFormSubmit}>
+					<Input name="b" defaultValue="b" />
+					<Submit />
+				</Form>
+				<Input name="c" defaultValue="c" />
+				<Submit />
+			</Form>
+		);
+		wrapper.find(Submit).first().simulate('click');
+		wrapper.find(Submit).last().simulate('click');
+	});
+
+	it('nested form with `name` prop', function (done) {
+		const handleSubFormSubmit = (data, state) => {
+			try {
+				state.stopPropagation();
+				assert.deepEqual(data, { b: 'b' });
+			}
+			catch (err) {
+				done(err);
+			}
+		};
+
+		const handleSubmit = (data) => {
+			try {
+				assert.deepEqual(data, {
+					c: 'c', // note
+				});
+				done();
+			}
+			catch (err) {
+				done(err);
+			}
+		};
+
+		const wrapper = mount(
+			<Form onSubmit={handleSubmit}>
+				<Form onSubmit={handleSubFormSubmit}> {/* no `name` */}
 					<Input name="b" defaultValue="b" />
 					<Submit />
 				</Form>

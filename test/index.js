@@ -4,7 +4,7 @@ import React from 'react';
 import assert from 'assert';
 import jsdom from 'jsdom';
 import { mount } from 'enzyme';
-import Form, { Input } from '../src';
+import Form, { Input, Submit } from '../src';
 
 describe('library', function () {
 	beforeEach(() => {
@@ -31,14 +31,15 @@ describe('library', function () {
 		const App = () => (
 			<Form onSubmit={handleSubmit}>
 				<Input name="hello" />
-				<button type="submit" />
+				<Submit />
 			</Form>
 		);
 		const wrapper = mount(<App />);
-		const input = wrapper.find('input');
+		const input = wrapper.find('input').first();
 		input.node.value = value;
 		input.simulate('change');
-		wrapper.find('[type="submit"]').get(0).click();
+		// wrapper.find(Submit).first().simulate('click');
+		wrapper.find(Submit).first().simulate('click');
 	});
 
 	it('remove field', function (done) {
@@ -54,12 +55,12 @@ describe('library', function () {
 		const App = ({ shouldShowHello = true }) => (
 			<Form onSubmit={handleSubmit}>
 				{shouldShowHello && <Input name="hello" />}
-				<button type="submit" />
+				<Submit />
 			</Form>
 		);
 		const wrapper = mount(<App />);
 		wrapper.setProps({ shouldShowHello: false });
-		wrapper.find('[type="submit"]').get(0).click();
+		wrapper.find(Submit).first().simulate('click');
 	});
 
 	it('nested data object', function (done) {
@@ -79,12 +80,12 @@ describe('library', function () {
 			<Form onSubmit={handleSubmit}>
 				<Form name="children">
 					<Input name="hello" defaultValue={value} />
-					<button type="submit" />
+					<Submit />
 				</Form>
 			</Form>
 		);
 		const wrapper = mount(<App />);
-		wrapper.find('[type="submit"]').get(0).click();
+		wrapper.find(Submit).first().simulate('click');
 	});
 
 	it('array', function (done) {
@@ -102,11 +103,11 @@ describe('library', function () {
 			<Form onSubmit={handleSubmit}>
 				<Input name="list[]" defaultValue={values[0]} />
 				<Input name="list[]" defaultValue={values[1]} />
-				<button type="submit" />
+				<Submit />
 			</Form>
 		);
 		const wrapper = mount(<App />);
-		wrapper.find('[type="submit"]').get(0).click();
+		wrapper.find(Submit).first().simulate('click');
 	});
 
 	it('validation', function (done) {
@@ -131,11 +132,11 @@ describe('library', function () {
 						},
 					]}
 				/>
-				<button type="submit" />
+				<Submit />
 			</Form>
 		);
 		const wrapper = mount(<App />);
-		wrapper.find('[type="submit"]').get(0).click();
+		wrapper.find(Submit).first().simulate('click');
 	});
 
 	it('validation with typing', function (done) {
@@ -160,14 +161,14 @@ describe('library', function () {
 						},
 					]}
 				/>
-				<button type="submit" />
+				<Submit />
 			</Form>
 		);
 		const wrapper = mount(<App />);
-		const input = wrapper.find('input');
+		const input = wrapper.find('input').first();
 		input.node.value = '666666';
 		input.simulate('change');
-		wrapper.find('[type="submit"]').get(0).click();
+		wrapper.find(Submit).first().simulate('click');
 	});
 
 	it('`onValid` and `onInvalid` prop', function (done) {
@@ -193,10 +194,10 @@ describe('library', function () {
 						},
 					]}
 				/>
-				<button type="submit" />
+				<Submit />
 			</Form>
 		);
-		const input = wrapper.find('input');
+		const input = wrapper.find('input').first();
 		input.node.value = '666666';
 		input.simulate('change');
 	});
@@ -217,11 +218,12 @@ describe('library', function () {
 					name="id"
 					required
 				/>
-				<button type="submit" />
+				<Submit />
 			</Form>
 		);
 		const wrapper = mount(<App />);
-		wrapper.find('[type="submit"]').get(0).click();
+
+		wrapper.find(Submit).first().simulate('click');
 	});
 
 	it('reset()', function (done) {
@@ -238,39 +240,52 @@ describe('library', function () {
 		const wrapper = mount(
 			<Form ref="form" onSubmit={handleSubmit}>
 				<Input name="hello" defaultValue={value} />
-				<button type="submit" />
+				<Submit />
 			</Form>
 		);
-		const input = wrapper.find('input');
+		const input = wrapper.find('input').first();
 		input.node.value = 'updated';
 		input.simulate('change');
 		const instance = wrapper.instance();
 		instance.reset();
-		wrapper.find('[type="submit"]').get(0).click();
+		wrapper.find(Submit).first().simulate('click');
 	});
 
-	// it('setAsPristine()', function (done) {
-	// 	const value = 'world';
-	// 	const handleSubmit = (data) => {
-	// 		try {
-	// 			assert.equal(data.hello, value);
-	// 			done();
-	// 		}
-	// 		catch (err) {
-	// 			done(err);
-	// 		}
-	// 	};
-	// 	const wrapper = mount(
-	// 		<Form ref="form" onSubmit={handleSubmit}>
-	// 			<Input name="hello" defaultValue={value} />
-	// 			<button type="submit" />
-	// 		</Form>
-	// 	);
-	// 	const input = wrapper.find('input');
-	// 	input.node.value = 'updated';
-	// 	input.simulate('change');
-	// 	const instance = wrapper.instance();
-	// 	instance.setAsPristine();
-	// 	wrapper.find('[type="submit"]').get(0).click();
-	// });
+	it('nested forms', function (done) {
+		const handleSubFormSubmit = (data, state) => {
+			try {
+				state.stopPropagation();
+				assert.deepEqual(data, { b: 'b' });
+			}
+			catch (err) {
+				done(err);
+			}
+		};
+
+		const handleSubmit = (data) => {
+			try {
+				assert.deepEqual(data, {
+					a: { b: 'b' },
+					c: 'c',
+				});
+				done();
+			}
+			catch (err) {
+				done(err);
+			}
+		};
+
+		const wrapper = mount(
+			<Form onSubmit={handleSubmit}>
+				<Form name="a" onSubmit={handleSubFormSubmit}>
+					<Input name="b" defaultValue="b" />
+					<Submit />
+				</Form>
+				<Input name="c" defaultValue="c" />
+				<Submit />
+			</Form>
+		);
+		wrapper.find(Submit).first().simulate('click');
+		wrapper.find(Submit).last().simulate('click');
+	});
 });

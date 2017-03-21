@@ -19,9 +19,8 @@ export const isFunction = function isFunction(target) {
 	return typeof target === 'function';
 };
 
-export const isValidChild = function isValidChild(child) {
-	if (child && child.props && child.props.name &&
-		child.getValue && child.reset && child.setAsPristine) {
+export const isValidChild = function isValidChild(c) {
+	if (c && c.props && c.getValue && c.reset && c.setAsPristine) {
 		return true;
 	}
 	else {

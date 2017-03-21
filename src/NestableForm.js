@@ -43,16 +43,18 @@ export default class NestableForm extends Component {
 				attach: this.attach.bind(this),
 				detach: this.detach.bind(this),
 				validate: this.validate.bind(this),
+				submit: this.submit.bind(this),
 			},
 		};
 	}
 
 	componentWillMount() {
-		const contextForm = this.context[CONTEXT_NAME];
-		this._contextForm = contextForm || {
+		const { props: { name }, context } = this;
+		this._contextForm = (name && context[CONTEXT_NAME]) || {
 			attach: emptyFunction,
 			detach: emptyFunction,
 			validate: returnsTrue,
+			submit: returnsTrue,
 		};
 
 		this._contextForm.attach(this);
@@ -97,6 +99,9 @@ export default class NestableForm extends Component {
 
 		const newValue = this._childrens.reduce((data, child) => {
 			const { props: { name } } = child;
+
+			if (!name) { return data; }
+
 			const { isArray, realName } = parseName(name);
 			const value = child.getValue();
 			const dataValue = data[realName];
@@ -149,15 +154,25 @@ export default class NestableForm extends Component {
 	submit(callback = emptyFunction) {
 		const { isInvalid } = this;
 		const value = this.getValue();
-		const state = { isInvalid };
+		const state = {
+			isInvalid,
+			isStoppedPropagation: false,
+			stopPropagation() {
+				state.isStoppedPropagation = true;
+			},
+		};
 		this.props.onSubmit(value, state);
 		callback(value, state);
 		console.log('submit value:', value);
+
+		if (!state.isStoppedPropagation) {
+			this._contextForm.submit();
+		}
 	}
 
 	_handleSubmit = (ev) => {
 		ev.preventDefault();
-		this.submit();
+		// this.submit();
 	};
 
 	render() {

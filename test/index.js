@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 
 import React from 'react';
 import assert from 'assert';
@@ -37,6 +38,27 @@ describe('library', function () {
 		const input = wrapper.find('input');
 		input.node.value = value;
 		input.simulate('change');
+		wrapper.find('[type="submit"]').get(0).click();
+	});
+
+	it('remove field', function (done) {
+		const handleSubmit = (data) => {
+			try {
+				assert.deepEqual(data, {});
+				done();
+			}
+			catch (err) {
+				done(err);
+			}
+		};
+		const App = ({ shouldShowHello = true }) => (
+			<Form onSubmit={handleSubmit}>
+				{shouldShowHello && <Input name="hello" />}
+				<button type="submit" />
+			</Form>
+		);
+		const wrapper = mount(<App />);
+		wrapper.setProps({ shouldShowHello: false });
 		wrapper.find('[type="submit"]').get(0).click();
 	});
 
@@ -88,9 +110,9 @@ describe('library', function () {
 	});
 
 	it('validation', function (done) {
-		const handleSubmit = (data, { isValid }) => {
+		const handleSubmit = (data, { isInvalid }) => {
 			try {
-				assert(!isValid);
+				assert(isInvalid);
 				done();
 			}
 			catch (err) {
@@ -117,9 +139,9 @@ describe('library', function () {
 	});
 
 	it('validation with typing', function (done) {
-		const handleSubmit = (data, { isValid }) => {
+		const handleSubmit = (data, { isInvalid }) => {
 			try {
-				assert(isValid);
+				assert(!isInvalid);
 				done();
 			}
 			catch (err) {
@@ -149,9 +171,9 @@ describe('library', function () {
 	});
 
 	it('nested validation', function (done) {
-		const handleSubmit = (data, { isValid }) => {
+		const handleSubmit = (data, { isInvalid }) => {
 			try {
-				assert.equal(isValid, data.a === 'a' && data.b.c === 'c');
+				assert.equal(!isInvalid, data.a === 'a' && data.b.c === 'c');
 				done();
 			}
 			catch (err) {
@@ -182,6 +204,29 @@ describe('library', function () {
 						]}
 					/>
 				</Form>
+				<button type="submit" />
+			</Form>
+		);
+		const wrapper = mount(<App />);
+		wrapper.find('[type="submit"]').get(0).click();
+	});
+
+	it('required field', function (done) {
+		const handleSubmit = (data, { isInvalid }) => {
+			try {
+				assert(isInvalid === !data.id);
+				done();
+			}
+			catch (err) {
+				done(err);
+			}
+		};
+		const App = () => (
+			<Form onSubmit={handleSubmit}>
+				<Input
+					name="id"
+					required
+				/>
 				<button type="submit" />
 			</Form>
 		);

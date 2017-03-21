@@ -17,7 +17,8 @@ class Input extends Component {
 
 			/* eslint-disable */
 			errorMessage,
-			isValid,
+			isInvalid,
+			isRequired,
 			/* eslint-enable */
 
 			...other,

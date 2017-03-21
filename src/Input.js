@@ -4,29 +4,17 @@ import nestify from './nestify';
 
 class Input extends Component {
 	static propTypes = {
-		onChange: PropTypes.func.isRequired,
-	};
-
-	_handleChange = (ev) => {
-		const { value } = ev.currentTarget;
-		this.props.onChange(ev, value);
+		nest: PropTypes.object.isRequired,
 	};
 
 	render() {
 		const {
-
-			/* eslint-disable */
-			setValue,
-			errorMessage,
-			isInvalid,
-			isRequired,
-			/* eslint-enable */
-
+			nest: { onChange },
 			...other,
 		} = this.props;
 
 		return (
-			<input {...other} onChange={this._handleChange} />
+			<input {...other} onChange={onChange} />
 		);
 	}
 }

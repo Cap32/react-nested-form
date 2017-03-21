@@ -50,6 +50,12 @@ export default class NestedForm extends Component {
 
 	componentWillMount() {
 		const { props: { name }, context } = this;
+
+		this.nest = {
+			isInvalid: false,
+			value: undefined,
+		};
+
 		this._contextForm = (name && context[CONTEXT_NAME]) || {
 			attach: emptyFunction,
 			detach: emptyFunction,
@@ -66,11 +72,7 @@ export default class NestedForm extends Component {
 
 	_childrens = [];
 
-	isInvalid = false;
-
-	value = undefined;
-
-	hasChanged = false;
+	_hasChanged = false;
 
 	attach(child) {
 		if (isValidChild(child) && this._childrens.indexOf(child) < 0) {
@@ -90,12 +92,12 @@ export default class NestedForm extends Component {
 	}
 
 	handleChange() {
-		this.hasChanged = true;
+		this._hasChanged = true;
 		this.validate();
 	}
 
 	getValue() {
-		if (!this.hasChanged) { return this.value; }
+		if (!this._hasChanged) { return this.nest.value; }
 
 		const newValue = this._childrens.reduce((data, child) => {
 			const { props: { name } } = child;
@@ -121,20 +123,21 @@ export default class NestedForm extends Component {
 			return data;
 		}, {});
 
-		this.value = newValue;
-		this.hasChanged = false;
+		this.nest.value = newValue;
+		this._hasChanged = false;
 
 		return newValue;
 	}
 
 	validate() {
+		const { nest } = this;
 		const isInvalid = this._childrens.every(
-			(child) => child.isInvalid || child.isRequired
+			(child) => child.nest.isInvalid || child.nest.isRequired
 		);
 
-		if (isInvalid !== this.isInvalid) {
+		if (isInvalid !== nest.isInvalid) {
 			const { onValid, onInvalid } = this.props;
-			this.isInvalid = isInvalid;
+			nest.isInvalid = isInvalid;
 			this._contextForm.validate();
 			this.forceUpdate();
 
@@ -152,7 +155,7 @@ export default class NestedForm extends Component {
 	}
 
 	submit(callback = emptyFunction) {
-		const { isInvalid } = this;
+		const { isInvalid } = this.nest;
 		const value = this.getValue();
 		const state = {
 			isInvalid,

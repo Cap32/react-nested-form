@@ -1,19 +1,20 @@
 
 import React, { Component, PropTypes } from 'react';
 import hoistStatics from 'hoist-non-react-statics';
-import { ValidationPropType, isFunction } from './utils';
+import { ValidationPropType, isFunction, isUndefined } from './utils';
 import find from 'array-find';
 import { CONTEXT_NAME } from './constants';
 
 export default function nestify(options) {
 	return (WrappedComponent) => {
-		class Nestle extends Component {
+		class Nest extends Component {
 			static propTypes = {
 				name: PropTypes.string.isRequired,
 				defaultValue: PropTypes.any,
 				validations: ValidationPropType,
 				defaultErrorMessage: PropTypes.string,
 				required: PropTypes.bool,
+				onChange: PropTypes.func,
 			};
 
 			static defaultProps = {
@@ -26,14 +27,16 @@ export default function nestify(options) {
 			};
 
 			componentWillMount() {
-				this.isInvalid = false;
-				this.isRequired = false;
-				this.isPristine = true;
-				this.errorMessage = '';
+				this.nest = {
+					isInvalid: false,
+					isRequired: false,
+					isPristine: true,
+					errorMessage: '',
+					value: this.props.defaultValue,
+				};
 
 				this.prevValue = undefined;
-				this.value = this.props.defaultValue;
-				this.pristineValue = this.value;
+				this.pristineValue = this.nest.value;
 
 				this.validate();
 				this._shouldUpdate = false;
@@ -46,12 +49,12 @@ export default function nestify(options) {
 			}
 
 			getValue() {
-				return this.value;
+				return this.nest.value;
 			}
 
 			_updateValue(value, isReset = false) {
-				this.prevValue = this.value;
-				this.value = value;
+				this.prevValue = this.nest.value;
+				this.nest.value = value;
 				this.validate();
 				this._setPristine(isReset);
 				this._updateState();
@@ -61,51 +64,51 @@ export default function nestify(options) {
 				if (this.prevValue !== value) {
 					this._updateValue(value);
 				}
-				return this.value;
+				return this.nest.value;
 			};
 
 			reset = () => {
 				this._updateValue(this.pristineValue, true);
-				return this.value;
+				return this.nest.value;
 			};
 
 			setAsPristine() {
-				if (this.pristineValue !== this.value) {
+				if (this.pristineValue !== this.nest.value) {
 					this._shouldUpdate = true;
-					this.pristineValue = this.value;
+					this.pristineValue = this.nest.value;
 				}
 				this._setPristine(true);
 				this._updateState();
-				return this.value;
+				return this.nest.value;
 			}
 
 			_setRequired(isRequired) {
-				if (this.isRequired !== isRequired) {
+				if (this.nest.isRequired !== isRequired) {
 					this._shouldUpdate = true;
-					this.isRequired = isRequired;
+					this.nest.isRequired = isRequired;
 				}
 			}
 
 			_setInvalid(isInvalid) {
-				if (this.isInvalid !== isInvalid) {
+				if (this.nest.isInvalid !== isInvalid) {
 					this._shouldUpdate = true;
-					this.isInvalid = isInvalid;
+					this.nest.isInvalid = isInvalid;
 				}
 			}
 
 			_setPristine(isPristine) {
-				if (this.isPristine !== isPristine) {
+				if (this.nest.isPristine !== isPristine) {
 					this._shouldUpdate = true;
-					this.isPristine = isPristine;
+					this.nest.isPristine = isPristine;
 				}
 			}
 
 			_setErrorMessage(errorMessage = '') {
-				if ((errorMessage && this.errorMessage !== errorMessage) ||
-					(!errorMessage && this.errorMessage)
+				if ((errorMessage && this.nest.errorMessage !== errorMessage) ||
+					(!errorMessage && this.nest.errorMessage)
 				) {
 					this._shouldUpdate = true;
-					this.errorMessage = errorMessage;
+					this.nest.errorMessage = errorMessage;
 				}
 			}
 
@@ -121,7 +124,7 @@ export default function nestify(options) {
 				const {
 					props: { validations, defaultErrorMessage, required },
 					context: { [CONTEXT_NAME]: form },
-					value, isInvalid,
+					nest: { value, isInvalid },
 				} = this;
 
 				const isEmpty = !value && value !== 0;
@@ -168,8 +171,12 @@ export default function nestify(options) {
 
 			}
 
-			_handleChange = (ev, value) => {
-				this.setValue(value);
+			_handleChange = (ev, value, ...rest) => {
+				const { onChange } = this.props;
+				const target = ev && ev.currentTarget;
+				const val = isUndefined(target.value) ? value : target.value;
+				this.setValue(val);
+				if (isFunction(onChange)) { onChange(ev, value, ...rest); }
 			};
 
 			render() {
@@ -184,21 +191,26 @@ export default function nestify(options) {
 
 						...other,
 					},
-					errorMessage,
-					isInvalid,
+					context: {
+						[CONTEXT_NAME]: form,
+					},
+					nest,
 				} = this;
 				return (
 					<WrappedComponent
 						{...other}
-						errorMessage={errorMessage}
-						isInvalid={isInvalid}
-						onChange={this._handleChange}
-						setValue={this.setValue}
+						nest={{
+							...nest,
+							onChange: this._handleChange,
+							setValue: this.setValue,
+							attach: form.attach,
+							detach: form.detach,
+						}}
 					/>
 				);
 			}
 		}
 
-		return hoistStatics(Nestle, WrappedComponent);
+		return hoistStatics(Nest, WrappedComponent);
 	};
 }

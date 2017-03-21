@@ -19,8 +19,12 @@ export const isFunction = function isFunction(target) {
 	return typeof target === 'function';
 };
 
+export const isUndefined = function isUndefined(target) {
+	return typeof target === 'undefined';
+};
+
 export const isValidChild = function isValidChild(c) {
-	if (c && c.props && c.getValue && c.reset && c.setAsPristine) {
+	if (c && c.props && c.nest && c.getValue && c.reset && c.setAsPristine) {
 		return true;
 	}
 	else {

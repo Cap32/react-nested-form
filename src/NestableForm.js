@@ -1,6 +1,6 @@
 
 import React, { Component, PropTypes } from 'react';
-import { emptyFunction, returnsArgument } from 'empty-functions';
+import { emptyFunction, returnsTrue, returnsArgument } from 'empty-functions';
 import { ValidationPropType, isValidChild } from './utils';
 import { CONTEXT_NAME } from './constants';
 
@@ -48,13 +48,18 @@ export default class NestableForm extends Component {
 	}
 
 	componentWillMount() {
-		const form = this.context[CONTEXT_NAME];
-		form && form.attach(this);
+		const contextForm = this.context[CONTEXT_NAME];
+		this._contextForm = contextForm || {
+			attach: emptyFunction,
+			detach: emptyFunction,
+			validate: returnsTrue,
+		};
+
+		this._contextForm.attach(this);
 	}
 
 	componentWillUnmount() {
-		const form = this.context[CONTEXT_NAME];
-		form && form.detach(this);
+		this._contextForm.detach(this);
 	}
 
 	_childrens = [];
@@ -120,9 +125,8 @@ export default class NestableForm extends Component {
 	validate() {
 		const isValid = this._childrens.every((child) => child.isValid);
 		if (isValid !== this.isValid) {
-			const form = this.context[CONTEXT_NAME];
 			this.isValid = isValid;
-			if (form) { form.validate(); }
+			this._contextForm.validate();
 			this.forceUpdate();
 		}
 	}
@@ -131,7 +135,7 @@ export default class NestableForm extends Component {
 		ev.preventDefault();
 		const { isValid } = this;
 		const value = this.getValue();
-		this.props.onSubmit(ev, value, {
+		this.props.onSubmit(value, {
 			isValid,
 		});
 		console.log('submit value:', value);

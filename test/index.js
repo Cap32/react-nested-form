@@ -18,7 +18,7 @@ describe('library', function () {
 
 	it('basic', function (done) {
 		const value = 'world';
-		const handleSubmit = (ev, data) => {
+		const handleSubmit = (data) => {
 			try {
 				assert.equal(data.hello, value);
 				done();
@@ -40,9 +40,9 @@ describe('library', function () {
 		wrapper.find('[type="submit"]').get(0).click();
 	});
 
-	it('nested', function (done) {
+	it('nested data object', function (done) {
 		const value = 'world';
-		const handleSubmit = (ev, data) => {
+		const handleSubmit = (data) => {
 			try {
 				assert.deepEqual(data, {
 					children: { hello: value },
@@ -67,7 +67,7 @@ describe('library', function () {
 
 	it('array', function (done) {
 		const values = ['hello', 'world'];
-		const handleSubmit = (ev, data) => {
+		const handleSubmit = (data) => {
 			try {
 				assert.deepEqual(data.list, values);
 				done();
@@ -88,7 +88,7 @@ describe('library', function () {
 	});
 
 	it('validation', function (done) {
-		const handleSubmit = (ev, data, { isValid }) => {
+		const handleSubmit = (data, { isValid }) => {
 			try {
 				assert(!isValid);
 				done();
@@ -109,6 +109,79 @@ describe('library', function () {
 						},
 					]}
 				/>
+				<button type="submit" />
+			</Form>
+		);
+		const wrapper = mount(<App />);
+		wrapper.find('[type="submit"]').get(0).click();
+	});
+
+	it('validation with typing', function (done) {
+		const handleSubmit = (data, { isValid }) => {
+			try {
+				assert(isValid);
+				done();
+			}
+			catch (err) {
+				done(err);
+			}
+		};
+		const App = () => (
+			<Form onSubmit={handleSubmit}>
+				<Input
+					name="numbers"
+					defaultValue="hello"
+					validations={[
+						{
+							validator: (val) => /^\d*$/.test(val),
+							message: 'Not a number.',
+						},
+					]}
+				/>
+				<button type="submit" />
+			</Form>
+		);
+		const wrapper = mount(<App />);
+		const input = wrapper.find('input');
+		input.node.value = '666666';
+		input.simulate('change');
+		wrapper.find('[type="submit"]').get(0).click();
+	});
+
+	it('nested validation', function (done) {
+		const handleSubmit = (data, { isValid }) => {
+			try {
+				assert.equal(isValid, data.a === 'a' && data.b.c === 'c');
+				done();
+			}
+			catch (err) {
+				done(err);
+			}
+		};
+		const App = () => (
+			<Form onSubmit={handleSubmit}>
+				<Input
+					name="a"
+					defaultValue="a"
+					validations={[
+						{
+							validator: (a) => a === 'a',
+							message: 'Not "a".',
+						},
+					]}
+				/>
+				<Form name="b">
+					<Input
+						name="c"
+						defaultValue="c"
+						validations={[
+							{
+								validator: (c) => c === 'c',
+								message: 'Not "c".',
+							},
+						]}
+					/>
+				</Form>
 				<button type="submit" />
 			</Form>
 		);

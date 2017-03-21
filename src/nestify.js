@@ -54,23 +54,21 @@ export default function nestify(options) {
 			}
 
 			// TODO: should use bounce/throttle
-			_setStateSync(state) {
-
-				// TODO: should use `assign()` polyfill
-				Object.assign(this, state);
-
+			_updateState() {
 				this.forceUpdate();
 			}
 
 			_setErrorMessage(errorMessage) {
 				if (errorMessage && this.errorMessage !== errorMessage) {
-					this._setStateSync({ errorMessage, isValid: false });
+					this.errorMessage = errorMessage;
+					this._updateState();
 				}
 			}
 
 			_clearErrorMessage() {
 				if (this.errorMessage) {
-					this._setStateSync({ errorMessage: '', isValid: true });
+					this.errorMessage = '';
+					this._updateState();
 				}
 			}
 
@@ -81,13 +79,13 @@ export default function nestify(options) {
 					value, isValid,
 				} = this;
 
-				const getErrorMessage = () => {
-					if (!validations) { return ''; }
+				let errorMessage = '';
 
+				if (validations) {
 					const invalidation = []
 						.concat(validations)
 
-						// TODO: should polyfill `find()`
+						// TODO: should inject `find()` polyfill
 						.find((valid) => {
 							const fn = isFunction(valid) ? valid : valid.validator;
 							return !fn(value);
@@ -97,24 +95,22 @@ export default function nestify(options) {
 					if (invalidation) {
 						const maybeMsg = invalidation.message || defaultErrorMessage;
 						const message = isFunction(maybeMsg) ? maybeMsg(value) : maybeMsg;
-						return message;
+						errorMessage = message;
 					}
-
-					return '';
-				};
-
-				const errorMessage = getErrorMessage();
+				}
 
 				if (errorMessage) {
-					if (isValid && form) { form.validate(); }
+					this.isValid = false;
 					this._setErrorMessage(errorMessage);
-					return false;
+					if (isValid) { form.validate(); }
 				}
 				else {
-					if (!isValid && form) { form.validate(); }
+					this.isValid = true;
 					this._clearErrorMessage();
-					return true;
+					if (!isValid) { form.validate(); }
 				}
+
+				return this.isValid;
 			}
 
 			_handleChange = (ev, value) => {

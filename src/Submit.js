@@ -1,56 +1,22 @@
 
 import React, { Component, PropTypes } from 'react';
-import { emptyFunction } from 'empty-functions';
-import { CONTEXT_NAME } from './constants';
+import submitify from './submitify';
 
-export default class Submit extends Component {
+class Submit extends Component {
 	static propTypes = {
-		onClick: PropTypes.func,
-		isHidden: PropTypes.bool,
-		component: PropTypes.oneOfType([
-			PropTypes.func,
-			PropTypes.string,
-		]),
-		style: PropTypes.object,
-	};
-
-	static defaultProps = {
-		onClick: emptyFunction,
-		isHidden: false,
-		component: 'span',
-		style: {},
-	};
-
-	static contextTypes = {
-		[CONTEXT_NAME]: PropTypes.object,
-	};
-
-	_handleClick = (ev) => {
-		const {
-			props: { onClick },
-			context: { [CONTEXT_NAME]: form },
-		} = this;
-		form && form.submit();
-		onClick(ev);
+		nest: PropTypes.object.isRequired,
 	};
 
 	render() {
 		const {
-
-			/* eslint-disable */
-			isHidden,
-			component,
-			/* eslint-enable */
-
+			nest,
 			...other,
 		} = this.props;
 
 		return (
-			<input
-				{...other}
-				onClick={this._handleClick}
-				type="submit"
-			/>
+			<input {...other} {...nest} type="submit" />
 		);
 	}
 }
+
+export default submitify(Submit);

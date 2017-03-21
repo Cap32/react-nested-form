@@ -19,4 +19,4 @@ class Input extends Component {
 	}
 }
 
-export default nestify()(Input);
+export default nestify(Input);

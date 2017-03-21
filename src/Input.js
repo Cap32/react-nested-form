@@ -16,6 +16,7 @@ class Input extends Component {
 		const {
 
 			/* eslint-disable */
+			setValue,
 			errorMessage,
 			isInvalid,
 			isRequired,

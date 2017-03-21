@@ -2,6 +2,7 @@
 import React, { Component, PropTypes } from 'react';
 import hoistStatics from 'hoist-non-react-statics';
 import { ValidationPropType, isFunction } from './utils';
+import find from 'array-find';
 import { emptyFunction, returnsTrue, returnsArgument } from 'empty-functions';
 import { CONTEXT_NAME } from './constants';
 
@@ -25,17 +26,19 @@ export default function nestify(options) {
 				[CONTEXT_NAME]: PropTypes.object.isRequired,
 			};
 
-			isInvalid = false;
-			isRequired = false;
-			errorMessage: '';
-
-			prevValue = undefined;
-			value = this.props.defaultValue;
-
-			_shouldUpdate = false;
-
 			componentWillMount() {
+				this.isInvalid = false;
+				this.isRequired = false;
+				this.isPristine = true;
+				this.errorMessage = '';
+
+				this.prevValue = undefined;
+				this.value = this.props.defaultValue;
+				this.pristineValue = this.value;
+
 				this.validate();
+				this._shouldUpdate = false;
+
 				this.context[CONTEXT_NAME].attach(this);
 			}
 
@@ -47,14 +50,35 @@ export default function nestify(options) {
 				return this.value;
 			}
 
+			_updateValue(value, isReset = false) {
+				this.prevValue = this.value;
+				this.value = value;
+				this.validate();
+				this._setPristine(isReset);
+				this._updateState();
+			}
+
 			setValue = (value) => {
 				if (this.prevValue !== value) {
-					this.prevValue = this.value;
-					this.value = value;
-					this.validate();
+					this._updateValue(value);
 				}
 				return this.value;
 			};
+
+			reset = () => {
+				this._updateValue(this.pristineValue, true);
+				return this.value;
+			};
+
+			setAsPristine() {
+				if (this.pristineValue !== this.value) {
+					this._shouldUpdate = true;
+					this.pristineValue = this.value;
+				}
+				this._setPristine(true);
+				this._updateState();
+				return this.value;
+			}
 
 			_setRequired(isRequired) {
 				if (this.isRequired !== isRequired) {
@@ -67,6 +91,13 @@ export default function nestify(options) {
 				if (this.isInvalid !== isInvalid) {
 					this._shouldUpdate = true;
 					this.isInvalid = isInvalid;
+				}
+			}
+
+			_setPristine(isPristine) {
+				if (this.isPristine !== isPristine) {
+					this._shouldUpdate = true;
+					this.isPristine = isPristine;
 				}
 			}
 
@@ -112,15 +143,10 @@ export default function nestify(options) {
 					let errorMessage = '';
 
 					if (validations) {
-						const invalidation = []
-							.concat(validations)
-
-							// TODO: should inject `find()` polyfill
-							.find((valid) => {
-								const fn = isFunction(valid) ? valid : valid.validator;
-								return !fn(value);
-							})
-						;
+						const invalidation = find([].concat(validations), (valid) => {
+							const fn = isFunction(valid) ? valid : valid.validator;
+							return !fn(value);
+						});
 
 						if (invalidation) {
 							const maybeMsg = invalidation.message || defaultErrorMessage;
@@ -141,7 +167,6 @@ export default function nestify(options) {
 					}
 				}
 
-				this._updateState();
 			}
 
 			_handleChange = (ev, value) => {

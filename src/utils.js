@@ -20,7 +20,8 @@ export const isFunction = function isFunction(target) {
 };
 
 export const isValidChild = function isValidChild(child) {
-	if (child && child.props && child.props.name && child.getValue) {
+	if (child && child.props && child.props.name &&
+		child.getValue && child.reset && child.setAsPristine) {
 		return true;
 	}
 	else {

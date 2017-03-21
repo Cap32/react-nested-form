@@ -133,6 +133,14 @@ export default class NestableForm extends Component {
 		}
 	}
 
+	reset() {
+		this._childrens.forEach((child) => child.reset());
+	}
+
+	setAsPristine() {
+		this._childrens.forEach((child) => child.setAsPristine());
+	}
+
 	_handleSubmit = (ev) => {
 		ev.preventDefault();
 		const { isInvalid } = this;

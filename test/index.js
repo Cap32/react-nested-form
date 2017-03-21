@@ -233,4 +233,54 @@ describe('library', function () {
 		const wrapper = mount(<App />);
 		wrapper.find('[type="submit"]').get(0).click();
 	});
+
+	it('reset()', function (done) {
+		const value = 'world';
+		const handleSubmit = (data) => {
+			try {
+				assert.equal(data.hello, value);
+				done();
+			}
+			catch (err) {
+				done(err);
+			}
+		};
+		const wrapper = mount(
+			<Form ref="form" onSubmit={handleSubmit}>
+				<Input name="hello" defaultValue={value} />
+				<button type="submit" />
+			</Form>
+		);
+		const input = wrapper.find('input');
+		input.node.value = 'updated';
+		input.simulate('change');
+		const instance = wrapper.instance();
+		instance.reset();
+		wrapper.find('[type="submit"]').get(0).click();
+	});
+
+	// it('setAsPristine()', function (done) {
+	// 	const value = 'world';
+	// 	const handleSubmit = (data) => {
+	// 		try {
+	// 			assert.equal(data.hello, value);
+	// 			done();
+	// 		}
+	// 		catch (err) {
+	// 			done(err);
+	// 		}
+	// 	};
+	// 	const wrapper = mount(
+	// 		<Form ref="form" onSubmit={handleSubmit}>
+	// 			<Input name="hello" defaultValue={value} />
+	// 			<button type="submit" />
+	// 		</Form>
+	// 	);
+	// 	const input = wrapper.find('input');
+	// 	input.node.value = 'updated';
+	// 	input.simulate('change');
+	// 	const instance = wrapper.instance();
+	// 	instance.setAsPristine();
+	// 	wrapper.find('[type="submit"]').get(0).click();
+	// });
 });

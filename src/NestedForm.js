@@ -132,7 +132,7 @@ export default class NestedForm extends Component {
 
 	validate() {
 		const { nest } = this;
-		const isInvalid = this._childrens.every(
+		const isInvalid = this._childrens.some(
 			(child) => child.nest.isInvalid || child.nest.isRequired
 		);
 

@@ -51,6 +51,10 @@ export default function nestify(WrappedComponent/*, options*/) {
 			return this.nest.value;
 		}
 
+		_requestFormValidate() {
+			this.context[CONTEXT_NAME].validate();
+		}
+
 		_updateValue(value, isReset = false) {
 			this.prevValue = this.nest.value;
 			this.nest.value = value;
@@ -132,11 +136,13 @@ export default function nestify(WrappedComponent/*, options*/) {
 				this._setErrorMessage();
 				this._setInvalid(false);
 				this._setRequired(true);
+				form.validate();
 			}
 			else if (!required && isEmpty) {
 				this._setErrorMessage();
 				this._setInvalid(false);
 				this._setRequired(false);
+				form.validate();
 			}
 			else {
 				this._setRequired(false);
@@ -159,13 +165,12 @@ export default function nestify(WrappedComponent/*, options*/) {
 				if (errorMessage) {
 					this._setInvalid(true);
 					this._setErrorMessage(errorMessage);
-					if (!isInvalid) { form.validate(); }
 				}
 				else {
 					this._setInvalid(false);
 					this._setErrorMessage();
-					if (isInvalid) { form.validate(); }
 				}
+				form.validate();
 			}
 
 		}

@@ -1,5 +1,6 @@
 
 import { PropTypes } from 'react';
+import warning from 'fbjs/lib/warning';
 
 const ValidationPropTypeShape = PropTypes.shape({
 	validator: PropTypes.func.isRequired,
@@ -12,6 +13,11 @@ const ValidationPropTypeShape = PropTypes.shape({
 export const ValidationPropType = PropTypes.oneOfType([
 	ValidationPropTypeShape,
 	PropTypes.arrayOf(ValidationPropTypeShape),
+	PropTypes.func,
+]);
+
+export const ComponentPropType = PropTypes.oneOfType([
+	PropTypes.string,
 	PropTypes.func,
 ]);
 
@@ -28,7 +34,7 @@ export const isValidChild = function isValidChild(c) {
 		return true;
 	}
 	else {
-		console.warn('[ReactNestedForm]: child is INVALID.');
+		warning(false, '[ReactNestedForm]: child is INVALID.');
 		return false;
 	}
 };

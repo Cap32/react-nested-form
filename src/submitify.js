@@ -19,17 +19,18 @@ export default function submitify(WrappedComponent/*, options*/) {
 				props: { onClick },
 				context: { [CONTEXT_NAME]: form },
 			} = this;
-			form && form.submit();
+			form.submit();
 			if (isFunction(onClick)) { onClick(...args); }
 		};
 
 		render() {
-			const { props } = this;
+			const { props, context: { [CONTEXT_NAME]: form } } = this;
 			return (
 				<WrappedComponent
 					{...props}
 					nest={{
 						onClick: this._handleClick,
+						onSubmit: form.submit,
 					}}
 				/>
 			);

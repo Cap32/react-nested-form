@@ -178,6 +178,13 @@ export default function nestify(WrappedComponent/*, options*/) {
 			if (isFunction(onChange)) { onChange(ev, value, ...rest); }
 		};
 
+		_handleKeyPress = (ev) => {
+			const code = ev.keyCode || ev.which;
+			if (ev.key === 'Enter' || code === 13) {
+				this.context[CONTEXT_NAME].submit();
+			}
+		};
+
 		render() {
 			const {
 				props: {
@@ -201,6 +208,7 @@ export default function nestify(WrappedComponent/*, options*/) {
 					nest={{
 						...nest,
 						onChange: this._handleChange,
+						onKeyPress: this._handleKeyPress,
 						setValue: this.setValue,
 						attach: form.attach,
 						detach: form.detach,

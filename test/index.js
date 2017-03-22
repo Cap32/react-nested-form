@@ -41,6 +41,29 @@ describe('library', function () {
 		wrapper.find(Submit).first().simulate('click');
 	});
 
+	it('submit by pressed `enter` key', function (done) {
+		const value = 'world';
+		const handleSubmit = (data) => {
+			try {
+				assert.equal(data.hello, value);
+				done();
+			}
+			catch (err) {
+				done(err);
+			}
+		};
+		const App = () => (
+			<Form onSubmit={handleSubmit}>
+				<Input name="hello" />
+			</Form>
+		);
+		const wrapper = mount(<App />);
+		const input = wrapper.find('input').first();
+		input.node.value = value;
+		input.simulate('change');
+		input.simulate('keyPress', { key: 'Enter' });
+	});
+
 	it('`remove` field', function (done) {
 		const handleSubmit = (data) => {
 			try {

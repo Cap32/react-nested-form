@@ -1,7 +1,8 @@
 
 import React, { Component, PropTypes } from 'react';
-import { emptyFunction, returnsTrue } from 'empty-functions';
-import { ValidationPropType, isValidChild } from './utils';
+import emptyFunction from 'fbjs/lib/emptyFunction';
+import warning from 'fbjs/lib/warning';
+import { ValidationPropType, ComponentPropType, isValidChild } from './utils';
 import { CONTEXT_NAME } from './constants';
 
 const parseName = (name = '') => {
@@ -17,6 +18,7 @@ const parseName = (name = '') => {
 export default class NestedForm extends Component {
 	static propTypes = {
 		name: PropTypes.string,
+		component: ComponentPropType,
 		onSubmit: PropTypes.func,
 		onValid: PropTypes.func,
 		onInvalid: PropTypes.func,
@@ -24,6 +26,7 @@ export default class NestedForm extends Component {
 	};
 
 	static defaultProps = {
+		component: 'div',
 		onSubmit: emptyFunction,
 		onValid: emptyFunction,
 		onInvalid: emptyFunction,
@@ -59,8 +62,8 @@ export default class NestedForm extends Component {
 		this._contextForm = (name && context[CONTEXT_NAME]) || {
 			attach: emptyFunction,
 			detach: emptyFunction,
-			validate: returnsTrue,
-			submit: returnsTrue,
+			validate: emptyFunction.thatReturnsTrue,
+			submit: emptyFunction.thatReturnsTrue,
 		};
 
 		this._contextForm.attach(this);
@@ -112,12 +115,10 @@ export default class NestedForm extends Component {
 				else { data[realName] = [value]; }
 			}
 			else {
-				if (dataValue) {
-					console.warn(
-						`[ReactNestedForm]: Multi names called \`${realName}\`! ` +
-						`If you wanna use array, please use \`${realName}[]\` instead.`
-					);
-				}
+				warning(!dataValue,
+					`[ReactNestedForm]: Multi names called \`${realName}\`! ` +
+					`If you wanna use array, please use \`${realName}[]\` instead.`
+				);
 				data[realName] = value;
 			}
 			return data;
@@ -172,14 +173,10 @@ export default class NestedForm extends Component {
 		}
 	}
 
-	_handleSubmit = (ev) => {
-		ev.preventDefault();
-		// this.submit();
-	};
-
 	render() {
 		const {
 			props: {
+				component: Comp,
 
 				/* eslint-disable */
 				onValid,
@@ -189,15 +186,10 @@ export default class NestedForm extends Component {
 
 				...other,
 			},
-			context,
 		} = this;
-		const Comp = context[CONTEXT_NAME] ? 'div' : 'form';
 
 		return (
-			<Comp
-				{...other}
-				onSubmit={this._handleSubmit}
-			/>
+			<Comp {...other} />
 		);
 	}
 }

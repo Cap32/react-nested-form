@@ -9,12 +9,12 @@ class Submit extends Component {
 
 	render() {
 		const {
-			nest,
+			nest: { onClick },
 			...other,
 		} = this.props;
 
 		return (
-			<input {...other} {...nest} type="submit" />
+			<button {...other} onClick={onClick} type="button" />
 		);
 	}
 }

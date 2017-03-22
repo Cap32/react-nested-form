@@ -9,12 +9,12 @@ class Input extends Component {
 
 	render() {
 		const {
-			nest: { onChange },
+			nest: { onChange, onKeyPress },
 			...other,
 		} = this.props;
 
 		return (
-			<input {...other} onChange={onChange} />
+			<input {...other} onChange={onChange} onKeyPress={onKeyPress} />
 		);
 	}
 }

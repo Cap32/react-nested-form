@@ -55,8 +55,8 @@ export default class NestedForm extends Component {
 		const { props: { name }, context } = this;
 
 		this.nest = {
-			isInvalid: false,
-			value: undefined,
+			// isInvalid: undefined,
+			// value: undefined,
 		};
 
 		this._contextForm = (name && context[CONTEXT_NAME]) || {

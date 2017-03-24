@@ -193,7 +193,44 @@ describe('library', function () {
 		wrapper.find(Submit).first().simulate('click');
 	});
 
-	it('`onValid` and `onInvalid` prop', function (done) {
+	it('`onValid` if initial state is valid', function (done) {
+		mount(
+			<Form onValid={done}>
+				<Input
+					name="numbers"
+					defaultValue="23333"
+					validations={[
+						{
+							validator: (val) => /^\d*$/.test(val),
+							message: 'Not a number.',
+						},
+					]}
+				/>
+				<Submit />
+			</Form>
+		);
+	});
+
+
+	it('`onInalid` if initial state is invalid', function (done) {
+		mount(
+			<Form onValid={done}>
+				<Input
+					name="numbers"
+					defaultValue="hello"
+					validations={[
+						{
+							validator: (val) => /^\d*$/.test(val),
+							message: 'Not a number.',
+						},
+					]}
+				/>
+				<Submit />
+			</Form>
+		);
+	});
+
+	it('`onValid` after typed', function (done) {
 		let hasCallInvalid = false;
 
 		const handleValid = () => {

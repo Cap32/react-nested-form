@@ -17,6 +17,7 @@ export default function nestify(WrappedComponent/*, options*/) {
 		};
 
 		static defaultProps = {
+			defaultValue: '',
 			required: false,
 			defaultErrorMessage: 'Error',
 		};
@@ -34,7 +35,6 @@ export default function nestify(WrappedComponent/*, options*/) {
 				value: this.props.defaultValue,
 			};
 
-			this.prevValue = undefined;
 			this.pristineValue = this.nest.value;
 
 			this.validate();
@@ -56,7 +56,6 @@ export default function nestify(WrappedComponent/*, options*/) {
 		}
 
 		_updateValue(value, isReset = false) {
-			this.prevValue = this.nest.value;
 			this.nest.value = value;
 			this.validate();
 			this._setPristine(isReset);
@@ -64,7 +63,7 @@ export default function nestify(WrappedComponent/*, options*/) {
 		}
 
 		setValue = (value) => {
-			if (this.prevValue !== value) {
+			if (this.nest.value !== value) {
 				this._updateValue(value);
 			}
 			return this.nest.value;
@@ -127,7 +126,7 @@ export default function nestify(WrappedComponent/*, options*/) {
 			const {
 				props: { validations, defaultErrorMessage, required },
 				context: { [CONTEXT_NAME]: form },
-				nest: { value, isInvalid },
+				nest: { value },
 			} = this;
 
 			const isEmpty = !value && value !== 0;
@@ -136,13 +135,11 @@ export default function nestify(WrappedComponent/*, options*/) {
 				this._setErrorMessage();
 				this._setInvalid(false);
 				this._setRequired(true);
-				form.validate();
 			}
 			else if (!required && isEmpty) {
 				this._setErrorMessage();
 				this._setInvalid(false);
 				this._setRequired(false);
-				form.validate();
 			}
 			else {
 				this._setRequired(false);
@@ -170,9 +167,9 @@ export default function nestify(WrappedComponent/*, options*/) {
 					this._setInvalid(false);
 					this._setErrorMessage();
 				}
-				form.validate();
 			}
 
+			form.validate();
 		}
 
 		_handleChange = (ev, value, ...rest) => {

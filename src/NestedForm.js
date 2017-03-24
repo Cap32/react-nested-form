@@ -1,7 +1,7 @@
 
 import React, { Component, PropTypes } from 'react';
-import emptyFunction from 'fbjs/lib/emptyFunction';
-import warning from 'fbjs/lib/warning';
+import { emptyFunction, returnsTrue } from 'empty-functions';
+import warning from 'warning';
 import { ValidationPropType, ComponentPropType, isValidChild } from './utils';
 import { CONTEXT_NAME } from './constants';
 
@@ -62,8 +62,8 @@ export default class NestedForm extends Component {
 		this._contextForm = (name && context[CONTEXT_NAME]) || {
 			attach: emptyFunction,
 			detach: emptyFunction,
-			validate: emptyFunction.thatReturnsTrue,
-			submit: emptyFunction.thatReturnsTrue,
+			validate: returnsTrue,
+			submit: returnsTrue,
 		};
 
 		this._contextForm.attach(this);

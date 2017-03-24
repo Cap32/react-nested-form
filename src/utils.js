@@ -1,6 +1,6 @@
 
 import { PropTypes } from 'react';
-import warning from 'fbjs/lib/warning';
+import warning from 'warning';
 
 const ValidationPropTypeShape = PropTypes.shape({
 	validator: PropTypes.func.isRequired,

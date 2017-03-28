@@ -47,6 +47,7 @@ export default class NestedForm extends Component {
 				detach: this.detach.bind(this),
 				validate: this.validate.bind(this),
 				submit: this.submit.bind(this),
+				reset: this.reset.bind(this),
 			},
 		};
 	}
@@ -63,7 +64,8 @@ export default class NestedForm extends Component {
 			attach: emptyFunction,
 			detach: emptyFunction,
 			validate: returnsTrue,
-			submit: returnsTrue,
+			submit: emptyFunction,
+			reset: emptyFunction,
 		};
 
 		this._contextForm.attach(this);

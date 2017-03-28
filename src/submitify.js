@@ -1,7 +1,6 @@
 
 import React, { Component, PropTypes } from 'react';
 import hoistStatics from 'hoist-non-react-statics';
-import { isFunction } from './utils';
 import { CONTEXT_NAME } from './constants';
 
 export default function submitify(WrappedComponent/*, options*/) {
@@ -20,7 +19,7 @@ export default function submitify(WrappedComponent/*, options*/) {
 				context: { [CONTEXT_NAME]: form },
 			} = this;
 			form.submit();
-			if (isFunction(onClick)) { onClick(...args); }
+			onClick && onClick(...args);
 		};
 
 		render() {
@@ -30,7 +29,8 @@ export default function submitify(WrappedComponent/*, options*/) {
 					{...props}
 					nest={{
 						onClick: this._handleClick,
-						onSubmit: form.submit,
+						submit: form.submit,
+						reset: form.reset,
 					}}
 				/>
 			);

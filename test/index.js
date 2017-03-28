@@ -4,7 +4,7 @@ import React from 'react';
 import assert from 'assert';
 import jsdom from 'jsdom';
 import { mount } from 'enzyme';
-import Form, { Input, Submit } from '../src';
+import Form, { Input, Submit, Reset } from '../src';
 
 describe('library', function () {
 	beforeEach(() => {
@@ -384,4 +384,30 @@ describe('library', function () {
 		wrapper.find(Submit).first().simulate('click');
 		wrapper.find(Submit).last().simulate('click');
 	});
+
+	it('click <Reset />', function (done) {
+		const value = 'world';
+		const handleSubmit = (data) => {
+			try {
+				assert.equal(data.hello, value);
+				done();
+			}
+			catch (err) {
+				done(err);
+			}
+		};
+		const wrapper = mount(
+			<Form onSubmit={handleSubmit}>
+				<Input name="hello" defaultValue={value} />
+				<Reset />
+				<Submit />
+			</Form>
+		);
+		const input = wrapper.find('input').first();
+		input.node.value = 'updated';
+		input.simulate('change');
+		wrapper.find(Reset).first().simulate('click');
+		wrapper.find(Submit).first().simulate('click');
+	});
+
 });

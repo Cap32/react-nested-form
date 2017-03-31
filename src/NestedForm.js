@@ -142,7 +142,6 @@ export default class NestedForm extends Component {
 			const { onValid, onInvalid } = this.props;
 			nest.isInvalid = isInvalid;
 			this._contextForm.validate();
-			this.forceUpdate();
 
 			if (isInvalid) { onInvalid(); }
 			else { onValid(); }

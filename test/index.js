@@ -41,6 +41,28 @@ describe('library', function () {
 		wrapper.find(Submit).first().simulate('click');
 	});
 
+	it('update input value prop', function (done) {
+		const value = 'world';
+		const handleSubmit = (data) => {
+			try {
+				assert.equal(data.hello, value);
+				done();
+			}
+			catch (err) {
+				done(err);
+			}
+		};
+		const App = ({ value }) => (
+			<Form onSubmit={handleSubmit}>
+				<Input name="hello" value={value} />
+				<Submit />
+			</Form>
+		);
+		const wrapper = mount(<App />);
+		wrapper.setProps({ value });
+		wrapper.find(Submit).first().simulate('click');
+	});
+
 	it('submit by pressed `enter` key', function (done) {
 		const value = 'world';
 		const handleSubmit = (data) => {

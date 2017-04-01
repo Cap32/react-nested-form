@@ -5,7 +5,14 @@ import nestify from './nestify';
 class Input extends Component {
 	static propTypes = {
 		nest: PropTypes.object.isRequired,
+		value: PropTypes.any,
 	};
+
+	componentWillReceiveProps({ value }) {
+		if (this.props.value !== value) {
+			this.props.nest.setValue(value);
+		}
+	}
 
 	render() {
 		const {

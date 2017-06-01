@@ -407,7 +407,23 @@ describe('library', function () {
 		wrapper.find(Submit).last().simulate('click');
 	});
 
-	it('click <Reset />', function (done) {
+	it('click <Reset />', function () {
+		const wrapper = mount(
+			<Form>
+				<Input name="hello" />
+				<Reset />
+				<Submit />
+			</Form>
+		);
+		const input = wrapper.find('input').first();
+		input.node.value = 'updated';
+		input.simulate('change');
+		assert.equal(input.node.value, 'updated');
+		wrapper.find(Reset).first().simulate('click');
+		assert(!input.node.value);
+	});
+
+	it('click <Reset /> and submit', function (done) {
 		const value = 'world';
 		const handleSubmit = (data) => {
 			try {

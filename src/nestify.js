@@ -194,7 +194,6 @@ export default function nestify(WrappedComponent/*, options*/) {
 					/* eslint-disable */
 					validations,
 					defaultErrorMessage,
-					required,
 					/* eslint-enable */
 
 					...other,

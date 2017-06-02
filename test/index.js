@@ -6,16 +6,18 @@ import jsdom from 'jsdom';
 import { mount } from 'enzyme';
 import Form, { Input, Submit, Reset } from '../src';
 
-describe('library', function () {
-	beforeEach(() => {
-		global.document = jsdom.jsdom(
-			'<!doctype html><html><body></body></html>'
-		);
-		if (typeof window === 'undefined') {
-			global.window = global.document.defaultView;
-			global.navigator = global.window.navigator;
-		}
-	});
+const resetBOM = () => {
+	global.document = jsdom.jsdom(
+		'<!doctype html><html><body></body></html>'
+	);
+	if (typeof window === 'undefined') {
+		global.window = global.document.defaultView;
+		global.navigator = global.window.navigator;
+	}
+};
+
+describe('<NestedForm />', function () {
+	beforeEach(resetBOM);
 
 	it('basic', function (done) {
 		const value = 'world';
@@ -446,6 +448,26 @@ describe('library', function () {
 		input.simulate('change');
 		wrapper.find(Reset).first().simulate('click');
 		wrapper.find(Submit).first().simulate('click');
+	});
+});
+
+describe('other components', function () {
+	beforeEach(resetBOM);
+
+	it('<Input /> typing', function () {
+		const App = () => (
+			<Form>
+				<Input name="hello" />
+			</Form>
+		);
+		const wrapper = mount(<App />);
+		const input = wrapper.find('input').first();
+		input.node.value += 'o';
+		input.simulate('change');
+		assert.equal(input.node.value, 'o');
+		input.node.value += 'k';
+		input.simulate('change');
+		assert.equal(input.node.value, 'ok');
 	});
 
 });

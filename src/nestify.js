@@ -55,22 +55,24 @@ export default function nestify(WrappedComponent/*, options*/) {
 			this.context[CONTEXT_NAME].validate();
 		}
 
-		_updateValue(value, isReset = false) {
+		_updateValue(value) {
+			this._shouldUpdate = true;
 			this.nest.value = value;
 			this.validate();
-			this._setPristine(isReset);
 			this._updateState();
 		}
 
 		setValue = (value) => {
 			if (this.nest.value !== value) {
 				this._updateValue(value);
+				this._setPristine(false);
 			}
 			return this.nest.value;
 		};
 
 		reset = () => {
-			this._updateValue(this.pristineValue, true);
+			this._updateValue(this.pristineValue);
+			this._setPristine(true);
 			return this.nest.value;
 		};
 
@@ -114,7 +116,6 @@ export default function nestify(WrappedComponent/*, options*/) {
 			}
 		}
 
-		// TODO: should use bounce/throttle
 		_updateState() {
 			if (this._shouldUpdate) {
 				this.forceUpdate();

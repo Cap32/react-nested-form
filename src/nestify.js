@@ -175,7 +175,7 @@ export default function nestify(WrappedComponent/*, options*/) {
 		_handleChange = (ev, value, ...rest) => {
 			const { onChange } = this.props;
 			const target = ev && ev.currentTarget;
-			const hasTargetValue = isUndefined(target) && isUndefined(target.value);
+			const hasTargetValue = target && !isUndefined(target.value);
 			const val = hasTargetValue ? target.value : value;
 			this.setValue(val);
 			if (isFunction(onChange)) { onChange(ev, value, ...rest); }

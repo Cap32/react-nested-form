@@ -1,7 +1,6 @@
 /* eslint-disable react/prop-types */
 
 import React from 'react';
-import assert from 'assert';
 import jsdom from 'jsdom';
 import { mount } from 'enzyme';
 import Form, { Input, Submit, Reset } from '../src';
@@ -23,11 +22,11 @@ describe('<NestedForm />', function () {
 		const value = 'world';
 		const handleSubmit = (data) => {
 			try {
-				assert.equal(data.hello, value);
+				expect(data.hello).toBe(value);
 				done();
 			}
 			catch (err) {
-				done(err);
+				done.fail(err);
 			}
 		};
 		const App = () => (
@@ -47,11 +46,11 @@ describe('<NestedForm />', function () {
 		const value = 'world';
 		const handleSubmit = (data) => {
 			try {
-				assert.equal(data.hello, value);
+				expect(data.hello).toBe(value);
 				done();
 			}
 			catch (err) {
-				done(err);
+				done.fail(err);
 			}
 		};
 		const App = ({ value }) => (
@@ -62,18 +61,20 @@ describe('<NestedForm />', function () {
 		);
 		const wrapper = mount(<App />);
 		wrapper.setProps({ value });
-		wrapper.find(Submit).first().simulate('click');
+		process.nextTick(() => {
+			wrapper.find(Submit).first().simulate('click');
+		});
 	});
 
 	it('submit by pressed `enter` key', function (done) {
 		const value = 'world';
 		const handleSubmit = (data) => {
 			try {
-				assert.equal(data.hello, value);
+				expect(data.hello).toBe(value);
 				done();
 			}
 			catch (err) {
-				done(err);
+				done.fail(err);
 			}
 		};
 		const App = () => (
@@ -91,11 +92,11 @@ describe('<NestedForm />', function () {
 	it('`remove` field', function (done) {
 		const handleSubmit = (data) => {
 			try {
-				assert.deepEqual(data, {});
+				expect(data).toEqual({});
 				done();
 			}
 			catch (err) {
-				done(err);
+				done.fail(err);
 			}
 		};
 		const App = ({ shouldShowHello = true }) => (
@@ -106,20 +107,22 @@ describe('<NestedForm />', function () {
 		);
 		const wrapper = mount(<App />);
 		wrapper.setProps({ shouldShowHello: false });
-		wrapper.find(Submit).first().simulate('click');
+		process.nextTick(() => {
+			wrapper.find(Submit).first().simulate('click');
+		});
 	});
 
 	it('nested data object', function (done) {
 		const value = 'world';
 		const handleSubmit = (data) => {
 			try {
-				assert.deepEqual(data, {
+				expect(data).toEqual({
 					children: { hello: value },
 				});
 				done();
 			}
 			catch (err) {
-				done(err);
+				done.fail(err);
 			}
 		};
 		const App = () => (
@@ -138,11 +141,11 @@ describe('<NestedForm />', function () {
 		const values = ['hello', 'world'];
 		const handleSubmit = (data) => {
 			try {
-				assert.deepEqual(data.list, values);
+				expect(data.list).toEqual(values);
 				done();
 			}
 			catch (err) {
-				done(err);
+				done.fail(err);
 			}
 		};
 		const App = () => (
@@ -159,11 +162,11 @@ describe('<NestedForm />', function () {
 	it('validation', function (done) {
 		const handleSubmit = (data, { isInvalid }) => {
 			try {
-				assert(isInvalid);
+				expect(isInvalid).toBe(true);
 				done();
 			}
 			catch (err) {
-				done(err);
+				done.fail(err);
 			}
 		};
 		const App = () => (
@@ -188,11 +191,11 @@ describe('<NestedForm />', function () {
 	it('validation with typing', function (done) {
 		const handleSubmit = (data, { isInvalid }) => {
 			try {
-				assert(!isInvalid);
+				expect(isInvalid).toBe(false);
 				done();
 			}
 			catch (err) {
-				done(err);
+				done.fail(err);
 			}
 		};
 		const App = () => (
@@ -288,11 +291,11 @@ describe('<NestedForm />', function () {
 	it('required field', function (done) {
 		const handleSubmit = (data, { isInvalid }) => {
 			try {
-				assert(isInvalid === !data.id);
+				expect(isInvalid).toBe(!data.id);
 				done();
 			}
 			catch (err) {
-				done(err);
+				done.fail(err);
 			}
 		};
 		const App = () => (
@@ -313,15 +316,15 @@ describe('<NestedForm />', function () {
 		const value = 'world';
 		const handleSubmit = (data) => {
 			try {
-				assert.equal(data.hello, value);
+				expect(data.hello).toEqual(value);
 				done();
 			}
 			catch (err) {
-				done(err);
+				done.fail(err);
 			}
 		};
 		const wrapper = mount(
-			<Form ref="form" onSubmit={handleSubmit}>
+			<Form onSubmit={handleSubmit}>
 				<Input name="hello" defaultValue={value} />
 				<Submit />
 			</Form>
@@ -338,23 +341,23 @@ describe('<NestedForm />', function () {
 		const handleSubFormSubmit = (data, state) => {
 			try {
 				state.stopPropagation();
-				assert.deepEqual(data, { b: 'b' });
+				expect(data).toEqual({ b: 'b' });
 			}
 			catch (err) {
-				done(err);
+				done.fail(err);
 			}
 		};
 
 		const handleSubmit = (data) => {
 			try {
-				assert.deepEqual(data, {
+				expect(data).toEqual({
 					a: { b: 'b' },
 					c: 'c',
 				});
 				done();
 			}
 			catch (err) {
-				done(err);
+				done.fail(err);
 			}
 		};
 
@@ -376,22 +379,22 @@ describe('<NestedForm />', function () {
 		const handleSubFormSubmit = (data, state) => {
 			try {
 				state.stopPropagation();
-				assert.deepEqual(data, { b: 'b' });
+				expect(data).toEqual({ b: 'b' });
 			}
 			catch (err) {
-				done(err);
+				done.fail(err);
 			}
 		};
 
 		const handleSubmit = (data) => {
 			try {
-				assert.deepEqual(data, {
-					c: 'c', // note
+				expect(data).toEqual({
+					c: 'c', // notice
 				});
 				done();
 			}
 			catch (err) {
-				done(err);
+				done.fail(err);
 			}
 		};
 
@@ -409,7 +412,7 @@ describe('<NestedForm />', function () {
 		wrapper.find(Submit).last().simulate('click');
 	});
 
-	it('click <Reset />', function () {
+	it('click <Reset />', function (done) {
 		const wrapper = mount(
 			<Form>
 				<Input name="hello" />
@@ -420,20 +423,29 @@ describe('<NestedForm />', function () {
 		const input = wrapper.find('input').first();
 		input.node.value = 'updated';
 		input.simulate('change');
-		assert.equal(input.node.value, 'updated');
+		expect(input.node.value).toBe('updated');
 		wrapper.find(Reset).first().simulate('click');
-		assert(!input.node.value);
+
+		process.nextTick(() => {
+			try {
+				expect(input.node.value).toBe('');
+				done();
+			}
+			catch (err) {
+				done.fail(err);
+			}
+		});
 	});
 
 	it('click <Reset /> and submit', function (done) {
 		const value = 'world';
 		const handleSubmit = (data) => {
 			try {
-				assert.equal(data.hello, value);
+				expect(data.hello).toEqual(value);
 				done();
 			}
 			catch (err) {
-				done(err);
+				done.fail(err);
 			}
 		};
 		const wrapper = mount(
@@ -464,10 +476,10 @@ describe('other components', function () {
 		const input = wrapper.find('input').first();
 		input.node.value += 'o';
 		input.simulate('change');
-		assert.equal(input.node.value, 'o');
+		expect(input.node.value).toBe('o');
 		input.node.value += 'k';
 		input.simulate('change');
-		assert.equal(input.node.value, 'ok');
+		expect(input.node.value).toBe('ok');
 	});
 
 });

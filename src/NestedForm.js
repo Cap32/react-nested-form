@@ -1,5 +1,6 @@
 
-import React, { Component, PropTypes } from 'react';
+import PropTypes from 'prop-types';
+import React, { Component } from 'react';
 import { emptyFunction, returnsTrue } from 'empty-functions';
 import warning from 'warning';
 import { ValidationPropType, ComponentPropType, isValidChild } from './utils';

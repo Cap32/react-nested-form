@@ -1,5 +1,5 @@
 
-import { PropTypes } from 'react';
+import PropTypes from 'prop-types';
 import warning from 'warning';
 
 const ValidationPropTypeShape = PropTypes.shape({

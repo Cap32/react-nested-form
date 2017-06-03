@@ -1,5 +1,6 @@
 
-import React, { Component, PropTypes } from 'react';
+import PropTypes from 'prop-types';
+import React, { Component } from 'react';
 import hoistStatics from 'hoist-non-react-statics';
 import { ValidationPropType, isFunction, isUndefined } from './utils';
 import find from 'array-find';

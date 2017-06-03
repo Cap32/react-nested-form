@@ -7,7 +7,13 @@ class Input extends Component {
 	static propTypes = {
 		nest: PropTypes.object.isRequired,
 		value: PropTypes.any,
+		defaultValue: PropTypes.any,
 	};
+
+	componentWillMount() {
+		const { defaultValue, nest } = this.props;
+		if (defaultValue) { nest.setValue(defaultValue); }
+	}
 
 	componentWillReceiveProps({ value }) {
 		if (this.props.value !== value) {
@@ -18,13 +24,14 @@ class Input extends Component {
 	render() {
 		const {
 			nest: { onChange, onKeyPress, value },
+			defaultValue,
 			...other,
 		} = this.props;
 
 		return (
 			<input
 				{...other}
-				value={value}
+				value={defaultValue || value}
 				onChange={onChange}
 				onKeyPress={onKeyPress}
 			/>

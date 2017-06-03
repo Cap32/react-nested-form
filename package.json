@@ -5,8 +5,8 @@
   "repository": "cap32/react-nested-form",
   "scripts": {
     "prebuild": "rimraf ./dist ./lib ./es && mkdirp ./dist ./lib ./es",
-    "build:cjs": "cross-env BABEL_ENV=cjs babel src -d lib",
-    "build:es": "cross-env BABEL_ENV=es babel src -d es",
+    "build:cjs": "cross-env BABEL_ENV=cjs babel src -d lib --ignore __tests__",
+    "build:es": "cross-env BABEL_ENV=es babel src -d es --ignore __tests__",
     "build:umd": "cross-env NODE_ENV=production webpack",
     "build:min": "cross-env NODE_ENV=production webpack --env.minify",
     "build": "yarn build:cjs && yarn build:es && yarn build:umd && yarn build:min",

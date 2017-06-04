@@ -148,7 +148,7 @@ test('array', function (done) {
 	wrapper.find(Submit).first().simulate('click');
 });
 
-test('should ignore empty fields', function (done) {
+test('should ignore empty fields if pristine value is empty', function (done) {
 	const handleSubmit = (data) => {
 		try {
 			expect(data).toEqual({});
@@ -165,6 +165,30 @@ test('should ignore empty fields', function (done) {
 		</Form>
 	);
 	const wrapper = mount(<App />);
+	wrapper.find(Submit).first().simulate('click');
+});
+
+
+test('should not ignore empty fields if pristine value is not empty', function (done) {
+	const handleSubmit = (data) => {
+		try {
+			expect(data).toEqual({ hello: '' });
+			done();
+		}
+		catch (err) {
+			done.fail(err);
+		}
+	};
+	const App = () => (
+		<Form onSubmit={handleSubmit}>
+			<Input name="hello" value="hello" />
+			<Submit />
+		</Form>
+	);
+	const wrapper = mount(<App />);
+	const input = wrapper.find('input').first();
+	input.node.value = '';
+	input.simulate('change');
 	wrapper.find(Submit).first().simulate('click');
 });
 

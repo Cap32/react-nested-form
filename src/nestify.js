@@ -28,7 +28,7 @@ export default function nestify(WrappedComponent/*, options*/) {
 			required: false,
 			defaultErrorMessage: 'Error',
 			shouldIgnoreEmpty: (value, pristineValue) =>
-				!pristineValue && pristineValue !== false
+				(!pristineValue && pristineValue !== false)
 			,
 		};
 
@@ -88,14 +88,14 @@ export default function nestify(WrappedComponent/*, options*/) {
 		}
 
 		_shouldAttachEmptyValue(prevValue, nextValue) {
-			const { nest, props: { required } } = this;
+			const { nest, pristineValue, props: { required } } = this;
 			if ((required && !nest.hasAttached) ||
 				(isEmpty(prevValue) && !isEmpty(nextValue) && !nest.hasAttached)
 			) {
 				this.attach();
 			}
 			else if (!isEmpty(prevValue) && isEmpty(nextValue) && nest.hasAttached &&
-				nest.shouldIgnoreEmpty(nextValue, nest.pristineValue)
+				nest.shouldIgnoreEmpty(nextValue, pristineValue)
 			) {
 				this.detach();
 			}

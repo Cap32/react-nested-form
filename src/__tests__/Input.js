@@ -1,19 +1,9 @@
 /* eslint-disable react/prop-types */
 
 import React from 'react';
-import jsdom from 'jsdom';
+import { resetBOM } from './utils';
 import { mount } from 'enzyme';
 import Form, { Input } from '../';
-
-const resetBOM = () => {
-	global.document = jsdom.jsdom(
-		'<!doctype html><html><body></body></html>'
-	);
-	if (typeof window === 'undefined') {
-		global.window = global.document.defaultView;
-		global.navigator = global.window.navigator;
-	}
-};
 
 beforeEach(resetBOM);
 

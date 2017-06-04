@@ -58,7 +58,7 @@ export default class NestedForm extends Component {
 
 		this.nest = {
 			// isInvalid: undefined,
-			// value: undefined,
+			value: {},
 		};
 
 		this._contextForm = (name && context[CONTEXT_NAME]) || {

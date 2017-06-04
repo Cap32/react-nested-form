@@ -6,21 +6,30 @@ import { ValidationPropType, isFunction, isUndefined } from './utils';
 import find from 'array-find';
 import { CONTEXT_NAME } from './constants';
 
+const isEmpty = (value) =>
+	isUndefined(value) || value === null || value === ''
+;
+
 export default function nestify(WrappedComponent/*, options*/) {
 	class Nestify extends Component {
 		static propTypes = {
 			name: PropTypes.string.isRequired,
 			defaultValue: PropTypes.any,
+			value: PropTypes.any,
 			validations: ValidationPropType,
 			defaultErrorMessage: PropTypes.string,
 			required: PropTypes.bool,
 			onChange: PropTypes.func,
+			shouldIgnoreEmpty: PropTypes.func,
 		};
 
 		static defaultProps = {
 			defaultValue: '',
 			required: false,
 			defaultErrorMessage: 'Error',
+			shouldIgnoreEmpty: (value, pristineValue) =>
+				!pristineValue && pristineValue !== false
+			,
 		};
 
 		static contextTypes = {
@@ -28,20 +37,32 @@ export default function nestify(WrappedComponent/*, options*/) {
 		};
 
 		componentWillMount() {
+			const {
+				value: propValue,
+				defaultValue,
+				shouldIgnoreEmpty,
+				required,
+			} = this.props;
+
 			this.nest = {
 				isInvalid: false,
 				isRequired: false,
 				isPristine: true,
+				hasAttached: false,
 				errorMessage: '',
-				value: this.props.defaultValue,
+				shouldIgnoreEmpty,
+				value: defaultValue || propValue || '',
 			};
 
-			this.pristineValue = this.nest.value;
+			const { value } = this.nest;
 
+			this.pristineValue = value;
 			this.validate();
 			this._shouldUpdate = false;
 
-			this.context[CONTEXT_NAME].attach(this);
+			if (required || !isEmpty(value) || !shouldIgnoreEmpty(value, value)) {
+				this.attach();
+			}
 		}
 
 		componentWillUnmount() {
@@ -52,22 +73,50 @@ export default function nestify(WrappedComponent/*, options*/) {
 			return this.nest.value;
 		}
 
+		attach = () => {
+			this.nest.hasAttached = true;
+			return this.context[CONTEXT_NAME].attach(this);
+		};
+
+		detach = () => {
+			this.nest.hasAttached = false;
+			return this.context[CONTEXT_NAME].detach(this);
+		};
+
 		_requestFormValidate() {
 			this.context[CONTEXT_NAME].validate();
 		}
 
+		_shouldAttachEmptyValue(prevValue, nextValue) {
+			const { nest, props: { required } } = this;
+			if ((required && !nest.hasAttached) ||
+				(isEmpty(prevValue) && !isEmpty(nextValue) && !nest.hasAttached)
+			) {
+				this.attach();
+			}
+			else if (!isEmpty(prevValue) && isEmpty(nextValue) && nest.hasAttached &&
+				nest.shouldIgnoreEmpty(nextValue, nest.pristineValue)
+			) {
+				this.detach();
+			}
+		}
+
 		_updateValue(value) {
-			this._shouldUpdate = true;
-			this.nest.value = value;
-			this.validate();
-			this._updateState();
+			const { nest } = this;
+			if (nest.value !== value) {
+				this._shouldAttachEmptyValue(nest.value, value);
+				nest.value = value;
+				this._shouldUpdate = true;
+				this.validate();
+				this._updateState();
+				return true;
+			}
+			return false;
 		}
 
 		setValue = (value) => {
-			if (this.nest.value !== value) {
-				this._updateValue(value);
-				this._setPristine(false);
-			}
+			const hasChanged = this._updateValue(value);
+			if (hasChanged) { this._setPristine(false); }
 			return this.nest.value;
 		};
 
@@ -131,14 +180,14 @@ export default function nestify(WrappedComponent/*, options*/) {
 				nest: { value },
 			} = this;
 
-			const isEmpty = !value && value !== 0;
+			const isEmptyValue = isEmpty(value);
 
-			if (required && isEmpty) {
+			if (required && isEmptyValue) {
 				this._setErrorMessage();
 				this._setInvalid(false);
 				this._setRequired(true);
 			}
-			else if (!required && isEmpty) {
+			else if (!required && isEmptyValue) {
 				this._setErrorMessage();
 				this._setInvalid(false);
 				this._setRequired(false);
@@ -197,12 +246,10 @@ export default function nestify(WrappedComponent/*, options*/) {
 					/* eslint-disable */
 					validations,
 					defaultErrorMessage,
+					shouldIgnoreEmpty,
 					/* eslint-enable */
 
 					...other,
-				},
-				context: {
-					[CONTEXT_NAME]: form,
 				},
 				nest,
 			} = this;
@@ -214,8 +261,8 @@ export default function nestify(WrappedComponent/*, options*/) {
 						onChange: this._handleChange,
 						onKeyPress: this._handleKeyPress,
 						setValue: this.setValue,
-						attach: form.attach,
-						detach: form.detach,
+						attach: this.attach,
+						detach: this.detach,
 					}}
 				/>
 			);

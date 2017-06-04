@@ -1,19 +1,9 @@
 /* eslint-disable react/prop-types */
 
 import React from 'react';
-import jsdom from 'jsdom';
 import { mount } from 'enzyme';
+import { resetBOM } from './utils';
 import Form, { Input, Submit, Reset } from '../';
-
-const resetBOM = () => {
-	global.document = jsdom.jsdom(
-		'<!doctype html><html><body></body></html>'
-	);
-	if (typeof window === 'undefined') {
-		global.window = global.document.defaultView;
-		global.navigator = global.window.navigator;
-	}
-};
 
 beforeEach(resetBOM);
 
@@ -100,7 +90,7 @@ test('`remove` field', function (done) {
 	};
 	const App = ({ shouldShowHello = true }) => (
 		<Form onSubmit={handleSubmit}>
-			{shouldShowHello && <Input name="hello" />}
+			{shouldShowHello && <Input name="hello" value="hello" />}
 			<Submit />
 		</Form>
 	);
@@ -151,6 +141,26 @@ test('array', function (done) {
 		<Form onSubmit={handleSubmit}>
 			<Input name="list[]" defaultValue={values[0]} />
 			<Input name="list[]" defaultValue={values[1]} />
+			<Submit />
+		</Form>
+	);
+	const wrapper = mount(<App />);
+	wrapper.find(Submit).first().simulate('click');
+});
+
+test('should ignore empty fields', function (done) {
+	const handleSubmit = (data) => {
+		try {
+			expect(data).toEqual({});
+			done();
+		}
+		catch (err) {
+			done.fail(err);
+		}
+	};
+	const App = () => (
+		<Form onSubmit={handleSubmit}>
+			<Input name="hello" />
 			<Submit />
 		</Form>
 	);
@@ -425,7 +435,8 @@ test('click <Reset />', function (done) {
 	expect(input.node.value).toBe('updated');
 	wrapper.find(Reset).first().simulate('click');
 
-	process.nextTick(() => {
+	// process.nextTick(() => {
+	setTimeout(() => {
 		try {
 			expect(input.node.value).toBe('');
 			done();
@@ -433,7 +444,7 @@ test('click <Reset />', function (done) {
 		catch (err) {
 			done.fail(err);
 		}
-	});
+	}, 1000);
 });
 
 test('click <Reset /> and submit', function (done) {

@@ -80,7 +80,8 @@
     ],
     "modulePathIgnorePatterns": [
       "node_modules",
-      "lib"
+      "lib",
+      "utils"
     ]
   }
 }

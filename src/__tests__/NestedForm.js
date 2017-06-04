@@ -435,8 +435,7 @@ test('click <Reset />', function (done) {
 	expect(input.node.value).toBe('updated');
 	wrapper.find(Reset).first().simulate('click');
 
-	// process.nextTick(() => {
-	setTimeout(() => {
+	process.nextTick(() => {
 		try {
 			expect(input.node.value).toBe('');
 			done();
@@ -444,7 +443,7 @@ test('click <Reset />', function (done) {
 		catch (err) {
 			done.fail(err);
 		}
-	}, 1000);
+	});
 });
 
 test('click <Reset /> and submit', function (done) {

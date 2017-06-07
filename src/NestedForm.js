@@ -1,7 +1,7 @@
 
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
-import { emptyFunction, returnsTrue } from 'empty-functions';
+import { emptyFunction, returnsTrue, returnsArgument } from 'empty-functions';
 import warning from 'warning';
 import { ValidationPropType, ComponentPropType, isValidChild } from './utils';
 import { CONTEXT_NAME } from './constants';
@@ -24,6 +24,7 @@ export default class NestedForm extends Component {
 		onValid: PropTypes.func,
 		onInvalid: PropTypes.func,
 		validations: ValidationPropType,
+		outputFilter: PropTypes.func,
 	};
 
 	static defaultProps = {
@@ -31,6 +32,7 @@ export default class NestedForm extends Component {
 		onSubmit: emptyFunction,
 		onValid: emptyFunction,
 		onInvalid: emptyFunction,
+		outputFilter: returnsArgument,
 	};
 
 	static contextTypes = {
@@ -102,8 +104,17 @@ export default class NestedForm extends Component {
 		this.validate();
 	}
 
+	_outputValue() {
+		const {
+			props: { outputFilter },
+			nest: { value },
+		} = this;
+		return outputFilter(value);
+	}
+
 	getValue() {
-		if (!this._hasChanged) { return this.nest.value; }
+
+		if (!this._hasChanged) { return this._outputValue(); }
 
 		const newValue = this._childrens.reduce((data, child) => {
 			const { props: { name } } = child;
@@ -130,7 +141,7 @@ export default class NestedForm extends Component {
 		this.nest.value = newValue;
 		this._hasChanged = false;
 
-		return newValue;
+		return this._outputValue();
 	}
 
 	validate() {
@@ -184,6 +195,7 @@ export default class NestedForm extends Component {
 				onValid,
 				onInvalid,
 				validations,
+				outputFilter,
 				/* eslint-enable */
 
 				...other,

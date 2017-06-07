@@ -24,14 +24,16 @@ class Input extends Component {
 	render() {
 		const {
 			nest: { onChange, onKeyPress, value },
-			defaultValue,
+
+			defaultValue, // omit
+
 			...other,
 		} = this.props;
 
 		return (
 			<input
 				{...other}
-				value={defaultValue || value}
+				value={value}
 				onChange={onChange}
 				onKeyPress={onKeyPress}
 			/>

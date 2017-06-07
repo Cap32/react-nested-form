@@ -5,6 +5,7 @@ import hoistStatics from 'hoist-non-react-statics';
 import { ValidationPropType, isFunction, isUndefined } from './utils';
 import find from 'array-find';
 import { CONTEXT_NAME } from './constants';
+import { returnsArgument } from 'empty-functions';
 
 const isEmpty = (value) =>
 	isUndefined(value) || value === null || value === ''
@@ -21,15 +22,17 @@ export default function nestify(WrappedComponent/*, options*/) {
 			required: PropTypes.bool,
 			onChange: PropTypes.func,
 			shouldIgnoreEmpty: PropTypes.func,
+			inputFilter: PropTypes.func,
+			outputFilter: PropTypes.func,
 		};
 
 		static defaultProps = {
 			defaultValue: '',
 			required: false,
 			defaultErrorMessage: 'Error',
-			shouldIgnoreEmpty: (value, pristineValue) =>
-				(!pristineValue && pristineValue !== false)
-			,
+			shouldIgnoreEmpty: (val, pristine) => (!pristine && pristine !== false),
+			inputFilter: returnsArgument,
+			outputFilter: returnsArgument,
 		};
 
 		static contextTypes = {
@@ -42,6 +45,7 @@ export default function nestify(WrappedComponent/*, options*/) {
 				defaultValue,
 				shouldIgnoreEmpty,
 				required,
+				inputFilter,
 			} = this.props;
 
 			this.nest = {
@@ -51,7 +55,7 @@ export default function nestify(WrappedComponent/*, options*/) {
 				hasAttached: false,
 				errorMessage: '',
 				shouldIgnoreEmpty,
-				value: defaultValue || propValue || '',
+				value: inputFilter(defaultValue || propValue || ''),
 			};
 
 			const { value } = this.nest;
@@ -70,7 +74,11 @@ export default function nestify(WrappedComponent/*, options*/) {
 		}
 
 		getValue() {
-			return this.nest.value;
+			const {
+				props: { outputFilter },
+				nest: { value },
+			} = this;
+			return outputFilter(value);
 		}
 
 		attach = () => {
@@ -102,7 +110,8 @@ export default function nestify(WrappedComponent/*, options*/) {
 		}
 
 		_updateValue(value) {
-			const { nest } = this;
+			const { nest, props: { inputFilter } } = this;
+			value = inputFilter(value);
 			if (nest.value !== value) {
 				this._shouldAttachEmptyValue(nest.value, value);
 				nest.value = value;
@@ -247,6 +256,8 @@ export default function nestify(WrappedComponent/*, options*/) {
 					validations,
 					defaultErrorMessage,
 					shouldIgnoreEmpty,
+					inputFilter,
+					outputFilter,
 					/* eslint-enable */
 
 					...other,

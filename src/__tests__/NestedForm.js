@@ -494,3 +494,29 @@ test('click <Reset /> and submit', function (done) {
 	wrapper.find(Reset).first().simulate('click');
 	wrapper.find(Submit).first().simulate('click');
 });
+
+test('outputFilter', function (done) {
+	const value = '1';
+	const handleSubmit = (data) => {
+		try {
+			expect(typeof data.hello).toBe('number');
+			done();
+		}
+		catch (err) {
+			done.fail(err);
+		}
+	};
+	const toNumber = (data) => {
+		return {
+			...data,
+			hello: parseInt(data.hello, 10),
+		};
+	};
+	const wrapper = mount(
+		<Form onSubmit={handleSubmit} outputFilter={toNumber}>
+			<Input name="hello" defaultValue={value} />
+			<Submit />
+		</Form>
+	);
+	wrapper.find(Submit).first().simulate('click');
+});

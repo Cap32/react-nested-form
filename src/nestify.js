@@ -127,7 +127,10 @@ export default function nestify(WrappedComponent/*, options*/) {
 
 		setValue = (value) => {
 			const hasChanged = this._updateValue(value);
-			if (hasChanged) { this._setPristine(false); }
+			if (hasChanged) {
+				this._setPristine(false);
+				this.context[CONTEXT_NAME].onRequestChange();
+			}
 			return this.nest.value;
 		};
 

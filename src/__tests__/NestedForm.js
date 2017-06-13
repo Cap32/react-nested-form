@@ -520,3 +520,31 @@ test('outputFilter', function (done) {
 	);
 	wrapper.find(Submit).first().simulate('click');
 });
+
+test('should work after submit and change', function (done) {
+	let submitCounter = 0;
+	const handleSubmit = (data) => {
+		if (submitCounter === 0) {
+			expect(data.hello).toBe('1');
+			submitCounter++;
+		}
+		else {
+			expect(data.hello).toBe('2');
+			done();
+		}
+	};
+	const App = () => (
+		<Form onSubmit={handleSubmit}>
+			<Input name="hello" />
+			<Submit />
+		</Form>
+	);
+	const wrapper = mount(<App />);
+	const input = wrapper.find('input').first();
+	input.node.value = '1';
+	input.simulate('change');
+	wrapper.find(Submit).first().simulate('click');
+	input.node.value = '2';
+	input.simulate('change');
+	wrapper.find(Submit).first().simulate('click');
+});

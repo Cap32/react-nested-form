@@ -51,6 +51,7 @@ export default class NestedForm extends Component {
 				validate: this.validate.bind(this),
 				submit: this.submit.bind(this),
 				reset: this.reset.bind(this),
+				onRequestChange: this.handleChange.bind(this),
 			},
 		};
 	}

@@ -27,7 +27,6 @@ export default function nestify(WrappedComponent/*, options*/) {
 		};
 
 		static defaultProps = {
-			defaultValue: '',
 			required: false,
 			defaultErrorMessage: 'Error',
 			shouldIgnoreEmpty: (val, pristine) => (!pristine && pristine !== false),
@@ -55,7 +54,10 @@ export default function nestify(WrappedComponent/*, options*/) {
 				hasAttached: false,
 				errorMessage: '',
 				shouldIgnoreEmpty,
-				value: inputFilter(defaultValue || propValue || ''),
+				value: inputFilter(
+					!isUndefined(defaultValue) ? defaultValue :
+						(!isUndefined(propValue) ? propValue : '')
+				),
 			};
 
 			const { value } = this.nest;

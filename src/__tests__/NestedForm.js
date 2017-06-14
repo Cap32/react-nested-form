@@ -408,7 +408,7 @@ test('nested forms', function (done) {
 	wrapper.find(Submit).last().simulate('click');
 });
 
-test('nested form with `name` prop', function (done) {
+test('should ignore nested form if no `name` prop', function (done) {
 	const handleSubFormSubmit = (data, state) => {
 		try {
 			state.stopPropagation();
@@ -421,9 +421,7 @@ test('nested form with `name` prop', function (done) {
 
 	const handleSubmit = (data) => {
 		try {
-			expect(data).toEqual({
-				c: 'c', // notice
-			});
+			expect(data).toEqual({ c: 'c' }); // notice
 			done();
 		}
 		catch (err) {

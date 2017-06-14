@@ -63,8 +63,10 @@ export default function nestify(WrappedComponent/*, options*/) {
 			const { value } = this.nest;
 
 			this.pristineValue = value;
-			this.validate();
-			this._shouldUpdate = false;
+			this._shouldForceRender = false;
+			this._shouldValid = true;
+			this._shouldRenew = true;
+			this._outputValue = null;
 
 			if (required || !isEmpty(value) || !shouldIgnoreEmpty(value, value)) {
 				this.attach();
@@ -76,11 +78,12 @@ export default function nestify(WrappedComponent/*, options*/) {
 		}
 
 		getValue() {
-			const {
-				props: { outputFilter },
-				nest: { value },
-			} = this;
-			return outputFilter(value);
+			if (this._shouldRenew) {
+				const { props, nest } = this;
+				this._shouldRenew = false;
+				return (this._outputValue = props.outputFilter(nest.value));
+			}
+			return this._outputValue;
 		}
 
 		attach = () => {
@@ -111,62 +114,68 @@ export default function nestify(WrappedComponent/*, options*/) {
 			}
 		}
 
-		_updateValue(value) {
-			const { nest, props: { inputFilter } } = this;
-			value = inputFilter(value);
-			if (nest.value !== value) {
-				this._shouldAttachEmptyValue(nest.value, value);
-				nest.value = value;
-				this._shouldUpdate = true;
-				this.validate();
-				this._updateState();
-				return true;
+		_checkHasChanged(value) {
+			const { nest, props } = this;
+			const hasChanged = nest.value !== props.inputFilter(value);
+			if (hasChanged) {
+				this._shouldRenew = true;
+				this._shouldValid = true;
 			}
-			return false;
+			return hasChanged;
+		}
+
+		_updateValue(value, shouldSetAsPristine) {
+			const { nest, props } = this;
+			const finalValue = props.inputFilter(value);
+			const hasChanged = nest.value !== finalValue;
+			if (hasChanged) {
+				this._shouldRenew = true;
+				this._shouldValid = true;
+				this._shouldAttachEmptyValue(nest.value, finalValue);
+				nest.value = finalValue;
+				this._shouldForceRender = true;
+				this._requestRender();
+				this._setPristine(shouldSetAsPristine);
+				this.context[CONTEXT_NAME].validate();
+			}
+			return nest.value;
 		}
 
 		setValue = (value) => {
-			const hasChanged = this._updateValue(value);
-			if (hasChanged) {
-				this._setPristine(false);
-				this.context[CONTEXT_NAME].onRequestChange();
-			}
-			return this.nest.value;
+			return this._updateValue(value, false);
 		};
 
 		reset = () => {
-			this._updateValue(this.pristineValue);
-			this._setPristine(true);
-			return this.nest.value;
+			return this._updateValue(this.pristineValue, true);
 		};
 
 		setAsPristine() {
 			if (this.pristineValue !== this.nest.value) {
-				this._shouldUpdate = true;
+				this._shouldForceRender = true;
 				this.pristineValue = this.nest.value;
 			}
 			this._setPristine(true);
-			this._updateState();
+			this._requestRender();
 			return this.nest.value;
 		}
 
 		_setRequired(isRequired) {
 			if (this.nest.isRequired !== isRequired) {
-				this._shouldUpdate = true;
+				this._shouldForceRender = true;
 				this.nest.isRequired = isRequired;
 			}
 		}
 
 		_setInvalid(isInvalid) {
 			if (this.nest.isInvalid !== isInvalid) {
-				this._shouldUpdate = true;
+				this._shouldForceRender = true;
 				this.nest.isInvalid = isInvalid;
 			}
 		}
 
 		_setPristine(isPristine) {
 			if (this.nest.isPristine !== isPristine) {
-				this._shouldUpdate = true;
+				this._shouldForceRender = true;
 				this.nest.isPristine = isPristine;
 			}
 		}
@@ -175,26 +184,28 @@ export default function nestify(WrappedComponent/*, options*/) {
 			if ((errorMessage && this.nest.errorMessage !== errorMessage) ||
 				(!errorMessage && this.nest.errorMessage)
 			) {
-				this._shouldUpdate = true;
+				this._shouldForceRender = true;
 				this.nest.errorMessage = errorMessage;
 			}
 		}
 
-		_updateState() {
-			if (this._shouldUpdate) {
+		_requestRender() {
+			if (this._shouldForceRender) {
 				this.forceUpdate();
-				this._shouldUpdate = false;
+				this._shouldForceRender = false;
 			}
 		}
 
 		validate() {
+			if (!this._shouldValid) { return; }
+
 			const {
 				props: { validations, defaultErrorMessage, required },
-				context: { [CONTEXT_NAME]: form },
 				nest: { value },
 			} = this;
 
 			const isEmptyValue = isEmpty(value);
+			this._shouldValid = true;
 
 			if (required && isEmptyValue) {
 				this._setErrorMessage();
@@ -234,16 +245,16 @@ export default function nestify(WrappedComponent/*, options*/) {
 				}
 			}
 
-			form.validate();
+			this._requestRender();
 		}
 
-		_handleChange = (ev, value, ...rest) => {
+		_handleChange = (ev, ...rest) => {
 			const { onChange } = this.props;
 			const target = ev && ev.currentTarget;
 			const hasTargetValue = target && !isUndefined(target.value);
-			const val = hasTargetValue ? target.value : value;
+			const val = hasTargetValue ? target.value : rest[0];
 			this.setValue(val);
-			if (isFunction(onChange)) { onChange(ev, value, ...rest); }
+			if (isFunction(onChange)) { onChange(ev, ...rest); }
 		};
 
 		_handleKeyPress = (ev) => {

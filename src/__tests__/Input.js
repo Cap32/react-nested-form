@@ -79,10 +79,8 @@ test('inputFilter and typing', function () {
 		</Form>
 	);
 	const input = wrapper.find('input');
-	expect(input.props().value).toEqual('hello, world');
-
+	expect(input.props().value).toBe('hello, world');
 	input.node.value = 'webb';
 	input.simulate('change');
-
-	expect(input.props().value).toEqual('hello, webb');
+	expect(input.props().value).toBe('hello, webb');
 });

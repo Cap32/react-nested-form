@@ -274,7 +274,7 @@ test('`onValid` if initial state is valid', function (done) {
 
 test('`onInalid` if initial state is invalid', function (done) {
 	mount(
-		<Form onValid={done}>
+		<Form onInvalid={done}>
 			<Input
 				name="numbers"
 				defaultValue="hello"

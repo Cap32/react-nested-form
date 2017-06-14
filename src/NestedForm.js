@@ -63,6 +63,7 @@ export default class NestedForm extends Component {
 
 		this.nest = {
 			value: {},
+			errorMessages: [],
 		};
 
 		this._outputValue = null;
@@ -184,12 +185,15 @@ export default class NestedForm extends Component {
 
 		this._shouldValid = false;
 
-		const errors = this._children.filter((child) => {
-			child.validate();
-			return child.nest.isInvalid || child.nest.isRequired;
-		});
-		const isInvalid = !!errors.length;
+		nest.errorMessages = this._children
+			.filter((child) => {
+				child.validate();
+				return child.nest.isInvalid || child.nest.isRequired;
+			})
+			.map(({ nest }) => nest.errorMessage)
+		;
 
+		const isInvalid = !!nest.errorMessages.length;
 		if (isInvalid !== nest.isInvalid) {
 			const { onValid, onInvalid } = this.props;
 			nest.isInvalid = isInvalid;
@@ -204,9 +208,10 @@ export default class NestedForm extends Component {
 	}
 
 	_getEventState() {
-		const { isInvalid } = this.nest;
+		const { isInvalid, errorMessages } = this.nest;
 		const state = {
 			isInvalid,
+			errorMessages,
 			isStoppedPropagation: false,
 			stopPropagation() {
 				state.isStoppedPropagation = true;

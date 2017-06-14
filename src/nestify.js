@@ -96,10 +96,6 @@ export default function nestify(WrappedComponent/*, options*/) {
 			return this.context[CONTEXT_NAME].detach(this);
 		};
 
-		_requestFormValidate() {
-			this.context[CONTEXT_NAME].validate();
-		}
-
 		_shouldAttachEmptyValue(prevValue, nextValue) {
 			const { nest, pristineValue, props: { required } } = this;
 			if ((required && !nest.hasAttached) ||
@@ -114,18 +110,9 @@ export default function nestify(WrappedComponent/*, options*/) {
 			}
 		}
 
-		_checkHasChanged(value) {
-			const { nest, props } = this;
-			const hasChanged = nest.value !== props.inputFilter(value);
-			if (hasChanged) {
-				this._shouldRenew = true;
-				this._shouldValid = true;
-			}
-			return hasChanged;
-		}
-
 		_updateValue(value, shouldSetAsPristine) {
-			const { nest, props } = this;
+			const { nest, props, context } = this;
+			const form = context[CONTEXT_NAME];
 			const finalValue = props.inputFilter(value);
 			const hasChanged = nest.value !== finalValue;
 			if (hasChanged) {
@@ -136,7 +123,8 @@ export default function nestify(WrappedComponent/*, options*/) {
 				this._shouldForceRender = true;
 				this._requestRender();
 				this._setPristine(shouldSetAsPristine);
-				this.context[CONTEXT_NAME].validate();
+				form.onRequestValidate();
+				form.onRequestRenew();
 			}
 			return nest.value;
 		}

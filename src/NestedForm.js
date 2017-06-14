@@ -48,12 +48,12 @@ export default class NestedForm extends Component {
 	getChildContext() {
 		return {
 			[CONTEXT_NAME]: {
-				attach: ::this.attach,
-				detach: ::this.detach,
-				hasAttached: ::this.hasAttached,
-				validate: ::this.validate,
-				submit: ::this.submit,
-				reset: ::this.reset,
+				attach: this.attach,
+				detach: this.detach,
+				submit: this.submit,
+				reset: this.reset,
+				onRequestValidate: this._requestValid,
+				onRequestRenew: this._requestRenew,
 			},
 		};
 	}
@@ -64,6 +64,10 @@ export default class NestedForm extends Component {
 		this.nest = {
 			value: {},
 		};
+
+		this._outputValue = null;
+		this._shouldRenew = true;
+		this._shouldValid = true;
 
 		this._contextForm = (name && context[CONTEXT_NAME]) || {
 			attach: emptyFunction,
@@ -86,10 +90,6 @@ export default class NestedForm extends Component {
 		return !!(props.name && context[CONTEXT_NAME]);
 	}
 
-	_hasAttached(child, wrapper) {
-		return wrapper.indexOf(child) > -1;
-	}
-
 	_attachChild(child, wrapper) {
 		if (isValidChild(child) && wrapper.indexOf(child) < 0) {
 			wrapper.push(child);
@@ -109,39 +109,48 @@ export default class NestedForm extends Component {
 		return false;
 	}
 
-	attach(child) {
+	attach = (child) => {
 		if (isValidChild(child) && this._children.indexOf(child) < 0) {
 			this._children.push(child);
 
-			if (this._hasParent()) { this.context[CONTEXT_NAME].attach(this); }
+			if (this._hasParent()) { this._contextForm.attach(this); }
 			else { this.validate(); }
 		}
-	}
+	};
 
-	detach(child) {
+	detach = (child) => {
 		if (!child) { return; }
 
 		const index = this._children.indexOf(child);
 		if (index > -1) {
 			this._children.splice(index, 1);
-			if (this._hasParent()) { this.context[CONTEXT_NAME].detach(this); }
+			if (this._hasParent()) { this._contextForm.detach(this); }
 			else { this.validate(); }
 		}
-	}
+	};
 
-	hasAttached(child) {
-		return this._hasAttached(child, this._children);
-	}
+	_requestRenew = () => {
+		this._shouldRenew = true;
+	};
 
-	_outputValue() {
-		const {
-			props: { outputFilter },
-			nest: { value },
-		} = this;
-		return outputFilter(value);
-	}
+	_requestValid = () => {
+		this._shouldValid = true;
+		if (this._hasParent()) { this._contextForm.onRequestValidate(); }
+		else { this.validate(); }
+	};
 
 	getValue() {
+		const {
+			props: { outputFilter },
+			nest,
+			_shouldRenew,
+			_outputValue,
+		} = this;
+
+		if (!_shouldRenew) { return _outputValue; }
+
+		this._shouldRenew = false;
+
 		const newValue = this._children.reduce((data, child) => {
 			const { props: { name } } = child;
 
@@ -164,14 +173,16 @@ export default class NestedForm extends Component {
 			return data;
 		}, {});
 
-		this.nest.value = newValue;
-		// this._changeList = [];
-
-		return this._outputValue();
+		nest.value = newValue;
+		return (this._outputValue = outputFilter(newValue));
 	}
 
 	validate() {
 		const { nest } = this;
+
+		if (!this._shouldValid) { return; }
+
+		this._shouldValid = false;
 
 		const errors = this._children.filter((child) => {
 			child.validate();
@@ -204,7 +215,7 @@ export default class NestedForm extends Component {
 		return state;
 	}
 
-	reset(callback = emptyFunction) {
+	reset = (callback = emptyFunction) => {
 		this._children.forEach((child) => child.reset());
 
 		const eventState = this._getEventState();
@@ -215,9 +226,9 @@ export default class NestedForm extends Component {
 		if (!eventState.isStoppedPropagation) {
 			this._contextForm.reset();
 		}
-	}
+	};
 
-	submit(callback = emptyFunction) {
+	submit = (callback = emptyFunction) => {
 		const eventState = this._getEventState();
 		const value = this.getValue();
 		this.props.onSubmit(value, eventState);
@@ -226,7 +237,7 @@ export default class NestedForm extends Component {
 		if (!eventState.isStoppedPropagation) {
 			this._contextForm.submit();
 		}
-	}
+	};
 
 	render() {
 		const {

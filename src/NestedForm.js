@@ -21,6 +21,7 @@ export default class NestedForm extends Component {
 		name: PropTypes.string,
 		component: ComponentPropType,
 		onSubmit: PropTypes.func,
+		onReset: PropTypes.func,
 		onValid: PropTypes.func,
 		onInvalid: PropTypes.func,
 		validations: ValidationPropType,
@@ -30,6 +31,7 @@ export default class NestedForm extends Component {
 	static defaultProps = {
 		component: 'div',
 		onSubmit: emptyFunction,
+		onReset: emptyFunction,
 		onValid: emptyFunction,
 		onInvalid: emptyFunction,
 		outputFilter: returnsArgument,
@@ -161,17 +163,12 @@ export default class NestedForm extends Component {
 		}
 	}
 
-	reset() {
-		this._childrens.forEach((child) => child.reset());
-	}
-
 	setAsPristine() {
 		this._childrens.forEach((child) => child.setAsPristine());
 	}
 
-	submit(callback = emptyFunction) {
+	_getEventState() {
 		const { isInvalid } = this.nest;
-		const value = this.getValue();
 		const state = {
 			isInvalid,
 			isStoppedPropagation: false,
@@ -179,10 +176,29 @@ export default class NestedForm extends Component {
 				state.isStoppedPropagation = true;
 			},
 		};
-		this.props.onSubmit(value, state);
-		callback(value, state);
+		return state;
+	}
 
-		if (!state.isStoppedPropagation) {
+	reset(callback = emptyFunction) {
+		this._childrens.forEach((child) => child.reset());
+
+		const eventState = this._getEventState();
+		const value = this.getValue();
+		this.props.onReset(value, eventState);
+		callback(value, eventState);
+
+		if (!eventState.isStoppedPropagation) {
+			this._contextForm.reset();
+		}
+	}
+
+	submit(callback = emptyFunction) {
+		const eventState = this._getEventState();
+		const value = this.getValue();
+		this.props.onSubmit(value, eventState);
+		callback(value, eventState);
+
+		if (!eventState.isStoppedPropagation) {
 			this._contextForm.submit();
 		}
 	}

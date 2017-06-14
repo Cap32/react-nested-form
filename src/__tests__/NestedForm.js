@@ -445,12 +445,21 @@ test('nested form with `name` prop', function (done) {
 	wrapper.find(Submit).last().simulate('click');
 });
 
-test('click <Reset />', function (done) {
+test('`onReset()` prop', function (done) {
+	const value = 'world';
+	const handleReset = (data) => {
+		try {
+			expect(data.hello).toEqual(value);
+			done();
+		}
+		catch (err) {
+			done.fail(err);
+		}
+	};
 	const wrapper = mount(
-		<Form>
-			<Input name="hello" />
+		<Form onReset={handleReset}>
+			<Input name="hello" value={value} />
 			<Reset />
-			<Submit />
 		</Form>
 	);
 	const input = wrapper.find('input').first();
@@ -458,16 +467,6 @@ test('click <Reset />', function (done) {
 	input.simulate('change');
 	expect(input.node.value).toBe('updated');
 	wrapper.find(Reset).first().simulate('click');
-
-	process.nextTick(() => {
-		try {
-			expect(input.node.value).toBe('');
-			done();
-		}
-		catch (err) {
-			done.fail(err);
-		}
-	});
 });
 
 test('click <Reset /> and submit', function (done) {

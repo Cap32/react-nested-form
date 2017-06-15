@@ -3,12 +3,11 @@ import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import hoistStatics from 'hoist-non-react-statics';
 import {
-	isFunction, isUndefined, isString, isEmpty,
-	ValidationPropType, ErrorMessagePropType, getGlobalDefaultErrorMessages,
+	isFunction, isUndefined, isEmpty, ValidationPropType, ErrorMessagePropType,
 } from './utils';
-import find from 'array-find';
 import { CONTEXT_NAME } from './constants';
 import { returnsArgument } from 'empty-functions';
+import Validation from './Validation';
 
 export default function nestify(WrappedComponent/*, options*/) {
 	class Nestify extends Component {
@@ -29,7 +28,7 @@ export default function nestify(WrappedComponent/*, options*/) {
 					minLength: ErrorMessagePropType,
 					pattern: ErrorMessagePropType,
 					enum: ErrorMessagePropType,
-					other: ErrorMessagePropType,
+					default: ErrorMessagePropType,
 				}),
 			]),
 			onChange: PropTypes.func,
@@ -88,8 +87,7 @@ export default function nestify(WrappedComponent/*, options*/) {
 
 			const { value } = this.nest;
 
-			this._initDefaultErrorMessages();
-			this._initValidations();
+			this._validation = new Validation(this.props);
 
 			this.pristineValue = value;
 			this._shouldForceRender = false;
@@ -97,83 +95,15 @@ export default function nestify(WrappedComponent/*, options*/) {
 			this._shouldRenew = true;
 			this._outputValue = null;
 
-			const isRequired = this._isRequired;
+			const { required } = this._validation;
 
-			if (isRequired || !isEmpty(value) || !shouldIgnoreEmpty(value, value)) {
+			if (required || !isEmpty(value) || !shouldIgnoreEmpty(value, value)) {
 				this.attach();
 			}
 		}
 
 		componentWillUnmount() {
 			this.context[CONTEXT_NAME].detach(this);
-		}
-
-		_initDefaultErrorMessages() {
-			let { defaultErrorMessage } = this.props;
-
-			if (isString(defaultErrorMessage)) {
-				defaultErrorMessage = { other: defaultErrorMessage };
-			}
-
-			this._errorMessages = {
-				...getGlobalDefaultErrorMessages(),
-				...defaultErrorMessage,
-			};
-		}
-
-		_initValidations() {
-			const {
-				props: {
-					validations: propValidations,
-					required,
-					maximum,
-					exclusiveMaximum,
-					minimum,
-					exclusiveMinimum,
-					maxLength,
-					minLength,
-					pattern,
-					enum: oneOf,
-				},
-				_errorMessages,
-			} = this;
-
-			let validations = [].concat(propValidations);
-
-			if (required) { this._isRequired = true; }
-			else {
-				const requiredValidation = validations.find((v) => v && v.required);
-				if (requiredValidation) {
-					this._isRequired = true;
-					if (requiredValidation.message) {
-						_errorMessages.required = requiredValidation.message;
-					}
-					delete requiredValidation.required;
-				}
-			}
-
-			validations = validations
-				.filter(Boolean)
-				.map((validator) => isFunction(validator) ? { validator } : validator)
-			;
-
-			const add = (type, value) => {
-				!isUndefined(value) && validations.unshift({
-					message: _errorMessages[type],
-					[type]: value,
-				});
-			};
-
-			add('maximum', maximum);
-			add('exclusiveMaximum', exclusiveMaximum);
-			add('minimum', minimum);
-			add('exclusiveMinimum', exclusiveMinimum);
-			add('maxLength', maxLength);
-			add('minLength', minLength);
-			add('pattern', pattern);
-			add('oneOf', oneOf);
-
-			this._validations = validations;
 		}
 
 		getValue() {
@@ -267,12 +197,7 @@ export default function nestify(WrappedComponent/*, options*/) {
 			}
 		}
 
-		_setErrorMessage(error, name, received, expected) {
-			const message = (function () {
-				if (!error) { return ''; }
-				return isString(error) ? error : error(name, received, expected);
-			}());
-
+		_setErrorMessage(message) {
 			if ((message && this.nest.errorMessage !== message) ||
 				(!message && this.nest.errorMessage)
 			) {
@@ -294,42 +219,18 @@ export default function nestify(WrappedComponent/*, options*/) {
 			const {
 				props: { name },
 				nest: { value },
-				_errorMessages,
-				_validations,
-				_isRequired,
 			} = this;
 
+			const {
+				errorMessage,
+				isInvalid,
+				isRequired,
+			} = this._validation.validate(name, value);
+
 			this._shouldValid = true;
-
-			const isEmptyValue = isEmpty(value);
-			if (_isRequired && isEmptyValue) {
-				this._setErrorMessage(_errorMessages.required, name, value, 'required');
-				this._setInvalid(false);
-				this._setRequired(true);
-			}
-			else if (!_isRequired && isEmptyValue) {
-				this._setErrorMessage();
-				this._setInvalid(false);
-				this._setRequired(false);
-			}
-			else {
-				this._setRequired(false);
-
-				const invalid = find(_validations, (valid) => {
-					const validator = isFunction(valid) ? valid : valid.validator;
-					return !validator(value);
-				});
-
-				if (invalid) {
-					const message = invalid.message || _errorMessages.other;
-					this._setInvalid(true);
-					this._setErrorMessage(message, name, value, '[Validator Function]');
-				}
-				else {
-					this._setInvalid(false);
-					this._setErrorMessage();
-				}
-			}
+			this._setErrorMessage(errorMessage);
+			this._setInvalid(isInvalid);
+			this._setRequired(isRequired);
 
 			this._requestRender();
 		}

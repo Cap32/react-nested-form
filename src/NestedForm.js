@@ -113,7 +113,6 @@ export default class NestedForm extends Component {
 	attach = (child) => {
 		if (isValidChild(child) && this._children.indexOf(child) < 0) {
 			this._children.push(child);
-
 			if (this._hasParent()) { this._contextForm.attach(this); }
 			else { this.validate(); }
 		}

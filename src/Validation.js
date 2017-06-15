@@ -1,8 +1,32 @@
 
 import {
-	isFunction, isUndefined, isString, isEmpty, getGlobalDefaultErrorMessages,
+	isFunction, isUndefined, isString, isEmpty,
+	globalDefaultErrorMessages, validationKeys,
 } from './utils';
 import find from 'array-find';
+
+const createValidator = (type, expected) => function schemaValidator(received) {
+	switch (type) {
+		case 'maximum':
+			return received <= expected;
+		case 'exclusiveMaximum':
+			return received < expected;
+		case 'minimum':
+			return received >= expected;
+		case 'exclusiveMinimum':
+			return received > expected;
+		case 'maxLength':
+			return (received + '').length <= expected;
+		case 'minLength':
+			return (received + '').length >= expected;
+		case 'pattern':
+			return expected.test(received);
+		case 'enum':
+			return expected.indexOf(received) > -1;
+		default:
+			return expected(received);
+	}
+};
 
 export default class Validation {
 	constructor(props) {
@@ -20,7 +44,7 @@ export default class Validation {
 		}
 
 		return {
-			...getGlobalDefaultErrorMessages(),
+			...globalDefaultErrorMessages,
 			...defaultErrorMessage,
 		};
 	}
@@ -37,7 +61,7 @@ export default class Validation {
 				maxLength,
 				minLength,
 				pattern,
-				enum: oneOf,
+				enum: _enum,
 			},
 			_errors,
 		} = this;
@@ -59,12 +83,33 @@ export default class Validation {
 		validations = validations
 			.filter(Boolean)
 			.map((validator) => isFunction(validator) ? { validator } : validator)
+			.reduce((flatten, validation) => {
+				const { message } = validation;
+				Object
+					.keys(validation)
+					.filter((key) => key !== 'message')
+					.forEach((key) => {
+						if (validationKeys.indexOf(key) < 0) {
+							console.warn(
+								`Validation key "${key}" is INVALID. Only [${validationKeys.join(', ')}] or "message" is valid.`
+							);
+						}
+						else {
+							flatten.push({
+								validator: createValidator(key, validation[key]),
+								message: message || _errors[key],
+							});
+						}
+					})
+				;
+				return flatten;
+			}, [])
 		;
 
-		const add = (type, value) => {
-			!isUndefined(value) && validations.unshift({
-				message: _errors[type],
-				[type]: value,
+		const add = (key, expected) => {
+			!isUndefined(expected) && validations.unshift({
+				message: _errors[key],
+				validator: createValidator(key, expected),
 			});
 		};
 
@@ -75,7 +120,7 @@ export default class Validation {
 		add('maxLength', maxLength);
 		add('minLength', minLength);
 		add('pattern', pattern);
-		add('oneOf', oneOf);
+		add('enum', _enum);
 
 		return validations;
 	}
@@ -87,7 +132,7 @@ export default class Validation {
 
 	validate(name, value) {
 		const {
-			_errorMessages,
+			_errors,
 			_validations,
 			required,
 		} = this;
@@ -98,21 +143,20 @@ export default class Validation {
 			isRequired: false,
 		};
 
+		// console.log('_validations', _validations.length);
+
 		const isEmptyValue = isEmpty(value);
 		if (required && isEmptyValue) {
 			result.errorMessage = this._getErrorMessage(
-				_errorMessages.required, name, value, 'required',
+				_errors.required, name, value, 'required',
 			);
 			result.isRequired = true;
 		}
 		else if (!isEmptyValue) {
-			const invalid = find(_validations, (valid) => {
-				const validator = isFunction(valid) ? valid : valid.validator;
-				return !validator(value);
-			});
+			const invalid = find(_validations, ({ validator }) => !validator(value));
 
 			if (invalid) {
-				const message = invalid.message || _errorMessages.other;
+				const message = invalid.message;
 				result.isInvalid = true;
 				result.errorMessage = this._getErrorMessage(
 					message, name, value, '[Validator Function]',

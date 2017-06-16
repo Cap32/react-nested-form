@@ -95,9 +95,11 @@ export default class Validation {
 							);
 						}
 						else {
+							const expected = validation[key];
 							flatten.push({
-								validator: createValidator(key, validation[key]),
+								validator: createValidator(key, expected),
 								message: message || _errors[key],
+								__expected: expected,
 							});
 						}
 					})
@@ -110,6 +112,7 @@ export default class Validation {
 			!isUndefined(expected) && validations.unshift({
 				message: _errors[key],
 				validator: createValidator(key, expected),
+				__expected: expected,
 			});
 		};
 
@@ -157,9 +160,10 @@ export default class Validation {
 
 			if (invalid) {
 				const message = invalid.message;
+				const expected = invalid.__expected || '[Validator Function]';
 				result.isInvalid = true;
 				result.errorMessage = this._getErrorMessage(
-					message, name, value, '[Validator Function]',
+					message, name, value, expected,
 				);
 			}
 		}

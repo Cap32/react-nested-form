@@ -321,30 +321,6 @@ test('`onValid` after typed', function (done) {
 	input.simulate('change');
 });
 
-test('required field', function (done) {
-	const handleSubmit = (data, { isInvalid }) => {
-		try {
-			expect(isInvalid).toBe(!data.id);
-			done();
-		}
-		catch (err) {
-			done.fail(err);
-		}
-	};
-	const App = () => (
-		<Form onSubmit={handleSubmit}>
-			<Input
-				name="id"
-				required
-			/>
-			<Submit />
-		</Form>
-	);
-	const wrapper = mount(<App />);
-
-	wrapper.find(Submit).first().simulate('click');
-});
-
 test('reset()', function (done) {
 	const value = 'world';
 	const handleSubmit = (data) => {

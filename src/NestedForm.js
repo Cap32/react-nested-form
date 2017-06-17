@@ -68,7 +68,7 @@ export default class NestedForm extends Component {
 
 		this._outputValue = null;
 		this._shouldRenew = true;
-		this._shouldValid = true;
+		this._shouldValidate = true;
 
 		this._contextForm = (name && context[CONTEXT_NAME]) || {
 			attach: emptyFunction,
@@ -134,7 +134,7 @@ export default class NestedForm extends Component {
 	};
 
 	_requestValid = () => {
-		this._shouldValid = true;
+		this._shouldValidate = true;
 		if (this._hasParent()) { this._contextForm.onRequestValidate(); }
 		else { this.validate(); }
 	};
@@ -180,9 +180,9 @@ export default class NestedForm extends Component {
 	validate() {
 		const { nest } = this;
 
-		if (!this._shouldValid) { return; }
+		if (!this._shouldValidate) { return; }
 
-		this._shouldValid = false;
+		this._shouldValidate = false;
 
 		nest.errorMessages = this._children
 			.filter((child) => {

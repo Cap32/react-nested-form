@@ -4,6 +4,7 @@ import {
 	globalDefaultErrorMessages, validationKeys,
 } from './utils';
 import find from 'array-find';
+import warning from 'warning';
 
 const createValidator = (type, expected) => function schemaValidator(received) {
 	switch (type) {
@@ -90,8 +91,9 @@ export default class Validation {
 					.filter((key) => key !== 'message')
 					.forEach((key) => {
 						if (validationKeys.indexOf(key) < 0) {
-							console.warn(
-								`Validation key "${key}" is INVALID. Only [${validationKeys.join(', ')}] or "message" is valid.`
+							warning(
+								false,
+								`[ReactNestedForm]: Validation key "${key}" is INVALID. Only [${validationKeys.join(', ')}] or "message" is valid.`
 							);
 						}
 						else {
@@ -145,8 +147,6 @@ export default class Validation {
 			isInvalid: false,
 			isRequired: false,
 		};
-
-		// console.log('_validations', _validations.length);
 
 		const isEmptyValue = isEmpty(value);
 		if (required && isEmptyValue) {

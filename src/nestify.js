@@ -32,6 +32,8 @@ export default function nestify(WrappedComponent/*, options*/) {
 				}),
 			]),
 			onChange: PropTypes.func,
+			onKeyPress: PropTypes.func,
+			onBlur: PropTypes.func,
 			shouldIgnoreEmpty: PropTypes.func,
 			inputFilter: PropTypes.func,
 			outputFilter: PropTypes.func,
@@ -55,7 +57,7 @@ export default function nestify(WrappedComponent/*, options*/) {
 
 		static defaultProps = {
 			required: false,
-			shouldIgnoreEmpty: (val, pristine) => (!pristine && pristine !== false),
+			shouldIgnoreEmpty: (val, pristineValue) => isEmpty(pristineValue),
 			inputFilter: returnsArgument,
 			outputFilter: returnsArgument,
 		};
@@ -91,7 +93,7 @@ export default function nestify(WrappedComponent/*, options*/) {
 
 			this.pristineValue = value;
 			this._shouldForceRender = false;
-			this._shouldValid = true;
+			this._shouldValidate = true;
 			this._shouldRenew = true;
 			this._outputValue = null;
 
@@ -100,6 +102,7 @@ export default function nestify(WrappedComponent/*, options*/) {
 			if (required || !isEmpty(value) || !shouldIgnoreEmpty(value, value)) {
 				this.attach();
 			}
+
 		}
 
 		componentWillUnmount() {
@@ -107,8 +110,11 @@ export default function nestify(WrappedComponent/*, options*/) {
 		}
 
 		getValue() {
+			this._setPristine(false);
+
 			if (this._shouldRenew) {
 				const { props, nest } = this;
+				nest.shouldShowErrorMessage = true;
 				this._shouldRenew = false;
 				return (this._outputValue = props.outputFilter(nest.value));
 			}
@@ -146,7 +152,7 @@ export default function nestify(WrappedComponent/*, options*/) {
 			const hasChanged = nest.value !== finalValue;
 			if (hasChanged) {
 				this._shouldRenew = true;
-				this._shouldValid = true;
+				this._shouldValidate = true;
 				this._shouldAttachEmptyValue(nest.value, finalValue);
 				nest.value = finalValue;
 				this._shouldForceRender = true;
@@ -176,33 +182,10 @@ export default function nestify(WrappedComponent/*, options*/) {
 			return this.nest.value;
 		}
 
-		_setRequired(isRequired) {
-			if (this.nest.isRequired !== isRequired) {
-				this._shouldForceRender = true;
-				this.nest.isRequired = isRequired;
-			}
-		}
-
-		_setInvalid(isInvalid) {
-			if (this.nest.isInvalid !== isInvalid) {
-				this._shouldForceRender = true;
-				this.nest.isInvalid = isInvalid;
-			}
-		}
-
 		_setPristine(isPristine) {
 			if (this.nest.isPristine !== isPristine) {
 				this._shouldForceRender = true;
 				this.nest.isPristine = isPristine;
-			}
-		}
-
-		_setErrorMessage(message) {
-			if ((message && this.nest.errorMessage !== message) ||
-				(!message && this.nest.errorMessage)
-			) {
-				this._shouldForceRender = true;
-				this.nest.errorMessage = message;
 			}
 		}
 
@@ -214,11 +197,12 @@ export default function nestify(WrappedComponent/*, options*/) {
 		}
 
 		validate() {
-			if (!this._shouldValid) { return; }
+			if (!this._shouldValidate) { return; }
 
 			const {
 				props: { name },
 				nest: { value },
+				nest,
 			} = this;
 
 			const {
@@ -227,10 +211,24 @@ export default function nestify(WrappedComponent/*, options*/) {
 				isRequired,
 			} = this._validation.validate(name, value);
 
-			this._shouldValid = true;
-			this._setErrorMessage(errorMessage);
-			this._setInvalid(isInvalid);
-			this._setRequired(isRequired);
+			this._shouldValidate = true;
+
+			if (nest.isRequired !== isRequired) {
+				this._shouldForceRender = true;
+				nest.isRequired = isRequired;
+			}
+
+			if (nest.isInvalid !== isInvalid) {
+				this._shouldForceRender = true;
+				nest.isInvalid = isInvalid;
+			}
+
+			if ((errorMessage && nest.errorMessage !== errorMessage) ||
+				(!errorMessage && nest.errorMessage)
+			) {
+				this._shouldForceRender = true;
+				nest.errorMessage = errorMessage;
+			}
 
 			this._requestRender();
 		}
@@ -241,14 +239,22 @@ export default function nestify(WrappedComponent/*, options*/) {
 			const hasTargetValue = target && !isUndefined(target.value);
 			const val = hasTargetValue ? target.value : rest[0];
 			this.setValue(val);
-			if (isFunction(onChange)) { onChange(ev, ...rest); }
+			if (isFunction(onChange)) { return onChange(ev, ...rest); }
 		};
 
-		_handleKeyPress = (ev) => {
+		_handleKeyPress = (ev, ...rest) => {
+			const { onKeyPress } = this.props;
 			const code = ev.keyCode || ev.which;
 			if (ev.key === 'Enter' || code === 13) {
 				this.context[CONTEXT_NAME].submit();
 			}
+			if (isFunction(onKeyPress)) { return onKeyPress(ev, ...rest); }
+		};
+
+		_handleBlur = (...args) => {
+			const { onBlur } = this.props;
+			this._setPristine(false);
+			if (isFunction(onBlur)) { return onBlur(...args); }
 		};
 
 		render() {

@@ -130,9 +130,9 @@ export default class Validation {
 		return validations;
 	}
 
-	_getErrorMessage(error, name, received, expected) {
+	_getErrorMessage(error, expected) {
 		if (!error) { return ''; }
-		return isString(error) ? error : error(name, received, expected);
+		return isString(error) ? error : error(expected);
 	}
 
 	validate(name, value) {
@@ -163,9 +163,7 @@ export default class Validation {
 				const message = invalid.message;
 				const expected = invalid.__expected || '[Validator Function]';
 				result.isInvalid = true;
-				result.errorMessage = this._getErrorMessage(
-					message, name, value, expected,
-				);
+				result.errorMessage = this._getErrorMessage(message, expected);
 			}
 		}
 

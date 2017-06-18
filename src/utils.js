@@ -1,3 +1,4 @@
+/* eslint max-len:0 */
 
 import PropTypes from 'prop-types';
 import warning from 'warning';
@@ -30,6 +31,10 @@ export const isFunction = function isFunction(target) {
 	return typeof target === 'function';
 };
 
+export const isObject = function isObject(target) {
+	return typeof target === 'object';
+};
+
 export const isString = function isString(target) {
 	return typeof target === 'string';
 };
@@ -52,28 +57,45 @@ export const isValidChild = function isValidChild(c) {
 	}
 };
 
-/* eslint-disable max-len */
 export const globalDefaultErrorMessages = {
-	required: (name) => `"${name}" is required`,
+	required: 'Required',
 
-	maximum: (name, received, expected) => `The value of "${name}" MUST less than or exactly equal to \`${expected}\`, but received \`${received}\``,
+	maximum: (expected) => `Must less than or exactly equal to \`${expected}\``,
 
-	exclusiveMaximum: (name, received, expected) => `The value of "${name}" MUST strictly less than (not equal to) \`${expected}\`, but received \`${received}\``,
+	exclusiveMaximum: (expected) => `Must strictly less than (not equal to) \`${expected}\``,
 
-	minimum: (name, received, expected) => `The value of "${name}" MUST greater than or exactly equal to \`${expected}\`, but received \`${received}\``,
+	minimum: (expected) => `Must greater than or exactly equal to \`${expected}\``,
 
-	exclusiveMinimum: (name, received, expected) => `The value of "${name}" MUST strictly greater than (not equal to) \`${expected}\`, but received \`${received}\``,
+	exclusiveMinimum: (expected) => `Must strictly greater than (not equal to) \`${expected}\``,
 
-	maxLength: (name, received, expected) => `The length of "${name}" MUST less than, or equal to \`${expected}\`, but received \`${received}\``,
+	maxLength: (expected) => `The length of value must less than, or equal to \`${expected}\``,
 
-	minLength: (name, received, expected) => `The length of "${name}" MUST greater than, or equal to \`${expected}\`, but received \`${received}\``,
+	minLength: (expected) => `The length of value must greater than, or equal to \`${expected}\``,
 
-	pattern: (name, received, expected) => `The value of "${name}" faled to match regular expression \`${expected}\`, which value is \`${received}\``,
+	enum: (expected) => `Must equal to one of [${expected.join(', ')}]`,
 
-	enum: (name, received, expected) => `The value of "${name}" MUST equal to one of [${expected.join(', ')}], but received \`${received}\``,
+	pattern: 'Illegal',
 
-	validator: (name, received) => `Value \`${received}\` of "${name}" is INVALID`,
+	validator: 'Illegal',
 };
-/* eslint-enable max-len */
 
 export const validationKeys = Object.keys(globalDefaultErrorMessages);
+
+export function setGlobalErrorMessages(messages) {
+	if (isObject(messages)) {
+		Object.keys(messages).forEach((key) => {
+			if (validationKeys.indexOf(key) < 0) {
+				warning(false, `[ReactNestedForm]: key "${key}" is INVALID.`);
+			}
+			else {
+				globalDefaultErrorMessages[key] = messages[key];
+			}
+		});
+	}
+	else {
+		warning(
+			false,
+			`[ReactNestedForm]: "messages" MUST be object, but received "${typeof messages}"`,
+		);
+	}
+}

@@ -3,13 +3,14 @@
 import React from 'react';
 import { mount } from 'enzyme';
 import { resetBOM } from './utils';
-import Form, { Input, Submit } from '../';
+import Form, { Input, Submit, setGlobalErrorMessages } from '../';
 
 beforeEach(resetBOM);
 
 test('`required` error', function (done) {
-	const handleSubmit = (data, { isInvalid }) => {
+	const handleSubmit = (data, { isInvalid, errorMessages }) => {
 		try {
+			expect(errorMessages).toEqual(['Required']);
 			expect(isInvalid).toBe(true);
 			done();
 		}
@@ -46,8 +47,11 @@ test('`required` success', function (done) {
 });
 
 test('`maximum` error', function (done) {
-	const handleSubmit = (data, { isInvalid }) => {
+	const handleSubmit = (data, { isInvalid, errorMessages }) => {
 		try {
+			expect(errorMessages).toEqual([
+				'Must less than or exactly equal to `10`'
+			]);
 			expect(isInvalid).toBe(true);
 			done();
 		}
@@ -84,8 +88,11 @@ test('`maximum` success', function (done) {
 });
 
 test('`exclusiveMaximum` error', function (done) {
-	const handleSubmit = (data, { isInvalid }) => {
+	const handleSubmit = (data, { isInvalid, errorMessages }) => {
 		try {
+			expect(errorMessages).toEqual([
+				'Must strictly less than (not equal to) `10`'
+			]);
 			expect(isInvalid).toBe(true);
 			done();
 		}
@@ -122,8 +129,11 @@ test('`exclusiveMaximum` success', function (done) {
 });
 
 test('`minimum` error', function (done) {
-	const handleSubmit = (data, { isInvalid }) => {
+	const handleSubmit = (data, { isInvalid, errorMessages }) => {
 		try {
+			expect(errorMessages).toEqual([
+				'Must greater than or exactly equal to `10`'
+			]);
 			expect(isInvalid).toBe(true);
 			done();
 		}
@@ -160,8 +170,11 @@ test('`minimum` success', function (done) {
 });
 
 test('`exclusiveMinimum` error', function (done) {
-	const handleSubmit = (data, { isInvalid }) => {
+	const handleSubmit = (data, { isInvalid, errorMessages }) => {
 		try {
+			expect(errorMessages).toEqual([
+				'Must strictly greater than (not equal to) `10`'
+			]);
 			expect(isInvalid).toBe(true);
 			done();
 		}
@@ -198,8 +211,11 @@ test('`exclusiveMinimum` success', function (done) {
 });
 
 test('`maxLength` error', function (done) {
-	const handleSubmit = (data, { isInvalid }) => {
+	const handleSubmit = (data, { isInvalid, errorMessages }) => {
 		try {
+			expect(errorMessages).toEqual([
+				'The length of value must less than, or equal to `2`'
+			]);
 			expect(isInvalid).toBe(true);
 			done();
 		}
@@ -236,8 +252,11 @@ test('`maxLength` success', function (done) {
 });
 
 test('`minLength` error', function (done) {
-	const handleSubmit = (data, { isInvalid }) => {
+	const handleSubmit = (data, { isInvalid, errorMessages }) => {
 		try {
+			expect(errorMessages).toEqual([
+				'The length of value must greater than, or equal to `2`'
+			]);
 			expect(isInvalid).toBe(true);
 			done();
 		}
@@ -274,8 +293,9 @@ test('`minLength` success', function (done) {
 });
 
 test('`pattern` error', function (done) {
-	const handleSubmit = (data, { isInvalid }) => {
+	const handleSubmit = (data, { isInvalid, errorMessages }) => {
 		try {
+			expect(errorMessages).toEqual(['Illegal']);
 			expect(isInvalid).toBe(true);
 			done();
 		}
@@ -312,8 +332,9 @@ test('`pattern` success', function (done) {
 });
 
 test('`enum` error', function (done) {
-	const handleSubmit = (data, { isInvalid }) => {
+	const handleSubmit = (data, { isInvalid, errorMessages }) => {
 		try {
+			expect(errorMessages).toEqual(['Must equal to one of [a, b]']);
 			expect(isInvalid).toBe(true);
 			done();
 		}
@@ -343,6 +364,34 @@ test('`enum` success', function (done) {
 	const wrapper = mount(
 		<Form onSubmit={handleSubmit}>
 			<Input name="test" enum={['a', 'b']} value="a" />
+			<Submit />
+		</Form>
+	);
+	wrapper.find(Submit).first().simulate('click');
+});
+
+test('`setGlobalErrorMessages`', function (done) {
+	setGlobalErrorMessages({
+		'required': 'required!!!',
+	});
+	const resetGlobalErrorMessages = () => {
+		setGlobalErrorMessages({ required: 'Required' });
+	};
+	const handleSubmit = (data, { isInvalid, errorMessages }) => {
+		try {
+			expect(errorMessages).toEqual(['required!!!']);
+			expect(isInvalid).toBe(true);
+			resetGlobalErrorMessages();
+			done();
+		}
+		catch (err) {
+			resetGlobalErrorMessages();
+			done.fail(err);
+		}
+	};
+	const wrapper = mount(
+		<Form onSubmit={handleSubmit}>
+			<Input name="test" required />
 			<Submit />
 		</Form>
 	);

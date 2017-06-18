@@ -149,6 +149,7 @@ export default class Validation {
 		};
 
 		const isEmptyValue = isEmpty(value);
+
 		if (required && isEmptyValue) {
 			result.errorMessage = this._getErrorMessage(
 				_errors.required, name, value, 'required',

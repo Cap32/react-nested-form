@@ -138,7 +138,8 @@ export default function nestify(WrappedComponent/*, options*/) {
 			) {
 				this.attach();
 			}
-			else if (!isEmpty(prevValue) && isEmpty(nextValue) && nest.hasAttached &&
+			else if (!required &&
+				!isEmpty(prevValue) && isEmpty(nextValue) && nest.hasAttached &&
 				nest.shouldIgnoreEmpty(nextValue, pristineValue)
 			) {
 				this.detach();
@@ -150,6 +151,7 @@ export default function nestify(WrappedComponent/*, options*/) {
 			const form = context[CONTEXT_NAME];
 			const finalValue = props.inputFilter(value);
 			const hasChanged = nest.value !== finalValue;
+
 			if (hasChanged) {
 				this._shouldRenew = true;
 				this._shouldValidate = true;
@@ -254,6 +256,7 @@ export default function nestify(WrappedComponent/*, options*/) {
 		_handleBlur = (...args) => {
 			const { onBlur } = this.props;
 			this._setPristine(false);
+			this._requestRender();
 			if (isFunction(onBlur)) { return onBlur(...args); }
 		};
 
@@ -287,6 +290,7 @@ export default function nestify(WrappedComponent/*, options*/) {
 						...nest,
 						onChange: this._handleChange,
 						onKeyPress: this._handleKeyPress,
+						onBlur: this._handleBlur,
 						setValue: this.setValue,
 						attach: this.attach,
 						detach: this.detach,

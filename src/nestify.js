@@ -83,7 +83,8 @@ export default function nestify(WrappedComponent/*, options*/) {
 				shouldIgnoreEmpty,
 				value: inputFilter(
 					!isUndefined(defaultValue) ? defaultValue :
-						(!isUndefined(propValue) ? propValue : '')
+						(!isUndefined(propValue) ? propValue : ''),
+					this.props,
 				),
 			};
 
@@ -102,7 +103,12 @@ export default function nestify(WrappedComponent/*, options*/) {
 			if (required || !isEmpty(value) || !shouldIgnoreEmpty(value, value)) {
 				this.attach();
 			}
+		}
 
+		componentWillReceiveProps({ value }) {
+			if (this.props.value !== value) {
+				this._updateValue(value);
+			}
 		}
 
 		componentWillUnmount() {
@@ -116,7 +122,7 @@ export default function nestify(WrappedComponent/*, options*/) {
 				const { props, nest } = this;
 				nest.shouldShowErrorMessage = true;
 				this._shouldRenew = false;
-				return (this._outputValue = props.outputFilter(nest.value));
+				return (this._outputValue = props.outputFilter(nest.value, props));
 			}
 			return this._outputValue;
 		}
@@ -149,7 +155,7 @@ export default function nestify(WrappedComponent/*, options*/) {
 		_updateValue(value, shouldSetAsPristine) {
 			const { nest, props, context } = this;
 			const form = context[CONTEXT_NAME];
-			const finalValue = props.inputFilter(value);
+			const finalValue = props.inputFilter(value, props);
 			const hasChanged = nest.value !== finalValue;
 
 			if (hasChanged) {

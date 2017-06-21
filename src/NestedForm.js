@@ -142,6 +142,7 @@ export default class NestedForm extends Component {
 	getValue() {
 		const {
 			props: { outputFilter },
+			props,
 			nest,
 			_shouldRenew,
 			_outputValue,
@@ -174,7 +175,7 @@ export default class NestedForm extends Component {
 		}, {});
 
 		nest.value = newValue;
-		return (this._outputValue = outputFilter(newValue));
+		return (this._outputValue = outputFilter(newValue, props));
 	}
 
 	validate() {

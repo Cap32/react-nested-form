@@ -245,7 +245,7 @@ test('validation', function (done) {
 	wrapper.find(Submit).first().simulate('click');
 });
 
-test('validation with typing', function (done) {
+test('validation after typed', function (done) {
 	const handleSubmit = (data, { isInvalid }) => {
 		try {
 			expect(isInvalid).toBe(false);
@@ -518,7 +518,7 @@ test('outputFilter', function (done) {
 	wrapper.find(Submit).first().simulate('click');
 });
 
-test('should work after submit and change', function (done) {
+test('should work after submitted and changed', function (done) {
 	let submitCounter = 0;
 	const handleSubmit = (data) => {
 		if (submitCounter === 0) {
@@ -544,4 +544,19 @@ test('should work after submit and change', function (done) {
 	input.node.value = '2';
 	input.simulate('change');
 	wrapper.find(Submit).first().simulate('click');
+});
+
+test('should `isPristine` be `false` after submitted', function (done) {
+	const wrapper = mount(<Form>
+			<Input name="hello" value="world" />
+			<Submit />
+		</Form>
+	);
+	const input = wrapper.find('Input').first();
+	expect(input.props().nest.isPristine).toBe(true);
+	wrapper.find(Submit).first().simulate('click');
+	process.nextTick(() => {
+		expect(input.props().nest.isPristine).toBe(false);
+		done();
+	});
 });

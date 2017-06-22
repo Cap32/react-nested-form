@@ -117,6 +117,7 @@ export default function nestify(WrappedComponent/*, options*/) {
 
 		getValue() {
 			this._setPristine(false);
+			this._requestRender();
 
 			if (this._shouldRenew) {
 				const { props, nest } = this;

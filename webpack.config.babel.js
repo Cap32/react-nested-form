@@ -39,6 +39,9 @@ module.exports = (webpackEnv = {}) => {
 							'react',
 							'stage-0',
 						],
+						plugins: [
+							'transform-decorators-legacy',
+						],
 						cacheDirectory: true,
 						babelrc: false,
 					},

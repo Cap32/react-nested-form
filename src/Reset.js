@@ -1,30 +1,19 @@
 
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
-import submitify from './submitify';
+import submittify from './submittify';
 
-class Reset extends Component {
+@submittify({ onReset: 'onClick' })
+export default class Reset extends Component {
 	static propTypes = {
 		nest: PropTypes.object.isRequired,
-		onClick: PropTypes.func,
-	};
-
-	_handleClick = (ev) => {
-		const { onClick, nest } = this.props;
-		nest.reset();
-		onClick && onClick(ev);
 	};
 
 	render() {
-		const {
-			nest, // eslint-disable-line
-			...other,
-		} = this.props;
+		const { nest, ...other } = this.props;
 
 		return (
-			<button {...other} onClick={this._handleClick} type="button" />
+			<button {...other} type="button" />
 		);
 	}
 }
-
-export default submitify(Reset);

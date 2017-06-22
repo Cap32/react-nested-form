@@ -90,7 +90,6 @@ export default function nestify(options) {
 					isPristine: true,
 					hasAttached: false,
 					errorMessage: '',
-					shouldIgnoreEmpty,
 					value,
 				};
 
@@ -103,8 +102,11 @@ export default function nestify(options) {
 				this._outputValue = null;
 
 				const { required } = this._validation;
+				const outputValue = this._getOutput(value);
 
-				if (required || !isEmpty(value) || !shouldIgnoreEmpty(value, value)) {
+				if (required || !isEmpty(outputValue) ||
+					!shouldIgnoreEmpty(outputValue, value)
+				) {
 					this.attach();
 				}
 			}
@@ -126,10 +128,10 @@ export default function nestify(options) {
 				this._requestRender();
 
 				if (this._shouldRenew) {
-					const { props, nest } = this;
+					const { nest } = this;
 					nest.shouldShowErrorMessage = true;
 					this._shouldRenew = false;
-					return (this._outputValue = props.outputFilter(nest.value, props));
+					return (this._outputValue = this._getOutput(nest.value));
 				}
 				return this._outputValue;
 			}
@@ -144,8 +146,18 @@ export default function nestify(options) {
 				return this.context[CONTEXT_NAME].detach(this);
 			};
 
+			// should cache result
+			_getOutput(value) {
+				const { props } = this;
+				return props.outputFilter(value, props);
+			}
+
 			_shouldAttachEmptyValue(prevValue, nextValue) {
-				const { nest, pristineValue, props: { required } } = this;
+				const {
+					nest,
+					pristineValue,
+					props: { required, shouldIgnoreEmpty }
+				} = this;
 				if ((required && !nest.hasAttached) ||
 					(isEmpty(prevValue) && !isEmpty(nextValue) && !nest.hasAttached)
 				) {
@@ -153,7 +165,7 @@ export default function nestify(options) {
 				}
 				else if (!required &&
 					!isEmpty(prevValue) && isEmpty(nextValue) && nest.hasAttached &&
-					nest.shouldIgnoreEmpty(nextValue, pristineValue)
+					shouldIgnoreEmpty(nextValue, pristineValue)
 				) {
 					this.detach();
 				}
@@ -168,7 +180,10 @@ export default function nestify(options) {
 				if (hasChanged) {
 					this._shouldRenew = true;
 					this._shouldValidate = true;
-					this._shouldAttachEmptyValue(nest.value, finalValue);
+					this._shouldAttachEmptyValue(
+						this._getOutput(nest.value),
+						this._getOutput(finalValue),
+					);
 					nest.value = finalValue;
 					this._shouldForceRender = true;
 					this._requestRender();
@@ -262,7 +277,6 @@ export default function nestify(options) {
 					this._requestRender();
 				},
 			};
-
 
 			render() {
 				const {

@@ -560,3 +560,24 @@ test('should `isPristine` be `false` after submitted', function (done) {
 		done();
 	});
 });
+
+test('should ignore empty fields with outputFilter', function (done) {
+	const handleSubmit = (data) => {
+		try {
+			expect(data).toEqual({});
+			done();
+		}
+		catch (err) {
+			done.fail(err);
+		}
+	};
+	const outputFilter = () => {};
+	const App = () => (
+		<Form onSubmit={handleSubmit}>
+			<Input name="hello" value="world" outputFilter={outputFilter} />
+			<Submit />
+		</Form>
+	);
+	const wrapper = mount(<App />);
+	wrapper.find(Submit).first().simulate('click');
+});

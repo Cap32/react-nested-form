@@ -56,6 +56,10 @@ export const isDate = function isDate(target) {
 	return target instanceof Date;
 };
 
+export const isByte = function isByte(target) {
+	return /^([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)|([0-9a-zA-Z+/]{3}=))?$/.test(target);
+};
+
 export const isEmpty = (target) =>
 	isUndefined(target) || target === null || target === ''
 ;

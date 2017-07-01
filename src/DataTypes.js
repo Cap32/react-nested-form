@@ -1,13 +1,18 @@
 
-import { isUndefined, isDate, isString, isNumber, padEnd } from './utils';
+import { isEmpty, isDate, isString, isNumber, isByte, padEnd } from './utils';
 import warning from 'warning';
 
 const tsToDate = (n) => new Date(+padEnd(n, 13, '0')).toISOString();
 
-const toInt = (val) => isUndefined(val) ? val : (parseInt(val, 10) || 0);
-const toNumber = (val) => isUndefined(val) ? val : (+val || 0);
-const toStr = (val) => val ? (val + '') : val;
+const toInt = (val) => (parseInt(val, 10) || 0);
+const toNumber = (val) => (+val || 0);
+const toStr = (val) => (val + '');
 const toBoolean = (val) => !!val;
+const toByte = (val) => {
+	const formated = toStr(val);
+	warning(isByte(formated), `${val} is NOT a valid Byte type`);
+	return formated;
+};
 
 const toDateTime = (val) => {
 	if (!val) { return ''; }
@@ -54,6 +59,7 @@ const DataTypes = {
 	float: toNumber,
 	double: toNumber,
 	string: toStr,
+	byte: toByte,
 	boolean: toBoolean,
 	date: toDate,
 	dateTime: toDateTime,
@@ -66,7 +72,7 @@ export const DataTypeKeys = Object.keys(DataTypes);
 
 export function createFormatDataTypeFunc(type) {
 	return function formatDataType(val) {
-		if (isUndefined(val)) { return; }
+		if (isEmpty(val)) { return; }
 		return isString(type) ? DataTypes[type](val) : type(val);
 	};
 }

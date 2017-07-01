@@ -7,26 +7,6 @@ import Form, { Input, Submit } from '../';
 
 beforeEach(resetBOM);
 
-test('dataType="string"', function (done) {
-	const value = '32';
-	const handleSubmit = (data) => {
-		try {
-			expect(data.test).toBe(value);
-			done();
-		}
-		catch (err) {
-			done.fail(err);
-		}
-	};
-	const wrapper = mount(
-		<Form onSubmit={handleSubmit}>
-			<Input name="test" dataType="string" defaultValue={+value} />
-			<Submit />
-		</Form>
-	);
-	wrapper.find(Submit).first().simulate('click');
-});
-
 test('dataType="integer"', function (done) {
 	const value = 32;
 	const handleSubmit = (data) => {
@@ -101,6 +81,46 @@ test('dataType="double"', function (done) {
 	const wrapper = mount(
 		<Form onSubmit={handleSubmit}>
 			<Input name="test" dataType="double" defaultValue={`${value}`} />
+			<Submit />
+		</Form>
+	);
+	wrapper.find(Submit).first().simulate('click');
+});
+
+test('dataType="string"', function (done) {
+	const value = '32';
+	const handleSubmit = (data) => {
+		try {
+			expect(data.test).toBe(value);
+			done();
+		}
+		catch (err) {
+			done.fail(err);
+		}
+	};
+	const wrapper = mount(
+		<Form onSubmit={handleSubmit}>
+			<Input name="test" dataType="string" defaultValue={+value} />
+			<Submit />
+		</Form>
+	);
+	wrapper.find(Submit).first().simulate('click');
+});
+
+test('dataType="byte"', function (done) {
+	const value = 'bWFudXRk';
+	const handleSubmit = (data) => {
+		try {
+			expect(data.test).toBe(value);
+			done();
+		}
+		catch (err) {
+			done.fail(err);
+		}
+	};
+	const wrapper = mount(
+		<Form onSubmit={handleSubmit}>
+			<Input name="test" dataType="byte" defaultValue={value} />
 			<Submit />
 		</Form>
 	);

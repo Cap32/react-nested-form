@@ -2,11 +2,14 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import hoistStatics from 'hoist-non-react-statics';
-import { isEmpty, ValidationPropType, ErrorMessagePropType } from './utils';
 import { CONTEXT_NAME } from './constants';
 import { noop, returnsArgument } from 'empty-functions';
 import Validation from './Validation';
 import Mapper from './Mapper';
+import {
+	isEmpty, ValidationPropType, ErrorMessagePropType, FilterPropType,
+} from './utils';
+import { getInput, getOutput } from './Mixins';
 
 export default function nestify(options) {
 	const mapper = new Mapper(options, {
@@ -18,6 +21,9 @@ export default function nestify(options) {
 	});
 
 	return function createNestedComponent(WrappedComponent) {
+
+		@getInput
+		@getOutput
 		class Nestify extends Component {
 			static propTypes = {
 				name: PropTypes.string.isRequired,
@@ -43,8 +49,8 @@ export default function nestify(options) {
 				onKeyPress: PropTypes.func,
 				onBlur: PropTypes.func,
 				shouldIgnoreEmpty: PropTypes.func,
-				inputFilter: PropTypes.func,
-				outputFilter: PropTypes.func,
+				inputFilter: FilterPropType,
+				outputFilter: FilterPropType,
 
 				// JSON Schema Validations
 				required: PropTypes.bool,
@@ -66,8 +72,6 @@ export default function nestify(options) {
 			static defaultProps = {
 				required: false,
 				shouldIgnoreEmpty: (val, pristineValue) => isEmpty(pristineValue),
-				inputFilter: returnsArgument,
-				outputFilter: returnsArgument,
 			};
 
 			static contextTypes = {
@@ -75,13 +79,10 @@ export default function nestify(options) {
 			};
 
 			componentWillMount() {
-				const {
-					shouldIgnoreEmpty,
-					inputFilter,
-				} = this.props;
+				const { shouldIgnoreEmpty } = this.props;
 
 				const initialValue = mapper.getInitialValue(this);
-				const value = inputFilter(initialValue, this.props);
+				const value = this._getInput(initialValue);
 				this._mapperHandlers = mapper.getHandlers(this);
 
 				this.nest = {
@@ -146,12 +147,6 @@ export default function nestify(options) {
 				return this.context[CONTEXT_NAME].detach(this);
 			};
 
-			// should cache result
-			_getOutput(value) {
-				const { props } = this;
-				return props.outputFilter(value, props);
-			}
-
 			_shouldAttachEmptyValue(prevValue, nextValue) {
 				const {
 					nest,
@@ -172,9 +167,9 @@ export default function nestify(options) {
 			}
 
 			_updateValue(value, shouldSetAsPristine) {
-				const { nest, props, context } = this;
+				const { nest, context } = this;
 				const form = context[CONTEXT_NAME];
-				const finalValue = props.inputFilter(value, props);
+				const finalValue = this._getInput(value);
 				const hasChanged = nest.value !== finalValue;
 
 				if (hasChanged) {

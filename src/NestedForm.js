@@ -3,8 +3,11 @@ import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import { emptyFunction, returnsArgument } from 'empty-functions';
 import warning from 'warning';
-import { ValidationPropType, ComponentPropType, isValidChild } from './utils';
 import { CONTEXT_NAME } from './constants';
+import {
+	ValidationPropType, ComponentPropType, isValidChild, FilterPropType,
+} from './utils';
+import { getOutput } from './Mixins';
 
 const parseName = (name = '') => {
 	const regExp = /\[\]$/;
@@ -16,6 +19,7 @@ const parseName = (name = '') => {
 	return { isArray, realName: name };
 };
 
+@getOutput
 export default class NestedForm extends Component {
 	static propTypes = {
 		name: PropTypes.string,
@@ -25,7 +29,7 @@ export default class NestedForm extends Component {
 		onValid: PropTypes.func,
 		onInvalid: PropTypes.func,
 		validations: ValidationPropType,
-		outputFilter: PropTypes.func,
+		outputFilter: FilterPropType,
 	};
 
 	static defaultProps = {
@@ -141,8 +145,6 @@ export default class NestedForm extends Component {
 
 	getValue() {
 		const {
-			props: { outputFilter },
-			props,
 			nest,
 			_shouldRenew,
 			_outputValue,
@@ -175,7 +177,7 @@ export default class NestedForm extends Component {
 		}, {});
 
 		nest.value = newValue;
-		return (this._outputValue = outputFilter(newValue, props));
+		return (this._outputValue = this._getOutput(newValue));
 	}
 
 	validate() {

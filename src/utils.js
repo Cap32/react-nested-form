@@ -27,6 +27,11 @@ export const ErrorMessagePropType = PropTypes.oneOfType([
 	PropTypes.func,
 ]);
 
+export const FilterPropType = PropTypes.oneOfType([
+	PropTypes.arrayOf(PropTypes.func),
+	PropTypes.func,
+]);
+
 export const isFunction = function isFunction(target) {
 	return typeof target === 'function';
 };

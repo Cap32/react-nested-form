@@ -12,6 +12,7 @@
     "build": "yarn build:cjs && yarn build:es && yarn build:umd && yarn build:min",
     "start": "npm test -- --watchAll",
     "test": "cross-env BABEL_ENV=cjs jest",
+    "coverage": "npm test -- --coverage",
     "preversion": "yarn test && yarn build"
   },
   "files": [

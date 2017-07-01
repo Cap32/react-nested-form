@@ -44,13 +44,26 @@ export const isString = function isString(target) {
 	return typeof target === 'string';
 };
 
+export const isNumber = function isNumber(target) {
+	return typeof target === 'number';
+};
+
 export const isUndefined = function isUndefined(target) {
 	return typeof target === 'undefined';
 };
 
-export const isEmpty = (value) =>
-	isUndefined(value) || value === null || value === ''
+export const isDate = function isDate(target) {
+	return target instanceof Date;
+};
+
+export const isEmpty = (target) =>
+	isUndefined(target) || target === null || target === ''
 ;
+
+export const padEnd = function padEnd(target, length, fillString) {
+	while (target.length < length) { target += fillString; }
+	return target;
+};
 
 export const isValidChild = function isValidChild(c) {
 	if (c && c.props && c.nest && c.getValue && c.reset && c.setAsPristine) {

@@ -1,10 +1,12 @@
 
+import { createFormatDataTypeFunc } from './DataTypes';
+
 const filterFn = function filterFn(Component, methodName, propName) {
 	Component.prototype[methodName] = function (val) {
-		const { props } = this;
-		const filters = props[propName];
-		if (!filters) { return val; }
-		return [].concat(filters).reduce((res, fn) => fn(res, props), val);
+		const { props, props: { dataType } } = this;
+		const filters = props[propName] || [];
+		const defaults = dataType ? [createFormatDataTypeFunc(dataType)] : [];
+		return defaults.concat(filters).reduce((res, fn) => fn(res, props), val);
 	};
 };
 

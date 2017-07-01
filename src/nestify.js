@@ -9,6 +9,7 @@ import Mapper from './Mapper';
 import {
 	isEmpty, ValidationPropType, ErrorMessagePropType, FilterPropType,
 } from './utils';
+import { DataTypeKeys } from './DataTypes';
 import { getInput, getOutput } from './Mixins';
 
 export default function nestify(options) {
@@ -49,6 +50,11 @@ export default function nestify(options) {
 				onKeyPress: PropTypes.func,
 				onBlur: PropTypes.func,
 				shouldIgnoreEmpty: PropTypes.func,
+
+				dataType: PropTypes.oneOfType([
+					PropTypes.func,
+					PropTypes.oneOf(DataTypeKeys),
+				]),
 				inputFilter: FilterPropType,
 				outputFilter: FilterPropType,
 
@@ -282,6 +288,7 @@ export default function nestify(options) {
 						validations,
 						defaultErrorMessage,
 						shouldIgnoreEmpty,
+						dataType,
 						inputFilter,
 						outputFilter,
 						maximum,

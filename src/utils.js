@@ -53,7 +53,7 @@ export const isUndefined = function isUndefined(target) {
 };
 
 export const isDate = function isDate(target) {
-	return target instanceof Date;
+	return target && isFunction(target.toISOString);
 };
 
 export const isByte = function isByte(target) {

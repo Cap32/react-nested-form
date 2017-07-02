@@ -79,6 +79,12 @@ export const isValidChild = function isValidChild(c) {
 	}
 };
 
+export const createFormatEmptyFunc = (formatEmptyValue) => {
+	return function formatEmpty(val) {
+		return isEmpty(val) && formatEmptyValue ? formatEmptyValue(val) : val;
+	};
+};
+
 export const globalDefaultErrorMessages = {
 	required: 'Required',
 

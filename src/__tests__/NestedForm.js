@@ -168,6 +168,27 @@ test('should ignore empty fields if pristine value is empty', function (done) {
 	wrapper.find(Submit).first().simulate('click');
 });
 
+test('format empty value', function (done) {
+	const value = 'world';
+	const handleSubmit = (data) => {
+		try {
+			expect(data.hello).toEqual(value);
+			done();
+		}
+		catch (err) {
+			done.fail(err);
+		}
+	};
+	const App = () => (
+		<Form onSubmit={handleSubmit}>
+			<Input name="hello" formatEmptyValue={() => value} />
+			<Submit />
+		</Form>
+	);
+	const wrapper = mount(<App />);
+	wrapper.find(Submit).first().simulate('click');
+});
+
 test('should not ignore empty fields if pristine value is not empty', function (done) {
 	const handleSubmit = (data) => {
 		try {

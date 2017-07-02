@@ -7,7 +7,9 @@ const tsToDate = (n) => new Date(+padEnd(n, 13, '0')).toISOString();
 const toInt = (val) => isEmpty(val) ? 0 : (parseInt(val, 10) || 0);
 const toNumber = (val) => isEmpty(val) ? 0 : (+val || 0);
 const toStr = (val) => isEmpty(val) ? '' : (val + '');
-const toBoolean = (val) => isEmpty(val) ? false : !!val;
+const toBoolean = (val) => (
+	!!val && val !== '0' && val !== 'false' && val !== 'undefined' && val !== 'null'
+);
 const toByte = (val) => {
 	const formated = toStr(val);
 	warning(isByte(formated), `${val} is NOT a valid Byte type`);

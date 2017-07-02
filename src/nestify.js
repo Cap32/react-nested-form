@@ -6,11 +6,11 @@ import { CONTEXT_NAME } from './constants';
 import { noop, returnsArgument } from 'empty-functions';
 import Validation from './Validation';
 import Mapper from './Mapper';
-import {
-	isEmpty, ValidationPropType, ErrorMessagePropType, FilterPropType,
-} from './utils';
+import { ValidationPropType, ErrorMessagePropType, FilterPropType } from './utils';
 import { DataTypeKeys } from './DataTypes';
 import { getInput, getOutput } from './Mixins';
+
+const defaultShouldIgnore = (value, pristineValue) => !value && !pristineValue;
 
 export default function nestify(options) {
 	const mapper = new Mapper(options, {
@@ -49,7 +49,7 @@ export default function nestify(options) {
 				onChange: PropTypes.func,
 				onKeyPress: PropTypes.func,
 				onBlur: PropTypes.func,
-				shouldIgnoreEmpty: PropTypes.func,
+				shouldIgnore: PropTypes.func,
 
 				dataType: PropTypes.oneOfType([
 					PropTypes.func,
@@ -57,6 +57,7 @@ export default function nestify(options) {
 				]),
 				inputFilter: FilterPropType,
 				outputFilter: FilterPropType,
+				formatEmptyValue: PropTypes.func,
 
 				// JSON Schema Validations
 				required: PropTypes.bool,
@@ -77,7 +78,7 @@ export default function nestify(options) {
 
 			static defaultProps = {
 				required: false,
-				shouldIgnoreEmpty: (val, pristineValue) => isEmpty(pristineValue),
+				shouldIgnore: defaultShouldIgnore,
 			};
 
 			static contextTypes = {
@@ -85,7 +86,10 @@ export default function nestify(options) {
 			};
 
 			componentWillMount() {
-				const { shouldIgnoreEmpty } = this.props;
+				const {
+					props,
+					props: { shouldIgnore },
+				} = this;
 
 				const initialValue = mapper.getInitialValue(this);
 				const value = this._getInput(initialValue);
@@ -100,7 +104,7 @@ export default function nestify(options) {
 					value,
 				};
 
-				this._validation = new Validation(this.props);
+				this._validation = new Validation(props);
 
 				this.pristineValue = value;
 				this._shouldForceRender = false;
@@ -111,9 +115,7 @@ export default function nestify(options) {
 				const { required } = this._validation;
 				const outputValue = this._getOutput(value);
 
-				if (required || !isEmpty(outputValue) ||
-					!shouldIgnoreEmpty(outputValue, value)
-				) {
+				if (required || !shouldIgnore(outputValue, value, props)) {
 					this.attach();
 				}
 			}
@@ -153,20 +155,20 @@ export default function nestify(options) {
 				return this.context[CONTEXT_NAME].detach(this);
 			};
 
-			_shouldAttachEmptyValue(prevValue, nextValue) {
+			_shouldAttach(nextValue) {
 				const {
 					nest,
 					pristineValue,
-					props: { required, shouldIgnoreEmpty }
+					props,
+					props: { required, shouldIgnore },
 				} = this;
-				if ((required && !nest.hasAttached) ||
-					(isEmpty(prevValue) && !isEmpty(nextValue) && !nest.hasAttached)
+				if (!nest.hasAttached &&
+					(required || !shouldIgnore(nextValue, pristineValue, props))
 				) {
 					this.attach();
 				}
-				else if (!required &&
-					!isEmpty(prevValue) && isEmpty(nextValue) && nest.hasAttached &&
-					shouldIgnoreEmpty(nextValue, pristineValue)
+				else if (nest.hasAttached && !required &&
+					shouldIgnore(nextValue, pristineValue, props)
 				) {
 					this.detach();
 				}
@@ -175,17 +177,14 @@ export default function nestify(options) {
 			_updateValue(value, shouldSetAsPristine) {
 				const { nest, context } = this;
 				const form = context[CONTEXT_NAME];
-				const finalValue = this._getInput(value);
-				const hasChanged = nest.value !== finalValue;
+				const nextValue = this._getInput(value);
+				const hasChanged = nest.value !== nextValue;
 
 				if (hasChanged) {
 					this._shouldRenew = true;
 					this._shouldValidate = true;
-					this._shouldAttachEmptyValue(
-						this._getOutput(nest.value),
-						this._getOutput(finalValue),
-					);
-					nest.value = finalValue;
+					this._shouldAttach(this._getOutput(nextValue));
+					nest.value = nextValue;
 					this._shouldForceRender = true;
 					this._requestRender();
 					this._setPristine(shouldSetAsPristine);
@@ -287,7 +286,8 @@ export default function nestify(options) {
 						defaultValue,
 						validations,
 						defaultErrorMessage,
-						shouldIgnoreEmpty,
+						shouldIgnore,
+						formatEmptyValue,
 						dataType,
 						inputFilter,
 						outputFilter,

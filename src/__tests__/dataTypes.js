@@ -139,7 +139,7 @@ test('dataType="byte"', function (done) {
 test('dataType="boolean"', function (done) {
 	const handleSubmit = (data) => {
 		try {
-			expect(data.test).toBe(false);
+			expect(data.test).toBe(true);
 			done();
 		}
 		catch (err) {
@@ -148,7 +148,7 @@ test('dataType="boolean"', function (done) {
 	};
 	const wrapper = mount(
 		<Form onSubmit={handleSubmit}>
-			<Input name="test" dataType="boolean" defaultValue={0} />
+			<Input name="test" dataType="boolean" defaultValue={1} />
 			<Submit />
 		</Form>
 	);

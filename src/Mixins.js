@@ -1,12 +1,15 @@
 
 import { createFormatDataTypeFunc } from './DataTypes';
+import { createFormatEmptyFunc } from './utils';
 
 const filterFn = function filterFn(Component, methodName, propName) {
 	Component.prototype[methodName] = function (val) {
-		const { props, props: { dataType } } = this;
-		const filters = props[propName] || [];
-		const defaults = dataType ? [createFormatDataTypeFunc(dataType)] : [];
-		return defaults.concat(filters).reduce((res, fn) => fn(res, props), val);
+		const { props, props: { dataType, formatEmptyValue } } = this;
+		const ioFilters = props[propName] || [];
+		const headFilter = dataType ? [createFormatDataTypeFunc(dataType)] : [];
+		const lastFilter = createFormatEmptyFunc(formatEmptyValue);
+		const filters = headFilter.concat(ioFilters).concat(lastFilter);
+		return filters.reduce((res, fn) => fn(res, props), val);
 	};
 };
 

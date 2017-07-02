@@ -27,13 +27,13 @@ test('dataType="integer"', function (done) {
 	wrapper.find(Submit).first().simulate('click');
 });
 
-test('dataType="integer" when value is empty string', function () {
+test('dataType="integer" when value is empty', function () {
 	const wrapper = mount(
 		<Form>
 			<Input name="test" dataType="integer" value="" />
 		</Form>
 	);
-	expect(typeof wrapper.find('input').prop('value')).toBe('number');
+	expect(typeof wrapper.find('input').prop('value')).toBe('undefined');
 });
 
 test('dataType="long"', function (done) {

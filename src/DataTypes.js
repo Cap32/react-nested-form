@@ -4,9 +4,9 @@ import warning from 'warning';
 
 const tsToDate = (n) => new Date(+padEnd(n, 13, '0')).toISOString();
 
-const toInt = (val) => isEmpty(val) ? 0 : (parseInt(val, 10) || 0);
-const toNumber = (val) => isEmpty(val) ? 0 : (+val || 0);
-const toStr = (val) => isEmpty(val) ? '' : (val + '');
+const toInt = (val) => (parseInt(val, 10) || 0);
+const toNumber = (val) => (+val || 0);
+const toStr = (val) => !val ? '' : (val + '');
 const toBoolean = (val) => (
 	!!val && val !== '0' && val !== 'false' && val !== 'undefined' && val !== 'null'
 );
@@ -74,6 +74,7 @@ export const DataTypeKeys = Object.keys(DataTypes);
 
 export function createFormatDataTypeFunc(type) {
 	return function formatDataType(val) {
+		if (isEmpty(val)) { return; }
 		return isString(type) ? DataTypes[type](val) : type(val);
 	};
 }

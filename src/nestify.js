@@ -6,11 +6,13 @@ import { CONTEXT_NAME } from './constants';
 import { noop, returnsArgument } from 'empty-functions';
 import Validation from './Validation';
 import Mapper from './Mapper';
-import { ValidationPropType, ErrorMessagePropType, FilterPropType } from './utils';
+import { isEmpty, ValidationPropType, ErrorMessagePropType, FilterPropType } from './utils';
 import { DataTypeKeys } from './DataTypes';
 import { getInput, getOutput } from './Mixins';
 
-const defaultShouldIgnore = (value, pristineValue) => !value && !pristineValue;
+const defaultShouldIgnore = (value, pristineValue) =>
+	isEmpty(value) && isEmpty(pristineValue)
+;
 
 export default function nestify(options) {
 	const mapper = new Mapper(options, {

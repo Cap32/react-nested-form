@@ -119,10 +119,10 @@ export default function nestify(options) {
 			}
 
 			componentWillReceiveProps(nextProps) {
-				const { name, map } = mapper.getValueProp();
+				const { name, get } = mapper.getValueProp();
 				const nextValue = nextProps[name];
 				if (this.props[name] !== nextValue) {
-					this._updateValue(map(nextValue));
+					this._updateValue(get(nextValue));
 				}
 			}
 

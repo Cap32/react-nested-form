@@ -19,13 +19,13 @@ export default class Mapper {
 		const valueProp = this._props['value'];
 		const value = reactProps[valueProp.name];
 
-		if (!isUndefined(value)) { return valueProp.map(value); }
+		if (!isUndefined(value)) { return valueProp.get(value); }
 
 		const defaultValueProp = this._props['defaultValue'];
 		const defaultValue = reactProps[defaultValueProp.name];
 
 		if (!isUndefined(defaultValue)) {
-			return defaultValueProp.map(defaultValue);
+			return defaultValueProp.get(defaultValue);
 		}
 	}
 
@@ -38,7 +38,7 @@ export default class Mapper {
 		const valueProp = this._props['value'];
 		const defaultValueProp = this._props['defaultValue'];
 		return {
-			[valueProp.name]: value || '',
+			[valueProp.name]: value,
 			[defaultValueProp.name]: undefined,
 		};
 	}
@@ -57,35 +57,35 @@ export default class Mapper {
 	}
 
 	_getHandler(reactInstance, prop) {
-		const { key, name, map } = isString(prop) ? this._props[prop] : prop;
+		const { key, name, get } = isString(prop) ? this._props[prop] : prop;
 		return (...args) => {
 			const { handlers, props } = reactInstance;
-			const value = map(...args);
+			const value = get(...args);
 			const res = handlers[key](value);
 			isFunction(props[name]) && props[name](...args);
 			return res;
 		};
 	}
 
-	_parseMapValue(name, map = noop) {
+	_parseMapValue(name, get = noop) {
 		const mapValue = this._options[name];
-		const res = { name, map };
+		const res = { name, get };
 
 		if (!mapValue) { return res; }
 
 		if (isString(mapValue)) { res.name = mapValue; }
 		else if (mapValue.name) { res.name = mapValue.name; }
 
-		if (isFunction(mapValue)) { res.map = mapValue; }
-		else if (mapValue.map) { res.map = mapValue.map; }
+		if (isFunction(mapValue)) { res.get = mapValue; }
+		else if (mapValue.get) { res.get = mapValue.get; }
 
 		return res;
 	}
 
 	_merge(key, defaultMap) {
 		const { _props } = this;
-		const { name, map } = this._parseMapValue(key, defaultMap);
+		const { name, get } = this._parseMapValue(key, defaultMap);
 		const _isHandler = /^on/.test(key);
-		_props[key] = { key, name, map, _isHandler };
+		_props[key] = { key, name, get, _isHandler };
 	}
 }

@@ -20,7 +20,7 @@ test('basic', function (done) {
 	};
 	const App = () => (
 		<Form onSubmit={handleSubmit}>
-			<Input name="hello" />
+			<Input name="hello" defaultValue="" />
 			<Submit />
 		</Form>
 	);
@@ -48,7 +48,7 @@ test('update input value prop', function (done) {
 			<Submit />
 		</Form>
 	);
-	const wrapper = mount(<App />);
+	const wrapper = mount(<App value="" />);
 	wrapper.setProps({ value });
 	process.nextTick(() => {
 		wrapper.find(Submit).first().simulate('click');
@@ -68,7 +68,7 @@ test('submit by pressed `enter` key', function (done) {
 	};
 	const App = () => (
 		<Form onSubmit={handleSubmit}>
-			<Input name="hello" />
+			<Input name="hello" defaultValue="" />
 		</Form>
 	);
 	const wrapper = mount(<App />);
@@ -160,7 +160,7 @@ test('should ignore empty fields if pristine value is empty', function (done) {
 	};
 	const App = () => (
 		<Form onSubmit={handleSubmit}>
-			<Input name="hello" />
+			<Input name="hello" defaultValue="" />
 			<Submit />
 		</Form>
 	);
@@ -203,7 +203,7 @@ test('should not ignore empty fields if required', function (done) {
 	};
 	const App = () => (
 		<Form onSubmit={handleSubmit}>
-			<Input name="hello" required />
+			<Input name="hello" defaultValue="" required />
 			<Submit />
 		</Form>
 	);
@@ -532,7 +532,7 @@ test('should work after submitted and changed', function (done) {
 	};
 	const App = () => (
 		<Form onSubmit={handleSubmit}>
-			<Input name="hello" />
+			<Input name="hello" defaultValue="" />
 			<Submit />
 		</Form>
 	);

@@ -4,10 +4,10 @@ import warning from 'warning';
 
 const tsToDate = (n) => new Date(+padEnd(n, 13, '0')).toISOString();
 
-const toInt = (val) => (parseInt(val, 10) || 0);
-const toNumber = (val) => (+val || 0);
-const toStr = (val) => (val + '');
-const toBoolean = (val) => !!val;
+const toInt = (val) => isEmpty(val) ? 0 : (parseInt(val, 10) || 0);
+const toNumber = (val) => isEmpty(val) ? 0 : (+val || 0);
+const toStr = (val) => isEmpty(val) ? '' : (val + '');
+const toBoolean = (val) => isEmpty(val) ? false : !!val;
 const toByte = (val) => {
 	const formated = toStr(val);
 	warning(isByte(formated), `${val} is NOT a valid Byte type`);
@@ -15,7 +15,7 @@ const toByte = (val) => {
 };
 
 const toDateTime = (val) => {
-	if (!val) { return ''; }
+	if (isEmpty(val)) { return; }
 
 	if (isString(val) && val.includes(',')) {
 		return val.split(',').map(toDateTime);
@@ -35,7 +35,7 @@ const toDateTime = (val) => {
 };
 
 const toDate = (val) => {
-	if (!val) { return ''; }
+	if (isEmpty(val)) { return; }
 
 	if (isString(val) && val.includes(',')) {
 		return val.split(',').map(toDate);
@@ -72,7 +72,6 @@ export const DataTypeKeys = Object.keys(DataTypes);
 
 export function createFormatDataTypeFunc(type) {
 	return function formatDataType(val) {
-		if (isEmpty(val)) { return; }
 		return isString(type) ? DataTypes[type](val) : type(val);
 	};
 }

@@ -10,7 +10,7 @@ beforeEach(resetBOM);
 test('typing', function () {
 	const wrapper = mount(
 		<Form>
-			<Input name="hello" />
+			<Input name="hello" defaultValue="" />
 		</Form>
 	);
 	const input = wrapper.find('input').first();

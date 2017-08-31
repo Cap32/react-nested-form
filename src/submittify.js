@@ -4,14 +4,9 @@ import React, { Component } from 'react';
 import hoistStatics from 'hoist-non-react-statics';
 import { CONTEXT_NAME } from './constants';
 import noop from 'empty-functions';
-import Mapper from './Mapper';
+import PropsMapper from './PropsMapper';
 
 export default function submittify(options) {
-	const mapper = new Mapper(options, {
-		onSubmit: noop,
-		onReset: noop,
-	});
-
 	return function createNestedComponent(WrappedComponent) {
 		class Submittify extends Component {
 			static contextTypes = {
@@ -19,7 +14,11 @@ export default function submittify(options) {
 			};
 
 			componentWillMount() {
-				this._mapperHandlers = mapper.getHandlers(this);
+				const mapper = new PropsMapper(this, options, {
+					onSubmit: noop,
+					onReset: noop,
+				});
+				this._mapperHandlers = mapper.getHandlers();
 			}
 
 			handlers = {

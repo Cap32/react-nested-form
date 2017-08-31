@@ -5,7 +5,7 @@ import hoistStatics from 'hoist-non-react-statics';
 import { CONTEXT_NAME } from './constants';
 import { noop, returnsArgument } from 'empty-functions';
 import Validation from './Validation';
-import Mapper from './Mapper';
+import PropsMapper from './PropsMapper';
 import { isEmpty, ValidationPropType, ErrorMessagePropType, FilterPropType } from './utils';
 import { DataTypeKeys } from './DataTypes';
 import { getInput, getOutput } from './Mixins';
@@ -15,14 +15,6 @@ const defaultShouldIgnore = (value, pristineValue) =>
 ;
 
 export default function nestify(options) {
-	const mapper = new Mapper(options, {
-		defaultValue: returnsArgument,
-		value: returnsArgument,
-		onChange: (event) => event.currentTarget.value,
-		onKeyPress: (event) => event.key,
-		onBlur: noop,
-	});
-
 	return function createNestedComponent(WrappedComponent) {
 
 		@getInput
@@ -93,9 +85,17 @@ export default function nestify(options) {
 					props: { shouldIgnore },
 				} = this;
 
-				const initialValue = mapper.getInitialValue(this);
+				this._mapper = new PropsMapper(this, options, {
+					defaultValue: returnsArgument,
+					value: returnsArgument,
+					onChange: (event) => event.currentTarget.value,
+					onKeyPress: (event) => event.key,
+					onBlur: noop,
+				});
+
+				const initialValue = this._mapper.getInitialValue();
 				const value = this._getInput(initialValue);
-				this._mapperHandlers = mapper.getHandlers(this);
+				this._mapperHandlers = this._mapper.getHandlers();
 
 				this.nest = {
 					isInvalid: false,
@@ -113,6 +113,7 @@ export default function nestify(options) {
 				this._shouldValidate = true;
 				this._shouldRenew = true;
 				this._outputValue = null;
+				this._changedValue = undefined;
 
 				const { required } = this._validation;
 				const outputValue = this._getOutput(value);
@@ -123,10 +124,10 @@ export default function nestify(options) {
 			}
 
 			componentWillReceiveProps(nextProps) {
-				const { name, get } = mapper.getValueProp();
+				const { name, get } = this._mapper.getValueProp();
 				const nextValue = nextProps[name];
 				if (this.props[name] !== nextValue) {
-					this._updateValue(get(nextValue));
+					this._updateValue(get(nextValue, nextProps));
 				}
 			}
 
@@ -140,7 +141,6 @@ export default function nestify(options) {
 
 				if (this._shouldRenew) {
 					const { nest } = this;
-					nest.shouldShowErrorMessage = true;
 					this._shouldRenew = false;
 					return (this._outputValue = this._getOutput(nest.value));
 				}
@@ -179,7 +179,7 @@ export default function nestify(options) {
 			_updateValue(value, shouldSetAsPristine) {
 				const { nest, context } = this;
 				const form = context[CONTEXT_NAME];
-				const nextValue = this._getInput(value);
+				const nextValue = this._getInput(this._mapper.getValue(value));
 				const hasChanged = nest.value !== nextValue;
 
 				if (hasChanged) {
@@ -267,6 +267,7 @@ export default function nestify(options) {
 
 			handlers = {
 				onChange: (value) => {
+					this._changedValue = value;
 					this.setValue(value);
 				},
 				onKeyPress: (key) => {
@@ -312,7 +313,7 @@ export default function nestify(options) {
 					<WrappedComponent
 						{...other}
 						{..._mapperHandlers}
-						{...mapper.getValues(this)}
+						{...this._mapper.getValues()}
 						nest={{
 							...nest,
 							setValue: this.setValue,

@@ -4,7 +4,7 @@ import React, { Component } from 'react';
 import nestify from './nestify';
 
 @nestify()
-class Input extends Component {
+export default class Input extends Component {
 	static propTypes = {
 		nest: PropTypes.object.isRequired,
 	};
@@ -16,5 +16,3 @@ class Input extends Component {
 		);
 	}
 }
-
-export default Input;

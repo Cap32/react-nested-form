@@ -14,7 +14,7 @@ const defaultShouldIgnore = (value, pristineValue) =>
 	isEmpty(value) && isEmpty(pristineValue)
 ;
 
-export default function nestify(options) {
+export default function nestify(mapProps, defaultProps) {
 	return function createNestedComponent(WrappedComponent) {
 
 		@getInput
@@ -73,6 +73,7 @@ export default function nestify(options) {
 			static defaultProps = {
 				required: false,
 				shouldIgnore: defaultShouldIgnore,
+				...defaultProps,
 			};
 
 			static contextTypes = {
@@ -85,7 +86,7 @@ export default function nestify(options) {
 					props: { shouldIgnore },
 				} = this;
 
-				this._mapper = new PropsMapper(this, options, {
+				this._mapper = new PropsMapper(this, mapProps, {
 					defaultValue: returnsArgument,
 					value: returnsArgument,
 					onChange: (event) => event.currentTarget.value,

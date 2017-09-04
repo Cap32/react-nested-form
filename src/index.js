@@ -2,6 +2,7 @@
 export default from './NestedForm';
 export Input from './Input';
 export Checkbox from './Checkbox';
+export ArrayOf from './ArrayOf';
 export Submit from './Submit';
 export Reset from './Reset';
 export nestify from './nestify';

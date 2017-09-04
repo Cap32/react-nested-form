@@ -10,13 +10,15 @@ import {
 import { getOutput } from './Mixins';
 
 const parseName = (name = '') => {
-	const regExp = /\[\]$/;
+	const regExp = /\[(\d*)\]$/;
 	let isArray = false;
-	name = (name + '').replace(regExp, () => {
+	let index = -1;
+	name = (name + '').replace(regExp, (m, i) => {
 		isArray = true;
+		if (/\d/.test(i)) { index = +i; }
 		return '';
 	});
-	return { isArray, realName: name };
+	return { isArray, realName: name, index };
 };
 
 @getOutput
@@ -28,6 +30,7 @@ export default class NestedForm extends Component {
 		onReset: PropTypes.func,
 		onValid: PropTypes.func,
 		onInvalid: PropTypes.func,
+		onRenew: PropTypes.func,
 		validations: ValidationPropType,
 		outputFilter: FilterPropType,
 	};
@@ -135,6 +138,8 @@ export default class NestedForm extends Component {
 
 	_requestRenew = () => {
 		this._shouldRenew = true;
+		const { onRenew } = this.props;
+		onRenew && onRenew(this.getValue());
 	};
 
 	_requestValid = () => {
@@ -159,12 +164,18 @@ export default class NestedForm extends Component {
 
 			if (!name) { return data; }
 
-			const { isArray, realName } = parseName(name);
+			const { isArray, realName, index } = parseName(name);
 			const value = child.getValue();
-			const dataValue = data[realName];
+			let dataValue = data[realName];
 			if (isArray) {
-				if (dataValue) { dataValue.push(value); }
-				else { data[realName] = [value]; }
+				if (!dataValue) { dataValue = (data[realName] = []); }
+
+				if (index < 0) {
+					dataValue.push(value);
+				}
+				else {
+					dataValue.splice(index, 0, value);
+				}
 			}
 			else {
 				warning(!dataValue,
@@ -254,6 +265,7 @@ export default class NestedForm extends Component {
 				/* eslint-disable */
 				onValid,
 				onInvalid,
+				onRenew,
 				validations,
 				outputFilter,
 				/* eslint-enable */

@@ -3,18 +3,22 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import nestify from './nestify';
 import NestedForm from './NestedForm';
-import { isUndefined } from './utils';
+import { isUndefined, isFunction } from './utils';
+import warning from 'warning';
 
 @nestify({}, {
 	shouldIgnore(value = [], pristineValue) {
 		return !value.length && isUndefined(pristineValue);
 	},
+}, {
+	withRef: true,
+	hoistMethods: ['dropAll', 'dropByKey', 'push', 'pop', 'shift', 'unshift', 'splice'],
 })
 export default class ArrayOf extends Component {
 	static propTypes = {
 		name: PropTypes.string,
 		nest: PropTypes.object,
-		value: PropTypes.array,
+		value: PropTypes.any,
 		render: PropTypes.func,
 	};
 
@@ -27,11 +31,14 @@ export default class ArrayOf extends Component {
 			items = [];
 			nest.setValue([]);
 		}
-		else {
+		else if (isFunction(values.map)) {
 			items = values.map(this._createItem);
 			this._appendName(items);
 		}
-		this._items = this._createEnhancedArray(items);
+		else {
+			warning(false, '[ArrayOf]: value should be array, but received', values);
+		}
+		this._items = items;
 	}
 
 	_appendName(items) {
@@ -47,59 +54,55 @@ export default class ArrayOf extends Component {
 		};
 	};
 
-	_createEnhancedArray = (items) => {
-		items.dropAll = () => {
-			items.length = 0;
-			this._updateValue();
-		};
+	dropAll = () => {
+		this._items.length = 0;
+		this._updateValue();
+	};
 
-		items.dropByKey = (key) => {
-			let index = -1;
-			for (let i = 0; i < items.length; i++) {
-				const item = items[i];
-				if (item.key === key) {
-					index = i;
-					break;
-				}
+	dropByKey = (key) => {
+		let index = -1;
+		for (let i = 0; i < this._items.length; i++) {
+			const item = this._items[i];
+			if (item.key === key) {
+				index = i;
+				break;
 			}
-			if (index > -1) {
-				items.splice(index, 1);
-				this._updateValue();
-			}
-		};
-
-		items.pushValue = (...values) => {
-			items.push(...values.map(this._createItem));
+		}
+		if (index > -1) {
+			this._items.splice(index, 1);
 			this._updateValue();
-			return items.length;
-		};
+		}
+	};
 
-		items.unshiftValue = (...values) => {
-			items.unshift(...values.map(this._createItem));
-			this._updateValue();
-			return items.length;
-		};
+	push = (...values) => {
+		this._items.push(...values.map(this._createItem));
+		this._updateValue();
+		return this._items.length;
+	};
 
-		items.popValue = () => {
-			items.pop();
-			this._updateValue();
-			return items.length;
-		};
+	unshift = (...values) => {
+		this._items.unshift(...values.map(this._createItem));
+		this._updateValue();
+		return this._items.length;
+	};
 
-		items.shiftValue = () => {
-			const item = items.shift();
-			this._updateValue();
-			return item;
-		};
+	pop = () => {
+		this._items.pop();
+		this._updateValue();
+		return this._items.length;
+	};
 
-		items.spliceValue = (start, deleteCount, ...arr) => {
-			const arrItems = arr.map(this._createItem);
-			const removed = items.splice(start, deleteCount, ...arrItems);
-			this._updateValue();
-			return removed;
-		};
+	shift = () => {
+		const item = this._items.shift();
+		this._updateValue();
+		return item;
+	};
 
-		return items;
+	splice = (start, deleteCount, ...arr) => {
+		const arrItems = arr.map(this._createItem);
+		const removed = this._items.splice(start, deleteCount, ...arrItems);
+		this._updateValue();
+		return removed;
 	};
 
 	_updateValue = () => {
@@ -119,9 +122,9 @@ export default class ArrayOf extends Component {
 		return (
 			<NestedForm
 				ref={(form) => (this._form = form)}
-				onRenew={this._setData}
+				onChange={this._setData}
 			>
-				{render(this._items)}
+				{render(this._items, this)}
 			</NestedForm>
 		);
 	}

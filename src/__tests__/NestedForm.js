@@ -602,3 +602,36 @@ test('should ignore empty fields with outputFilter', function (done) {
 	const wrapper = mount(<App />);
 	wrapper.find(Submit).first().simulate('click');
 });
+
+test('should `onChange` work', async () => {
+	const handleChange = jest.fn();
+	const wrapper = mount(
+		<Form onChange={handleChange}>
+			<Input name="test" defaultValue="hello" />
+		</Form>
+	);
+	const input = wrapper.find('input').first();
+	input.node.value = 'world';
+	input.simulate('change');
+	const value = handleChange.mock.calls[1][0];
+	expect(value).toEqual({ test: 'world' });
+});
+
+test('should nested `onChange` work', async () => {
+	const handleChange = jest.fn();
+	const handleNestedChange = jest.fn();
+	const wrapper = mount(
+		<Form onChange={handleChange}>
+			<Form name="nested" onChange={handleNestedChange}>
+				<Input name="test" defaultValue="hello" />
+			</Form>
+		</Form>
+	);
+	const input = wrapper.find('input').first();
+	input.node.value = 'world';
+	input.simulate('change');
+	const value = handleChange.mock.calls[2][0];
+	expect(value).toEqual({ nested: { test: 'world' } });
+	const nestedValue = handleNestedChange.mock.calls[1][0];
+	expect(nestedValue).toEqual({ test: 'world' });
+});

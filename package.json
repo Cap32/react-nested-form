@@ -31,6 +31,7 @@
     "array-find": "^1.0.0",
     "empty-functions": "^1.0.2",
     "hoist-non-react-statics": "^1.2.0",
+    "hoist-react-instance-methods": "^2.0.0",
     "prop-types": "^15.5.7",
     "warning": "^3.0.0"
   },

@@ -6,6 +6,7 @@ import warning from 'warning';
 import { CONTEXT_NAME } from './constants';
 import {
 	ValidationPropType, ComponentPropType, isValidChild, FilterPropType,
+	isFunction,
 } from './utils';
 import { getOutput } from './Mixins';
 
@@ -30,7 +31,7 @@ export default class NestedForm extends Component {
 		onReset: PropTypes.func,
 		onValid: PropTypes.func,
 		onInvalid: PropTypes.func,
-		onRenew: PropTypes.func,
+		onChange: PropTypes.func,
 		validations: ValidationPropType,
 		outputFilter: FilterPropType,
 	};
@@ -59,8 +60,11 @@ export default class NestedForm extends Component {
 				detach: this.detach,
 				submit: this.submit,
 				reset: this.reset,
-				onRequestValidate: this._requestValid,
-				onRequestRenew: this._requestRenew,
+				// onRequestValidate: this._requestValid,
+				// onRequestRenew: this._requestRenew,
+				requestChange: this._requestChange,
+				requestValidate: this._requestValidate,
+				requestRenew: this._requestRenew,
 			},
 		};
 	}
@@ -120,6 +124,7 @@ export default class NestedForm extends Component {
 	attach = (child) => {
 		if (isValidChild(child) && this._children.indexOf(child) < 0) {
 			this._children.push(child);
+			this._requestChange();
 			if (this._hasParent()) { this._contextForm.attach(this); }
 			else { this.validate(); }
 		}
@@ -129,23 +134,31 @@ export default class NestedForm extends Component {
 		if (!child) { return; }
 
 		const index = this._children.indexOf(child);
+
 		if (index > -1) {
 			this._children.splice(index, 1);
+			this._requestChange();
 			if (this._hasParent()) { this._contextForm.detach(this); }
 			else { this.validate(); }
 		}
 	};
 
-	_requestRenew = () => {
-		this._shouldRenew = true;
-		const { onRenew } = this.props;
-		onRenew && onRenew(this.getValue());
+	_requestChange = () => {
+		this._requestRenew();
+		this._requestValidate();
 	};
 
-	_requestValid = () => {
+	_requestValidate = () => {
 		this._shouldValidate = true;
-		if (this._hasParent()) { this._contextForm.onRequestValidate(); }
+		if (this._hasParent()) { this._contextForm.requestValidate(); }
 		else { this.validate(); }
+	};
+
+	_requestRenew = () => {
+		const { onChange } = this.props;
+		this._shouldRenew = true;
+		if (isFunction(onChange)) { onChange(this.getValue()); }
+		if (this._hasParent()) { this._contextForm.requestRenew(); }
 	};
 
 	getValue() {
@@ -265,7 +278,7 @@ export default class NestedForm extends Component {
 				/* eslint-disable */
 				onValid,
 				onInvalid,
-				onRenew,
+				onChange,
 				validations,
 				outputFilter,
 				/* eslint-enable */

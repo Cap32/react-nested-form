@@ -73,7 +73,7 @@ test('should work after value changed', async () => {
 	expect(data.array).toEqual(['c', 'b']);
 });
 
-test('should `pushValue` work', async () => {
+test('should `push` work', async () => {
 	const value = ['a', 'b'];
 	const handleSubmit = jest.fn();
 	const wrapper = mount(
@@ -81,12 +81,12 @@ test('should `pushValue` work', async () => {
 			<ArrayOf
 				name="array"
 				value={value}
-				render={(items) =>
+				render={(items, instance) =>
 					<div>
 						{items.map(({ value, key, name }) =>
 							<Input name={name} value={value} key={key} />
 						)}
-						<span onClick={() => items.pushValue('c')} />
+						<span onClick={() => instance.push('c')} />
 					</div>
 				}
 			/>
@@ -98,7 +98,32 @@ test('should `pushValue` work', async () => {
 	expect(data.array).toEqual(['a', 'b', 'c']);
 });
 
-test('should `popValue` work', async () => {
+test('should `push` work if defaults to empty array', async () => {
+	const value = [];
+	const handleSubmit = jest.fn();
+	const wrapper = mount(
+		<Form onSubmit={handleSubmit}>
+			<ArrayOf
+				name="array"
+				value={value}
+				render={(items, instance) =>
+					<div>
+						{items.map(({ value, key, name }) =>
+							<Input name={name} value={value} key={key} />
+						)}
+						<span onClick={() => instance.push('c')} />
+					</div>
+				}
+			/>
+		</Form>
+	);
+	wrapper.find('span').first().simulate('click');
+	wrapper.find(Form).get(0).submit();
+	const data = handleSubmit.mock.calls[0][0];
+	expect(data.array).toEqual(['c']);
+});
+
+test('should `pop` work', async () => {
 	const value = ['a', 'b'];
 	const handleSubmit = jest.fn();
 	const wrapper = mount(
@@ -106,12 +131,12 @@ test('should `popValue` work', async () => {
 			<ArrayOf
 				name="array"
 				value={value}
-				render={(items) =>
+				render={(items, instance) =>
 					<div>
 						{items.map(({ value, key, name }) =>
 							<Input name={name} value={value} key={key} />
 						)}
-						<span onClick={() => items.popValue()} />
+						<span onClick={instance.pop} />
 					</div>
 				}
 			/>
@@ -123,7 +148,7 @@ test('should `popValue` work', async () => {
 	expect(data.array).toEqual(['a']);
 });
 
-test('should `shiftValue` work', async () => {
+test('should `shift` work', async () => {
 	const value = ['a', 'b'];
 	const handleSubmit = jest.fn();
 	const wrapper = mount(
@@ -131,12 +156,12 @@ test('should `shiftValue` work', async () => {
 			<ArrayOf
 				name="array"
 				value={value}
-				render={(items) =>
+				render={(items, instance) =>
 					<div>
 						{items.map(({ value, key, name }) =>
 							<Input name={name} value={value} key={key} />
 						)}
-						<span onClick={() => items.shiftValue()} />
+						<span onClick={instance.shift} />
 					</div>
 				}
 			/>
@@ -148,7 +173,7 @@ test('should `shiftValue` work', async () => {
 	expect(data.array).toEqual(['b']);
 });
 
-test('should `unshiftValue` work', async () => {
+test('should `unshift` work', async () => {
 	const value = ['a', 'b'];
 	const handleSubmit = jest.fn();
 	const wrapper = mount(
@@ -156,12 +181,12 @@ test('should `unshiftValue` work', async () => {
 			<ArrayOf
 				name="array"
 				value={value}
-				render={(items) =>
+				render={(items, instance) =>
 					<div>
 						{items.map(({ value, key, name }) =>
 							<Input name={name} value={value} key={key} />
 						)}
-						<span onClick={() => items.unshiftValue('c')} />
+						<span onClick={() => instance.unshift('c')} />
 					</div>
 				}
 			/>
@@ -173,7 +198,7 @@ test('should `unshiftValue` work', async () => {
 	expect(data.array).toEqual(['c', 'a', 'b']);
 });
 
-test('should `spliceValue` work', async () => {
+test('should `splice` work', async () => {
 	const value = ['a', 'b', 'c'];
 	const handleSubmit = jest.fn();
 	const wrapper = mount(
@@ -181,12 +206,12 @@ test('should `spliceValue` work', async () => {
 			<ArrayOf
 				name="array"
 				value={value}
-				render={(items) =>
+				render={(items, instance) =>
 					<div>
 						{items.map(({ value, key, name }) =>
 							<Input name={name} value={value} key={key} />
 						)}
-						<span onClick={() => items.spliceValue(1, 2, 'd', 'e')} />
+						<span onClick={() => instance.splice(1, 2, 'd', 'e')} />
 					</div>
 				}
 			/>
@@ -206,12 +231,12 @@ test('should `dropAll` work', async () => {
 			<ArrayOf
 				name="array"
 				value={value}
-				render={(items) =>
+				render={(items, instance) =>
 					<div>
 						{items.map(({ value, key, name }) =>
 							<Input name={name} value={value} key={key} />
 						)}
-						<span onClick={() => items.dropAll()} />
+						<span onClick={instance.dropAll} />
 					</div>
 				}
 			/>

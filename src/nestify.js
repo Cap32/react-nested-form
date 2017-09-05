@@ -2,6 +2,7 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import hoistStatics from 'hoist-non-react-statics';
+import hoistReactInstanceMethods from 'hoist-react-instance-methods';
 import { CONTEXT_NAME } from './constants';
 import { noop, returnsArgument } from 'empty-functions';
 import Validation from './Validation';
@@ -14,9 +15,18 @@ const defaultShouldIgnore = (value, pristineValue) =>
 	isEmpty(value) && isEmpty(pristineValue)
 ;
 
-export default function nestify(mapProps, defaultProps) {
+export default function nestify(mapProps, defaultProps, options = {}) {
+	const {
+		withRef = false,
+		hoistMethods = [],
+	} = options;
+
 	return function createNestedComponent(WrappedComponent) {
 
+		@hoistReactInstanceMethods(
+			(instance) => instance.getWrappedInstance(),
+			hoistMethods,
+		)
 		@getInput
 		@getOutput
 		class Nestify extends Component {
@@ -105,6 +115,7 @@ export default function nestify(mapProps, defaultProps) {
 					hasAttached: false,
 					errorMessage: '',
 					value,
+					requestChange: this._requestChange,
 				};
 
 				this._validation = new Validation(props);
@@ -114,7 +125,6 @@ export default function nestify(mapProps, defaultProps) {
 				this._shouldValidate = true;
 				this._shouldRenew = true;
 				this._outputValue = null;
-				this._changedValue = undefined;
 
 				const { required } = this._validation;
 				const outputValue = this._getOutput(value);
@@ -134,6 +144,12 @@ export default function nestify(mapProps, defaultProps) {
 
 			componentWillUnmount() {
 				this.context[CONTEXT_NAME].detach(this);
+			}
+
+			_withRef = withRef ? { ref: (c) => (this.wrappedInstance = c) } : {};
+
+			getWrappedInstance() {
+				return this.wrappedInstance;
 			}
 
 			getValue() {
@@ -177,9 +193,12 @@ export default function nestify(mapProps, defaultProps) {
 				}
 			}
 
+			_requestChange = () => {
+				this.context[CONTEXT_NAME].requestChange();
+			};
+
 			_updateValue(value, shouldSetAsPristine) {
-				const { nest, context } = this;
-				const form = context[CONTEXT_NAME];
+				const { nest } = this;
 				const nextValue = this._getInput(this._mapper.getValue(value));
 				const hasChanged = nest.value !== nextValue;
 
@@ -191,8 +210,7 @@ export default function nestify(mapProps, defaultProps) {
 					this._shouldForceRender = true;
 					this._requestRender();
 					this._setPristine(shouldSetAsPristine);
-					form.onRequestValidate();
-					form.onRequestRenew();
+					this._requestChange();
 				}
 				return nest.value;
 			}
@@ -268,7 +286,6 @@ export default function nestify(mapProps, defaultProps) {
 
 			handlers = {
 				onChange: (value) => {
-					this._changedValue = value;
 					this.setValue(value);
 				},
 				onKeyPress: (key) => {
@@ -315,6 +332,7 @@ export default function nestify(mapProps, defaultProps) {
 						{...other}
 						{..._mapperHandlers}
 						{...this._mapper.getValues()}
+						{...this._withRef}
 						nest={{
 							...nest,
 							setValue: this.setValue,

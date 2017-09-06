@@ -7,7 +7,10 @@ import { CONTEXT_NAME } from './constants';
 import { noop, returnsArgument } from 'empty-functions';
 import Validation from './Validation';
 import PropsMapper from './PropsMapper';
-import { isEmpty, ValidationPropType, ErrorMessagePropType, FilterPropType } from './utils';
+import {
+	isEmpty, isFunction,
+	ValidationPropType, ErrorMessagePropType, FilterPropType,
+} from './utils';
 import { DataTypeKeys } from './DataTypes';
 import { getInput, getOutput } from './Mixins';
 
@@ -95,6 +98,8 @@ export default function nestify(mapProps, defaultProps, options = {}) {
 					props,
 					props: { shouldIgnore },
 				} = this;
+
+				if (isFunction(mapProps)) { mapProps = mapProps(this); }
 
 				this._mapper = new PropsMapper(this, mapProps, {
 					defaultValue: returnsArgument,

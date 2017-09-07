@@ -7,10 +7,11 @@ import { isUndefined, isFunction } from './utils';
 import warning from 'warning';
 
 @nestify({}, {
-	shouldIgnore(value = [], pristineValue) {
-		return !value.length && isUndefined(pristineValue);
+	defaultProps: {
+		shouldIgnore(value = [], pristineValue) {
+			return !value.length && isUndefined(pristineValue);
+		},
 	},
-}, {
 	withRef: true,
 	hoistMethods: ['dropAll', 'dropByKey', 'push', 'pop', 'shift', 'unshift', 'splice'],
 })

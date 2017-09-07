@@ -18,10 +18,14 @@ const defaultShouldIgnore = (value, pristineValue) =>
 	isEmpty(value) && isEmpty(pristineValue)
 ;
 
-export default function nestify(mapProps, defaultProps, options = {}) {
+export default function nestify(mapProps, options = {}) {
 	const {
+		render = function render(props, originalProps, WrappedComponent) {
+			return (<WrappedComponent {...props} />);
+		},
 		withRef = false,
 		hoistMethods = [],
+		defaultProps = {},
 	} = options;
 
 	return function createNestedComponent(WrappedComponent) {
@@ -306,6 +310,7 @@ export default function nestify(mapProps, defaultProps, options = {}) {
 
 			render() {
 				const {
+					props,
 					props: {
 
 						/* eslint-disable */
@@ -332,20 +337,18 @@ export default function nestify(mapProps, defaultProps, options = {}) {
 					_mapperHandlers,
 				} = this;
 
-				return (
-					<WrappedComponent
-						{...other}
-						{..._mapperHandlers}
-						{...this._mapper.getValues()}
-						{...this._withRef}
-						nest={{
-							...nest,
-							setValue: this.setValue,
-							attach: this.attach,
-							detach: this.detach,
-						}}
-					/>
-				);
+				return render({
+					...other,
+					..._mapperHandlers,
+					...this._mapper.getValues(),
+					...this._withRef,
+					nest: {
+						...nest,
+						setValue: this.setValue,
+						attach: this.attach,
+						detach: this.detach,
+					},
+				}, props, WrappedComponent);
 			}
 		}
 

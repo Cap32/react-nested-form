@@ -212,10 +212,10 @@ export default function nestify(mapProps, options = {}) {
 				const hasChanged = nest.value !== nextValue;
 
 				if (hasChanged) {
+					nest.value = nextValue;
 					this._shouldRenew = true;
 					this._shouldValidate = true;
 					this._shouldAttach(this._getOutput(nextValue));
-					nest.value = nextValue;
 					this._shouldForceRender = true;
 					this._requestRender();
 					this._setPristine(shouldSetAsPristine);

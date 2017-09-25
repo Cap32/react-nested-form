@@ -233,6 +233,10 @@ export default class NestedForm extends Component {
 		this._children.forEach((child) => child.setAsPristine());
 	}
 
+	setAsNotPristine() {
+		this._children.forEach((child) => child.setAsNotPristine());
+	}
+
 	_getEventState() {
 		const { isInvalid, errorMessages } = this.nest;
 		const state = {
@@ -262,6 +266,7 @@ export default class NestedForm extends Component {
 	submit = (callback = emptyFunction) => {
 		const eventState = this._getEventState();
 		const value = this.getValue();
+		this._children.forEach((child) => child.setAsNotPristine());
 		this.props.onSubmit(value, eventState);
 		callback(value, eventState);
 

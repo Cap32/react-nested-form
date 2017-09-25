@@ -162,7 +162,6 @@ export default function nestify(mapProps, options = {}) {
 			}
 
 			getValue() {
-				this._setPristine(false);
 				this._requestRender();
 
 				if (this._shouldRenew) {
@@ -240,6 +239,11 @@ export default function nestify(mapProps, options = {}) {
 				this._setPristine(true);
 				this._requestRender();
 				return this.nest.value;
+			}
+
+			setAsNotPristine() {
+				this._setPristine(false);
+				this._requestRender();
 			}
 
 			_setPristine(isPristine) {

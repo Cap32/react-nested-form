@@ -50,8 +50,10 @@ const toDate = (val) => {
 	if (isString(dateTime)) {
 		const d = new Date(dateTime);
 		const year = d.getFullYear();
-		const month = d.getMonth() + 1;
-		const date = d.getDate();
+		let month = d.getMonth() + 1;
+		let date = d.getDate();
+		if (month < 10) { month = `0${month}`; }
+		if (date < 10) { date = `0${date}`; }
 		return [year, month, date].join('-');
 	}
 	warning(false, `${val} is NOT a valid date type`);

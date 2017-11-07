@@ -48,10 +48,13 @@ const toDate = (val) => {
 
 	const dateTime = toDateTime(val);
 	if (isString(dateTime)) {
-		const [date] = dateTime.split('T');
-		warning(date, `${val} is NOT a valid date type`);
-		return date;
+		const d = new Date(dateTime);
+		const year = d.getFullYear();
+		const month = d.getMonth() + 1;
+		const date = d.getDate();
+		return [year, month, date].join('-');
 	}
+	warning(false, `${val} is NOT a valid date type`);
 	return val;
 };
 

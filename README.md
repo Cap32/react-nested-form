@@ -1,6 +1,4 @@
-# react-nested-form
-
-**This repo is under developing.**
+# react-nested-form [WIP]
 
 
 ## Installations

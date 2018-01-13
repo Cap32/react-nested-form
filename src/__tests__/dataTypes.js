@@ -4,8 +4,18 @@ import React from 'react';
 import { mount } from 'enzyme';
 import { resetBOM } from './utils';
 import Form, { Input, Submit } from '../';
+import padStart from 'lodash.padstart';
 
 beforeEach(resetBOM);
+
+const createDateValue = function createDateValue(date) {
+	return date
+		.toLocaleDateString()
+		.split('-')
+		.map((n) => padStart(n, 2, '0'))
+		.join('-')
+	;
+};
 
 test('dataType="integer"', function (done) {
 	const value = 32;
@@ -157,7 +167,7 @@ test('dataType="boolean"', function (done) {
 
 test('dataType="date" from date object', function (done) {
 	const date = new Date();
-	const value = date.toISOString().split('T')[0];
+	const value = createDateValue(date);
 	const handleSubmit = (data) => {
 		try {
 			expect(data.test).toBe(value);
@@ -178,7 +188,7 @@ test('dataType="date" from date object', function (done) {
 
 test('dataType="date" from date string', function (done) {
 	const date = new Date();
-	const value = date.toISOString().split('T')[0];
+	const value = createDateValue(date);
 	const handleSubmit = (data) => {
 		try {
 			expect(data.test).toBe(value);
@@ -190,7 +200,7 @@ test('dataType="date" from date string', function (done) {
 	};
 	const wrapper = mount(
 		<Form onSubmit={handleSubmit}>
-			<Input name="test" dataType="date" defaultValue={date.toISOString()} />
+			<Input name="test" dataType="date" defaultValue={date.toLocaleDateString()} />
 			<Submit />
 		</Form>
 	);
@@ -199,7 +209,7 @@ test('dataType="date" from date string', function (done) {
 
 test('dataType="date" from timestamp', function (done) {
 	const date = new Date();
-	const value = date.toISOString().split('T')[0];
+	const value = createDateValue(date);
 	const handleSubmit = (data) => {
 		try {
 			expect(data.test).toBe(value);

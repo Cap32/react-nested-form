@@ -119,9 +119,10 @@ export default class ArrayOf extends Component {
 	}
 
 	render() {
-		const { render } = this.props;
+		const { render, name, value, nest, ...other } = this.props;
 		return (
 			<NestedForm
+				{...other}
 				ref={(form) => (this._form = form)}
 				onChange={this._setData}
 			>

@@ -1,8 +1,8 @@
-const path = require("path");
+const path = require('path');
 
 module.exports = {
-	extends: ["cantonjs/react"],
+	extends: ['cantonjs/react'],
 	globals: {
-		__DEV__: true
-	}
+		__DEV__: true,
+	},
 };

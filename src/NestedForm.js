@@ -1,11 +1,13 @@
-
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import { emptyFunction, returnsArgument } from 'empty-functions';
 import warning from 'warning';
 import { CONTEXT_NAME } from './constants';
 import {
-	ValidationPropType, ComponentPropType, isValidChild, FilterPropType,
+	ValidationPropType,
+	ComponentPropType,
+	isValidChild,
+	FilterPropType,
 	isFunction,
 } from './utils';
 import { getOutput } from './Mixins';
@@ -16,7 +18,9 @@ const parseName = (name = '') => {
 	let index = -1;
 	name = (name + '').replace(regExp, (m, i) => {
 		isArray = true;
-		if (/\d/.test(i)) { index = +i; }
+		if (/\d/.test(i)) {
+			index = +i;
+		}
 		return '';
 	});
 	return { isArray, realName: name, index };
@@ -125,21 +129,29 @@ export default class NestedForm extends Component {
 		if (isValidChild(child) && this._children.indexOf(child) < 0) {
 			this._children.push(child);
 			this._requestChange();
-			if (this._hasParent()) { this._contextForm.attach(this); }
-			else { this.validate(); }
+			if (this._hasParent()) {
+				this._contextForm.attach(this);
+			} else {
+				this.validate();
+			}
 		}
 	};
 
 	detach = (child) => {
-		if (!child) { return; }
+		if (!child) {
+			return;
+		}
 
 		const index = this._children.indexOf(child);
 
 		if (index > -1) {
 			this._children.splice(index, 1);
 			this._requestChange();
-			if (this._hasParent()) { this._contextForm.detach(this); }
-			else { this.validate(); }
+			if (this._hasParent()) {
+				this._contextForm.detach(this);
+			} else {
+				this.validate();
+			}
 		}
 	};
 
@@ -150,50 +162,58 @@ export default class NestedForm extends Component {
 
 	_requestValidate = () => {
 		this._shouldValidate = true;
-		if (this._hasParent()) { this._contextForm.requestValidate(); }
-		else { this.validate(); }
+		if (this._hasParent()) {
+			this._contextForm.requestValidate();
+		} else {
+			this.validate();
+		}
 	};
 
 	_requestRenew = () => {
 		const { onChange } = this.props;
 		this._shouldRenew = true;
-		if (isFunction(onChange)) { onChange(this.getValue()); }
-		if (this._hasParent()) { this._contextForm.requestRenew(); }
+		if (isFunction(onChange)) {
+			onChange(this.getValue());
+		}
+		if (this._hasParent()) {
+			this._contextForm.requestRenew();
+		}
 	};
 
 	getValue() {
-		const {
-			nest,
-			_shouldRenew,
-			_outputValue,
-		} = this;
+		const { nest, _shouldRenew, _outputValue } = this;
 
-		if (!_shouldRenew) { return _outputValue; }
+		if (!_shouldRenew) {
+			return _outputValue;
+		}
 
 		this._shouldRenew = false;
 
 		const newValue = this._children.reduce((data, child) => {
 			const { props: { name } } = child;
 
-			if (!name) { return data; }
+			if (!name) {
+				return data;
+			}
 
 			const { isArray, realName, index } = parseName(name);
 			const value = child.getValue();
 			let dataValue = data[realName];
 			if (isArray) {
-				if (!dataValue) { dataValue = (data[realName] = []); }
+				if (!dataValue) {
+					dataValue = data[realName] = [];
+				}
 
 				if (index < 0) {
 					dataValue.push(value);
-				}
-				else {
+				} else {
 					dataValue.splice(index, 0, value);
 				}
-			}
-			else {
-				warning(!dataValue,
+			} else {
+				warning(
+					!dataValue,
 					`[ReactNestedForm]: Multi names called \`${realName}\`! ` +
-					`If you wanna use array, please use \`${realName}[]\` instead.`
+						`If you wanna use array, please use \`${realName}[]\` instead.`
 				);
 				data[realName] = value;
 			}
@@ -207,7 +227,9 @@ export default class NestedForm extends Component {
 	validate() {
 		const { nest } = this;
 
-		if (!this._shouldValidate) { return; }
+		if (!this._shouldValidate) {
+			return;
+		}
 
 		this._shouldValidate = false;
 
@@ -216,16 +238,18 @@ export default class NestedForm extends Component {
 				child.validate();
 				return child.nest.isInvalid || child.nest.isRequired;
 			})
-			.map(({ nest }) => nest.errorMessage)
-		;
+			.map(({ nest }) => nest.errorMessage);
 
 		const isInvalid = !!nest.errorMessages.length;
 		if (isInvalid !== nest.isInvalid) {
 			const { onValid, onInvalid } = this.props;
 			nest.isInvalid = isInvalid;
 
-			if (isInvalid) { onInvalid(); }
-			else { onValid(); }
+			if (isInvalid) {
+				onInvalid();
+			} else {
+				onValid();
+			}
 		}
 	}
 
@@ -288,12 +312,10 @@ export default class NestedForm extends Component {
 				outputFilter,
 				/* eslint-enable */
 
-				...other,
+				...other
 			},
 		} = this;
 
-		return (
-			<Comp {...other} />
-		);
+		return <Comp {...other} />;
 	}
 }

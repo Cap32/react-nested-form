@@ -1,30 +1,30 @@
-import { isEmpty, isDate, isString, isNumber, isByte, padEnd } from "./utils";
-import warning from "warning";
+import { isEmpty, isDate, isString, isNumber, isByte, padEnd } from './utils';
+import warning from 'warning';
 
-const tsToDate = n => new Date(+padEnd(n, 13, "0")).toISOString();
+const tsToDate = (n) => new Date(+padEnd(n, 13, '0')).toISOString();
 
-const toInt = val => parseInt(val, 10) || 0;
-const toNumber = val => +val || 0;
-const toStr = val => (!val ? "" : val + "");
-const toBoolean = val =>
+const toInt = (val) => parseInt(val, 10) || 0;
+const toNumber = (val) => +val || 0;
+const toStr = (val) => (!val ? '' : val + '');
+const toBoolean = (val) =>
 	!!val &&
-	val !== "0" &&
-	val !== "false" &&
-	val !== "undefined" &&
-	val !== "null";
-const toByte = val => {
+	val !== '0' &&
+	val !== 'false' &&
+	val !== 'undefined' &&
+	val !== 'null';
+const toByte = (val) => {
 	const formated = toStr(val);
 	warning(isByte(formated), `${val} is NOT a valid Byte type`);
 	return formated;
 };
 
-const toDateTime = val => {
+const toDateTime = (val) => {
 	if (isEmpty(val)) {
 		return;
 	}
 
-	if (isString(val) && val.includes(",")) {
-		return val.split(",").map(toDateTime);
+	if (isString(val) && val.includes(',')) {
+		return val.split(',').map(toDateTime);
 	} else if (Array.isArray(val)) {
 		return val.map(toDateTime);
 	}
@@ -43,13 +43,13 @@ const toDateTime = val => {
 	return val;
 };
 
-const toDate = val => {
+const toDate = (val) => {
 	if (isEmpty(val)) {
 		return;
 	}
 
-	if (isString(val) && val.includes(",")) {
-		return val.split(",").map(toDate);
+	if (isString(val) && val.includes(',')) {
+		return val.split(',').map(toDate);
 	} else if (Array.isArray(val)) {
 		return val.map(toDate);
 	}
@@ -66,7 +66,7 @@ const toDate = val => {
 		if (date < 10) {
 			date = `0${date}`;
 		}
-		return [year, month, date].join("-");
+		return [year, month, date].join('-');
 	}
 	warning(false, `${val} is NOT a valid date type`);
 	return val;
@@ -82,7 +82,7 @@ const DataTypes = {
 	boolean: toBoolean,
 	date: toDate,
 	dateTime: toDateTime,
-	password: toStr
+	password: toStr,
 };
 
 export default DataTypes;

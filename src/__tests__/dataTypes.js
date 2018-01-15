@@ -13,8 +13,7 @@ const createDateValue = function createDateValue(date) {
 		.toLocaleDateString()
 		.split('-')
 		.map((n) => padStart(n, 2, '0'))
-		.join('-')
-	;
+		.join('/');
 };
 
 test('dataType="integer"', function (done) {
@@ -23,8 +22,7 @@ test('dataType="integer"', function (done) {
 		try {
 			expect(data.test).toBe(value);
 			done();
-		}
-		catch (err) {
+		} catch (err) {
 			done.fail(err);
 		}
 	};
@@ -34,7 +32,10 @@ test('dataType="integer"', function (done) {
 			<Submit />
 		</Form>
 	);
-	wrapper.find(Submit).first().simulate('click');
+	wrapper
+		.find(Submit)
+		.first()
+		.simulate('click');
 });
 
 test('dataType="integer" when value is empty', function () {
@@ -52,8 +53,7 @@ test('dataType="long"', function (done) {
 		try {
 			expect(data.test).toBe(value);
 			done();
-		}
-		catch (err) {
+		} catch (err) {
 			done.fail(err);
 		}
 	};
@@ -63,7 +63,10 @@ test('dataType="long"', function (done) {
 			<Submit />
 		</Form>
 	);
-	wrapper.find(Submit).first().simulate('click');
+	wrapper
+		.find(Submit)
+		.first()
+		.simulate('click');
 });
 
 test('dataType="float"', function (done) {
@@ -72,8 +75,7 @@ test('dataType="float"', function (done) {
 		try {
 			expect(data.test).toBe(value);
 			done();
-		}
-		catch (err) {
+		} catch (err) {
 			done.fail(err);
 		}
 	};
@@ -83,7 +85,10 @@ test('dataType="float"', function (done) {
 			<Submit />
 		</Form>
 	);
-	wrapper.find(Submit).first().simulate('click');
+	wrapper
+		.find(Submit)
+		.first()
+		.simulate('click');
 });
 
 test('dataType="double"', function (done) {
@@ -92,8 +97,7 @@ test('dataType="double"', function (done) {
 		try {
 			expect(data.test).toBe(value);
 			done();
-		}
-		catch (err) {
+		} catch (err) {
 			done.fail(err);
 		}
 	};
@@ -103,7 +107,10 @@ test('dataType="double"', function (done) {
 			<Submit />
 		</Form>
 	);
-	wrapper.find(Submit).first().simulate('click');
+	wrapper
+		.find(Submit)
+		.first()
+		.simulate('click');
 });
 
 test('dataType="string"', function (done) {
@@ -112,8 +119,7 @@ test('dataType="string"', function (done) {
 		try {
 			expect(data.test).toBe(value);
 			done();
-		}
-		catch (err) {
+		} catch (err) {
 			done.fail(err);
 		}
 	};
@@ -123,7 +129,10 @@ test('dataType="string"', function (done) {
 			<Submit />
 		</Form>
 	);
-	wrapper.find(Submit).first().simulate('click');
+	wrapper
+		.find(Submit)
+		.first()
+		.simulate('click');
 });
 
 test('dataType="byte"', function (done) {
@@ -132,8 +141,7 @@ test('dataType="byte"', function (done) {
 		try {
 			expect(data.test).toBe(value);
 			done();
-		}
-		catch (err) {
+		} catch (err) {
 			done.fail(err);
 		}
 	};
@@ -143,7 +151,10 @@ test('dataType="byte"', function (done) {
 			<Submit />
 		</Form>
 	);
-	wrapper.find(Submit).first().simulate('click');
+	wrapper
+		.find(Submit)
+		.first()
+		.simulate('click');
 });
 
 test('dataType="boolean"', function (done) {
@@ -151,8 +162,7 @@ test('dataType="boolean"', function (done) {
 		try {
 			expect(data.test).toBe(true);
 			done();
-		}
-		catch (err) {
+		} catch (err) {
 			done.fail(err);
 		}
 	};
@@ -162,7 +172,10 @@ test('dataType="boolean"', function (done) {
 			<Submit />
 		</Form>
 	);
-	wrapper.find(Submit).first().simulate('click');
+	wrapper
+		.find(Submit)
+		.first()
+		.simulate('click');
 });
 
 test('dataType="date" from date object', function (done) {
@@ -172,8 +185,7 @@ test('dataType="date" from date object', function (done) {
 		try {
 			expect(data.test).toBe(value);
 			done();
-		}
-		catch (err) {
+		} catch (err) {
 			done.fail(err);
 		}
 	};
@@ -183,7 +195,10 @@ test('dataType="date" from date object', function (done) {
 			<Submit />
 		</Form>
 	);
-	wrapper.find(Submit).first().simulate('click');
+	wrapper
+		.find(Submit)
+		.first()
+		.simulate('click');
 });
 
 test('dataType="date" from date string', function (done) {
@@ -193,18 +208,24 @@ test('dataType="date" from date string', function (done) {
 		try {
 			expect(data.test).toBe(value);
 			done();
-		}
-		catch (err) {
+		} catch (err) {
 			done.fail(err);
 		}
 	};
 	const wrapper = mount(
 		<Form onSubmit={handleSubmit}>
-			<Input name="test" dataType="date" defaultValue={date.toLocaleDateString()} />
+			<Input
+				name="test"
+				dataType="date"
+				defaultValue={date.toLocaleDateString()}
+			/>
 			<Submit />
 		</Form>
 	);
-	wrapper.find(Submit).first().simulate('click');
+	wrapper
+		.find(Submit)
+		.first()
+		.simulate('click');
 });
 
 test('dataType="date" from timestamp', function (done) {
@@ -214,8 +235,7 @@ test('dataType="date" from timestamp', function (done) {
 		try {
 			expect(data.test).toBe(value);
 			done();
-		}
-		catch (err) {
+		} catch (err) {
 			done.fail(err);
 		}
 	};
@@ -225,7 +245,10 @@ test('dataType="date" from timestamp', function (done) {
 			<Submit />
 		</Form>
 	);
-	wrapper.find(Submit).first().simulate('click');
+	wrapper
+		.find(Submit)
+		.first()
+		.simulate('click');
 });
 
 test('dataType="dateTime" from date object', function (done) {
@@ -235,8 +258,7 @@ test('dataType="dateTime" from date object', function (done) {
 		try {
 			expect(data.test).toBe(value);
 			done();
-		}
-		catch (err) {
+		} catch (err) {
 			done.fail(err);
 		}
 	};
@@ -246,7 +268,10 @@ test('dataType="dateTime" from date object', function (done) {
 			<Submit />
 		</Form>
 	);
-	wrapper.find(Submit).first().simulate('click');
+	wrapper
+		.find(Submit)
+		.first()
+		.simulate('click');
 });
 
 test('dataType="dateTime" from date string', function (done) {
@@ -256,18 +281,24 @@ test('dataType="dateTime" from date string', function (done) {
 		try {
 			expect(data.test).toBe(value);
 			done();
-		}
-		catch (err) {
+		} catch (err) {
 			done.fail(err);
 		}
 	};
 	const wrapper = mount(
 		<Form onSubmit={handleSubmit}>
-			<Input name="test" dataType="dateTime" defaultValue={date.toISOString()} />
+			<Input
+				name="test"
+				dataType="dateTime"
+				defaultValue={date.toISOString()}
+			/>
 			<Submit />
 		</Form>
 	);
-	wrapper.find(Submit).first().simulate('click');
+	wrapper
+		.find(Submit)
+		.first()
+		.simulate('click');
 });
 
 test('dataType="dateTime" from timestamp', function (done) {
@@ -277,8 +308,7 @@ test('dataType="dateTime" from timestamp', function (done) {
 		try {
 			expect(data.test).toBe(value);
 			done();
-		}
-		catch (err) {
+		} catch (err) {
 			done.fail(err);
 		}
 	};
@@ -288,7 +318,10 @@ test('dataType="dateTime" from timestamp', function (done) {
 			<Submit />
 		</Form>
 	);
-	wrapper.find(Submit).first().simulate('click');
+	wrapper
+		.find(Submit)
+		.first()
+		.simulate('click');
 });
 
 test('dataType="password"', function (done) {
@@ -297,8 +330,7 @@ test('dataType="password"', function (done) {
 		try {
 			expect(data.test).toBe(value);
 			done();
-		}
-		catch (err) {
+		} catch (err) {
 			done.fail(err);
 		}
 	};
@@ -308,7 +340,10 @@ test('dataType="password"', function (done) {
 			<Submit />
 		</Form>
 	);
-	wrapper.find(Submit).first().simulate('click');
+	wrapper
+		.find(Submit)
+		.first()
+		.simulate('click');
 });
 
 test('dataType={customFunction}', function (done) {
@@ -317,8 +352,7 @@ test('dataType={customFunction}', function (done) {
 		try {
 			expect(data.test).toBe(true);
 			done();
-		}
-		catch (err) {
+		} catch (err) {
 			done.fail(err);
 		}
 	};
@@ -328,5 +362,8 @@ test('dataType={customFunction}', function (done) {
 			<Submit />
 		</Form>
 	);
-	wrapper.find(Submit).first().simulate('click');
+	wrapper
+		.find(Submit)
+		.first()
+		.simulate('click');
 });

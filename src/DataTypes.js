@@ -66,7 +66,7 @@ const toDate = (val) => {
 		if (date < 10) {
 			date = `0${date}`;
 		}
-		return [year, month, date].join('-');
+		return [year, month, date].join('/');
 	}
 	warning(false, `${val} is NOT a valid date type`);
 	return val;

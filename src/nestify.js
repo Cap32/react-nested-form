@@ -1,4 +1,3 @@
-
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import hoistStatics from 'hoist-non-react-statics';
@@ -8,20 +7,22 @@ import { noop, returnsArgument } from 'empty-functions';
 import Validation from './Validation';
 import PropsMapper from './PropsMapper';
 import {
-	isEmpty, isFunction,
-	ValidationPropType, ErrorMessagePropType, FilterPropType,
+	isEmpty,
+	isFunction,
+	ValidationPropType,
+	ErrorMessagePropType,
+	FilterPropType,
 } from './utils';
 import { DataTypeKeys } from './DataTypes';
 import { getInput, getOutput } from './Mixins';
 
 const defaultShouldIgnore = (value, pristineValue) =>
-	isEmpty(value) && isEmpty(pristineValue)
-;
+	isEmpty(value) && isEmpty(pristineValue);
 
 export default function nestify(mapProps, options = {}) {
 	const {
 		render = function render(props, originalProps, WrappedComponent) {
-			return (<WrappedComponent {...props} />);
+			return <WrappedComponent {...props} />;
 		},
 		withRef = false,
 		hoistMethods = [],
@@ -29,10 +30,9 @@ export default function nestify(mapProps, options = {}) {
 	} = options;
 
 	return function createNestedComponent(WrappedComponent) {
-
 		@hoistReactInstanceMethods(
 			(instance) => instance.getWrappedInstance(),
-			hoistMethods,
+			hoistMethods
 		)
 		@getInput
 		@getOutput
@@ -80,10 +80,7 @@ export default function nestify(mapProps, options = {}) {
 				minLength: PropTypes.number,
 				pattern: PropTypes.instanceOf(RegExp),
 				enum: PropTypes.arrayOf(
-					PropTypes.oneOfType([
-						PropTypes.string,
-						PropTypes.number,
-					]),
+					PropTypes.oneOfType([PropTypes.string, PropTypes.number])
 				),
 			};
 
@@ -98,12 +95,11 @@ export default function nestify(mapProps, options = {}) {
 			};
 
 			componentWillMount() {
-				const {
-					props,
-					props: { shouldIgnore },
-				} = this;
+				const { props, props: { shouldIgnore } } = this;
 
-				if (isFunction(mapProps)) { mapProps = mapProps(this); }
+				if (isFunction(mapProps)) {
+					mapProps = mapProps(this);
+				}
 
 				this._mapper = new PropsMapper(this, mapProps, {
 					defaultValue: returnsArgument,
@@ -189,12 +185,14 @@ export default function nestify(mapProps, options = {}) {
 					props,
 					props: { required, shouldIgnore },
 				} = this;
-				if (!nest.hasAttached &&
+				if (
+					!nest.hasAttached &&
 					(required || !shouldIgnore(nextValue, pristineValue, props))
 				) {
 					this.attach();
-				}
-				else if (nest.hasAttached && !required &&
+				} else if (
+					nest.hasAttached &&
+					!required &&
 					shouldIgnore(nextValue, pristineValue, props)
 				) {
 					this.detach();
@@ -261,13 +259,11 @@ export default function nestify(mapProps, options = {}) {
 			}
 
 			validate() {
-				if (!this._shouldValidate) { return; }
+				if (!this._shouldValidate) {
+					return;
+				}
 
-				const {
-					props: { name },
-					nest: { value },
-					nest,
-				} = this;
+				const { props: { name }, nest: { value }, nest } = this;
 
 				const {
 					errorMessage,
@@ -287,7 +283,8 @@ export default function nestify(mapProps, options = {}) {
 					nest.isInvalid = isInvalid;
 				}
 
-				if ((errorMessage && nest.errorMessage !== errorMessage) ||
+				if (
+					(errorMessage && nest.errorMessage !== errorMessage) ||
 					(!errorMessage && nest.errorMessage)
 				) {
 					this._shouldForceRender = true;
@@ -316,7 +313,6 @@ export default function nestify(mapProps, options = {}) {
 				const {
 					props,
 					props: {
-
 						/* eslint-disable */
 						defaultValue,
 						validations,
@@ -335,24 +331,28 @@ export default function nestify(mapProps, options = {}) {
 						enum: _,
 						/* eslint-enable */
 
-						...other,
+						...other
 					},
 					nest,
 					_mapperHandlers,
 				} = this;
 
-				return render({
-					...other,
-					..._mapperHandlers,
-					...this._mapper.getValues(),
-					...this._withRef,
-					nest: {
-						...nest,
-						setValue: this.setValue,
-						attach: this.attach,
-						detach: this.detach,
+				return render(
+					{
+						...other,
+						..._mapperHandlers,
+						...this._mapper.getValues(),
+						...this._withRef,
+						nest: {
+							...nest,
+							setValue: this.setValue,
+							attach: this.attach,
+							detach: this.detach,
+						},
 					},
-				}, props, WrappedComponent);
+					props,
+					WrappedComponent
+				);
 			}
 		}
 

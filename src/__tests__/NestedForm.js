@@ -13,8 +13,7 @@ test('basic', function (done) {
 		try {
 			expect(data.hello).toBe(value);
 			done();
-		}
-		catch (err) {
+		} catch (err) {
 			done.fail(err);
 		}
 	};
@@ -28,7 +27,10 @@ test('basic', function (done) {
 	const input = wrapper.find('input').first();
 	input.node.value = value;
 	input.simulate('change');
-	wrapper.find(Submit).first().simulate('click');
+	wrapper
+		.find(Submit)
+		.first()
+		.simulate('click');
 });
 
 test('update input value prop', function (done) {
@@ -37,8 +39,7 @@ test('update input value prop', function (done) {
 		try {
 			expect(data.hello).toBe(value);
 			done();
-		}
-		catch (err) {
+		} catch (err) {
 			done.fail(err);
 		}
 	};
@@ -51,7 +52,10 @@ test('update input value prop', function (done) {
 	const wrapper = mount(<App value="" />);
 	wrapper.setProps({ value });
 	process.nextTick(() => {
-		wrapper.find(Submit).first().simulate('click');
+		wrapper
+			.find(Submit)
+			.first()
+			.simulate('click');
 	});
 });
 
@@ -61,8 +65,7 @@ test('submit by pressed `enter` key', function (done) {
 		try {
 			expect(data.hello).toBe(value);
 			done();
-		}
-		catch (err) {
+		} catch (err) {
 			done.fail(err);
 		}
 	};
@@ -83,8 +86,7 @@ test('`remove` field', function (done) {
 		try {
 			expect(data).toEqual({});
 			done();
-		}
-		catch (err) {
+		} catch (err) {
 			done.fail(err);
 		}
 	};
@@ -97,7 +99,10 @@ test('`remove` field', function (done) {
 	const wrapper = mount(<App />);
 	wrapper.setProps({ shouldShowHello: false });
 	process.nextTick(() => {
-		wrapper.find(Submit).first().simulate('click');
+		wrapper
+			.find(Submit)
+			.first()
+			.simulate('click');
 	});
 });
 
@@ -109,8 +114,7 @@ test('nested data object', function (done) {
 				children: { hello: value },
 			});
 			done();
-		}
-		catch (err) {
+		} catch (err) {
 			done.fail(err);
 		}
 	};
@@ -123,7 +127,10 @@ test('nested data object', function (done) {
 		</Form>
 	);
 	const wrapper = mount(<App />);
-	wrapper.find(Submit).first().simulate('click');
+	wrapper
+		.find(Submit)
+		.first()
+		.simulate('click');
 });
 
 test('array', function (done) {
@@ -132,8 +139,7 @@ test('array', function (done) {
 		try {
 			expect(data.list).toEqual(values);
 			done();
-		}
-		catch (err) {
+		} catch (err) {
 			done.fail(err);
 		}
 	};
@@ -145,7 +151,10 @@ test('array', function (done) {
 		</Form>
 	);
 	const wrapper = mount(<App />);
-	wrapper.find(Submit).first().simulate('click');
+	wrapper
+		.find(Submit)
+		.first()
+		.simulate('click');
 });
 
 test('should ignore empty fields if pristine value is empty', function (done) {
@@ -153,8 +162,7 @@ test('should ignore empty fields if pristine value is empty', function (done) {
 		try {
 			expect(data).toEqual({});
 			done();
-		}
-		catch (err) {
+		} catch (err) {
 			done.fail(err);
 		}
 	};
@@ -165,7 +173,10 @@ test('should ignore empty fields if pristine value is empty', function (done) {
 		</Form>
 	);
 	const wrapper = mount(<App />);
-	wrapper.find(Submit).first().simulate('click');
+	wrapper
+		.find(Submit)
+		.first()
+		.simulate('click');
 });
 
 test('format empty value', function (done) {
@@ -174,8 +185,7 @@ test('format empty value', function (done) {
 		try {
 			expect(data.hello).toEqual(value);
 			done();
-		}
-		catch (err) {
+		} catch (err) {
 			done.fail(err);
 		}
 	};
@@ -186,7 +196,10 @@ test('format empty value', function (done) {
 		</Form>
 	);
 	const wrapper = mount(<App />);
-	wrapper.find(Submit).first().simulate('click');
+	wrapper
+		.find(Submit)
+		.first()
+		.simulate('click');
 });
 
 test('should not ignore empty fields if pristine value is not empty', function (done) {
@@ -194,8 +207,7 @@ test('should not ignore empty fields if pristine value is not empty', function (
 		try {
 			expect(data).toEqual({ hello: '' });
 			done();
-		}
-		catch (err) {
+		} catch (err) {
 			done.fail(err);
 		}
 	};
@@ -209,7 +221,10 @@ test('should not ignore empty fields if pristine value is not empty', function (
 	const input = wrapper.find('input').first();
 	input.node.value = '';
 	input.simulate('change');
-	wrapper.find(Submit).first().simulate('click');
+	wrapper
+		.find(Submit)
+		.first()
+		.simulate('click');
 });
 
 test('should not ignore empty fields if required', function (done) {
@@ -217,8 +232,7 @@ test('should not ignore empty fields if required', function (done) {
 		try {
 			expect(data).toEqual({ hello: '' });
 			done();
-		}
-		catch (err) {
+		} catch (err) {
 			done.fail(err);
 		}
 	};
@@ -234,7 +248,10 @@ test('should not ignore empty fields if required', function (done) {
 	input.simulate('change');
 	input.node.value = '';
 	input.simulate('change');
-	wrapper.find(Submit).first().simulate('click');
+	wrapper
+		.find(Submit)
+		.first()
+		.simulate('click');
 });
 
 test('validation', function (done) {
@@ -242,8 +259,7 @@ test('validation', function (done) {
 		try {
 			expect(isInvalid).toBe(true);
 			done();
-		}
-		catch (err) {
+		} catch (err) {
 			done.fail(err);
 		}
 	};
@@ -263,7 +279,10 @@ test('validation', function (done) {
 		</Form>
 	);
 	const wrapper = mount(<App />);
-	wrapper.find(Submit).first().simulate('click');
+	wrapper
+		.find(Submit)
+		.first()
+		.simulate('click');
 });
 
 test('validation after typed', function (done) {
@@ -271,8 +290,7 @@ test('validation after typed', function (done) {
 		try {
 			expect(isInvalid).toBe(false);
 			done();
-		}
-		catch (err) {
+		} catch (err) {
 			done.fail(err);
 		}
 	};
@@ -295,7 +313,10 @@ test('validation after typed', function (done) {
 	const input = wrapper.find('input').first();
 	input.node.value = '666666';
 	input.simulate('change');
-	wrapper.find(Submit).first().simulate('click');
+	wrapper
+		.find(Submit)
+		.first()
+		.simulate('click');
 });
 
 test('`onValid` if initial state is valid', function (done) {
@@ -315,7 +336,6 @@ test('`onValid` if initial state is valid', function (done) {
 		</Form>
 	);
 });
-
 
 test('`onInalid` if initial state is invalid', function (done) {
 	mount(
@@ -372,8 +392,7 @@ test('reset()', function (done) {
 		try {
 			expect(data.hello).toEqual(value);
 			done();
-		}
-		catch (err) {
+		} catch (err) {
 			done.fail(err);
 		}
 	};
@@ -388,7 +407,10 @@ test('reset()', function (done) {
 	input.simulate('change');
 	const instance = wrapper.instance();
 	instance.reset();
-	wrapper.find(Submit).first().simulate('click');
+	wrapper
+		.find(Submit)
+		.first()
+		.simulate('click');
 });
 
 test('nested forms', function (done) {
@@ -396,8 +418,7 @@ test('nested forms', function (done) {
 		try {
 			state.stopPropagation();
 			expect(data).toEqual({ b: 'b' });
-		}
-		catch (err) {
+		} catch (err) {
 			done.fail(err);
 		}
 	};
@@ -409,8 +430,7 @@ test('nested forms', function (done) {
 				c: 'c',
 			});
 			done();
-		}
-		catch (err) {
+		} catch (err) {
 			done.fail(err);
 		}
 	};
@@ -425,8 +445,14 @@ test('nested forms', function (done) {
 			<Submit />
 		</Form>
 	);
-	wrapper.find(Submit).first().simulate('click');
-	wrapper.find(Submit).last().simulate('click');
+	wrapper
+		.find(Submit)
+		.first()
+		.simulate('click');
+	wrapper
+		.find(Submit)
+		.last()
+		.simulate('click');
 });
 
 test('should ignore nested form if no `name` prop', function (done) {
@@ -434,8 +460,7 @@ test('should ignore nested form if no `name` prop', function (done) {
 		try {
 			state.stopPropagation();
 			expect(data).toEqual({ b: 'b' });
-		}
-		catch (err) {
+		} catch (err) {
 			done.fail(err);
 		}
 	};
@@ -444,15 +469,16 @@ test('should ignore nested form if no `name` prop', function (done) {
 		try {
 			expect(data).toEqual({ c: 'c' }); // notice
 			done();
-		}
-		catch (err) {
+		} catch (err) {
 			done.fail(err);
 		}
 	};
 
 	const wrapper = mount(
 		<Form onSubmit={handleSubmit}>
-			<Form onSubmit={handleSubFormSubmit}> {/* no `name` */}
+			<Form onSubmit={handleSubFormSubmit}>
+				{' '}
+				{/* no `name` */}
 				<Input name="b" defaultValue="b" />
 				<Submit />
 			</Form>
@@ -460,8 +486,14 @@ test('should ignore nested form if no `name` prop', function (done) {
 			<Submit />
 		</Form>
 	);
-	wrapper.find(Submit).first().simulate('click');
-	wrapper.find(Submit).last().simulate('click');
+	wrapper
+		.find(Submit)
+		.first()
+		.simulate('click');
+	wrapper
+		.find(Submit)
+		.last()
+		.simulate('click');
 });
 
 test('`onReset()` prop', function (done) {
@@ -470,8 +502,7 @@ test('`onReset()` prop', function (done) {
 		try {
 			expect(data.hello).toEqual(value);
 			done();
-		}
-		catch (err) {
+		} catch (err) {
 			done.fail(err);
 		}
 	};
@@ -485,7 +516,10 @@ test('`onReset()` prop', function (done) {
 	input.node.value = 'updated';
 	input.simulate('change');
 	expect(input.node.value).toBe('updated');
-	wrapper.find(Reset).first().simulate('click');
+	wrapper
+		.find(Reset)
+		.first()
+		.simulate('click');
 });
 
 test('click <Reset /> and submit', function (done) {
@@ -494,8 +528,7 @@ test('click <Reset /> and submit', function (done) {
 		try {
 			expect(data.hello).toEqual(value);
 			done();
-		}
-		catch (err) {
+		} catch (err) {
 			done.fail(err);
 		}
 	};
@@ -509,8 +542,14 @@ test('click <Reset /> and submit', function (done) {
 	const input = wrapper.find('input').first();
 	input.node.value = 'updated';
 	input.simulate('change');
-	wrapper.find(Reset).first().simulate('click');
-	wrapper.find(Submit).first().simulate('click');
+	wrapper
+		.find(Reset)
+		.first()
+		.simulate('click');
+	wrapper
+		.find(Submit)
+		.first()
+		.simulate('click');
 });
 
 test('outputFilter', function (done) {
@@ -519,8 +558,7 @@ test('outputFilter', function (done) {
 		try {
 			expect(typeof data.hello).toBe('number');
 			done();
-		}
-		catch (err) {
+		} catch (err) {
 			done.fail(err);
 		}
 	};
@@ -536,7 +574,10 @@ test('outputFilter', function (done) {
 			<Submit />
 		</Form>
 	);
-	wrapper.find(Submit).first().simulate('click');
+	wrapper
+		.find(Submit)
+		.first()
+		.simulate('click');
 });
 
 test('should work after submitted and changed', function (done) {
@@ -545,8 +586,7 @@ test('should work after submitted and changed', function (done) {
 		if (submitCounter === 0) {
 			expect(data.hello).toBe('1');
 			submitCounter++;
-		}
-		else {
+		} else {
 			expect(data.hello).toBe('2');
 			done();
 		}
@@ -561,21 +601,31 @@ test('should work after submitted and changed', function (done) {
 	const input = wrapper.find('input').first();
 	input.node.value = '1';
 	input.simulate('change');
-	wrapper.find(Submit).first().simulate('click');
+	wrapper
+		.find(Submit)
+		.first()
+		.simulate('click');
 	input.node.value = '2';
 	input.simulate('change');
-	wrapper.find(Submit).first().simulate('click');
+	wrapper
+		.find(Submit)
+		.first()
+		.simulate('click');
 });
 
 test('should `isPristine` be `false` after submitted', function (done) {
-	const wrapper = mount(<Form>
+	const wrapper = mount(
+		<Form>
 			<Input name="hello" value="world" />
 			<Submit />
 		</Form>
 	);
 	const input = wrapper.find('Input').first();
 	expect(input.props().nest.isPristine).toBe(true);
-	wrapper.find(Submit).first().simulate('click');
+	wrapper
+		.find(Submit)
+		.first()
+		.simulate('click');
 	process.nextTick(() => {
 		expect(input.props().nest.isPristine).toBe(false);
 		done();
@@ -587,8 +637,7 @@ test('should ignore empty fields with outputFilter', function (done) {
 		try {
 			expect(data).toEqual({});
 			done();
-		}
-		catch (err) {
+		} catch (err) {
 			done.fail(err);
 		}
 	};
@@ -600,7 +649,10 @@ test('should ignore empty fields with outputFilter', function (done) {
 		</Form>
 	);
 	const wrapper = mount(<App />);
-	wrapper.find(Submit).first().simulate('click');
+	wrapper
+		.find(Submit)
+		.first()
+		.simulate('click');
 });
 
 test('should `onChange` work', async () => {

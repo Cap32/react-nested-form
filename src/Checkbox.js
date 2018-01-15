@@ -1,4 +1,3 @@
-
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import nestify from './nestify';
@@ -9,7 +8,9 @@ const DEFAULT = 'on';
 	value: {
 		name: 'value',
 		get: (value, props) => {
-			if (value === false) { return; }
+			if (value === false) {
+				return;
+			}
 			if (value === true || props.checked) {
 				return props.value || DEFAULT;
 			}
@@ -18,7 +19,9 @@ const DEFAULT = 'on';
 	defaultValue: {
 		name: 'value',
 		get: (value, props) => {
-			if (value === false) { return; }
+			if (value === false) {
+				return;
+			}
 			if (value === true || props.defaultChecked) {
 				return props.value || DEFAULT;
 			}
@@ -33,8 +36,6 @@ export default class Checkbox extends Component {
 
 	render() {
 		const { nest, ...other } = this.props;
-		return (
-			<input {...other} type="checkbox" />
-		);
+		return <input {...other} type="checkbox" />;
 	}
 }

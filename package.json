@@ -13,6 +13,7 @@
     "start": "npm test -- --watchAll",
     "test": "cross-env BABEL_ENV=cjs jest",
     "coverage": "npm test -- --coverage",
+    "format": "prettier-eslint --write \"src/**/*.js\"",
     "preversion": "yarn test && yarn build"
   },
   "files": [

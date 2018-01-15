@@ -1,4 +1,3 @@
-
 /*
  * PropsMapper
  *
@@ -39,10 +38,7 @@ export default class PropsMapper {
 		this._props = {};
 		this._options = options;
 
-		Object
-			.keys(defaults)
-			.forEach((key) => this._merge(key, defaults[key]))
-		;
+		Object.keys(defaults).forEach((key) => this._merge(key, defaults[key]));
 	}
 
 	getInitialValue() {
@@ -52,7 +48,9 @@ export default class PropsMapper {
 		const reactPropValue = reactProps[valueProp.name];
 		const value = valueProp.get(reactPropValue, reactProps);
 
-		if (!isUndefined(value)) { return value; }
+		if (!isUndefined(value)) {
+			return value;
+		}
 
 		const defaultValueProp = this._props.defaultValue;
 		const defaultValue = reactProps[defaultValueProp.name];
@@ -78,16 +76,13 @@ export default class PropsMapper {
 	}
 
 	getHandlers() {
-		return Object
-			.keys(this._props)
-			.reduce((props, key) => {
-				const prop = this._props[key];
-				if (prop._isHandler) {
-					props[prop.name] = this._getHandler(prop);
-				}
-				return props;
-			}, {})
-		;
+		return Object.keys(this._props).reduce((props, key) => {
+			const prop = this._props[key];
+			if (prop._isHandler) {
+				props[prop.name] = this._getHandler(prop);
+			}
+			return props;
+		}, {});
 	}
 
 	_getHandler(prop) {
@@ -105,13 +100,21 @@ export default class PropsMapper {
 		const mapValue = this._options[name];
 		const res = { name, get };
 
-		if (!mapValue) { return res; }
+		if (!mapValue) {
+			return res;
+		}
 
-		if (isString(mapValue)) { res.name = mapValue; }
-		else if (mapValue.name) { res.name = mapValue.name; }
+		if (isString(mapValue)) {
+			res.name = mapValue;
+		} else if (mapValue.name) {
+			res.name = mapValue.name;
+		}
 
-		if (isFunction(mapValue)) { res.get = mapValue; }
-		else if (mapValue.get) { res.get = mapValue.get; }
+		if (isFunction(mapValue)) {
+			res.get = mapValue;
+		} else if (mapValue.get) {
+			res.get = mapValue.get;
+		}
 
 		return res;
 	}

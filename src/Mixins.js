@@ -1,4 +1,3 @@
-
 import { createFormatDataTypeFunc as createFormator } from './DataTypes';
 import { createFormatEmptyFunc } from './utils';
 

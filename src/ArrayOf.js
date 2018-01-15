@@ -1,4 +1,3 @@
-
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import nestify from './nestify';
@@ -6,15 +5,26 @@ import NestedForm from './NestedForm';
 import { isUndefined, isFunction } from './utils';
 import warning from 'warning';
 
-@nestify({}, {
-	defaultProps: {
-		shouldIgnore(value = [], pristineValue) {
-			return !value.length && isUndefined(pristineValue);
+@nestify(
+	{},
+	{
+		defaultProps: {
+			shouldIgnore(value = [], pristineValue) {
+				return !value.length && isUndefined(pristineValue);
+			},
 		},
-	},
-	withRef: true,
-	hoistMethods: ['dropAll', 'dropByKey', 'push', 'pop', 'shift', 'unshift', 'splice'],
-})
+		withRef: true,
+		hoistMethods: [
+			'dropAll',
+			'dropByKey',
+			'push',
+			'pop',
+			'shift',
+			'unshift',
+			'splice',
+		],
+	}
+)
 export default class ArrayOf extends Component {
 	static propTypes = {
 		name: PropTypes.string,
@@ -31,12 +41,10 @@ export default class ArrayOf extends Component {
 		if (isUndefined(values)) {
 			items = [];
 			nest.setValue([]);
-		}
-		else if (isFunction(values.map)) {
+		} else if (isFunction(values.map)) {
 			items = values.map(this._createItem);
 			this._appendName(items);
-		}
-		else {
+		} else {
 			warning(false, '[ArrayOf]: value should be array, but received', values);
 		}
 		this._items = items;
@@ -116,7 +124,7 @@ export default class ArrayOf extends Component {
 	_setData = (data) => {
 		const { name, nest } = this.props;
 		nest.setValue(data[name] || []);
-	}
+	};
 
 	render() {
 		const { render, name, value, nest, ...other } = this.props;

@@ -29,8 +29,7 @@ test('outputFilter', function (done) {
 		try {
 			expect(typeof data.hello).toBe('number');
 			done();
-		}
-		catch (err) {
+		} catch (err) {
 			done.fail(err);
 		}
 	};
@@ -40,7 +39,10 @@ test('outputFilter', function (done) {
 			<Input name="hello" defaultValue={value} outputFilter={toNumber} />
 		</Form>
 	);
-	wrapper.find(Form).get(0).submit();
+	wrapper
+		.find(Form)
+		.get(0)
+		.submit();
 });
 
 test('inputFilter', function () {
@@ -58,7 +60,9 @@ test('inputFilter', function () {
 test('inputFilter and typing', function () {
 	const value = 'world';
 	const filter = (value) => {
-		if (/^hello, /.test(value)) { return value; }
+		if (/^hello, /.test(value)) {
+			return value;
+		}
 		return `hello, ${value}`;
 	};
 	const wrapper = mount(
@@ -93,8 +97,7 @@ test('multi outputFilters', function (done) {
 		try {
 			expect(data.n).toBe(1 * 2 * 3);
 			done();
-		}
-		catch (err) {
+		} catch (err) {
 			done.fail(err);
 		}
 	};
@@ -105,5 +108,8 @@ test('multi outputFilters', function (done) {
 			<Input name="n" defaultValue={value} outputFilter={[double, triple]} />
 		</Form>
 	);
-	wrapper.find(Form).get(0).submit();
+	wrapper
+		.find(Form)
+		.get(0)
+		.submit();
 });

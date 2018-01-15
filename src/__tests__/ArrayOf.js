@@ -15,13 +15,18 @@ test('should work', async () => {
 			<ArrayOf
 				name="array"
 				value={value}
-				render={(items) => items.map(({ value, key, name }) =>
-					<Input name={name} value={value} key={key} />
-				)}
+				render={(items) =>
+					items.map(({ value, key, name }) => (
+						<Input name={name} value={value} key={key} />
+					))
+				}
 			/>
 		</Form>
 	);
-	wrapper.find(Form).get(0).submit();
+	wrapper
+		.find(Form)
+		.get(0)
+		.submit();
 	const data = handleSubmit.mock.calls[0][0];
 	expect(data.array).toEqual(value);
 });
@@ -37,16 +42,21 @@ test('should work with object', async () => {
 			<ArrayOf
 				name="array"
 				value={value}
-				render={(items) => items.map(({ value, key, name }) =>
-					<Form name={name} key={key}>
-						<Input name="hello" value={value.hello} />
-						<Input name="world" value={value.world} />
-					</Form>
-				)}
+				render={(items) =>
+					items.map(({ value, key, name }) => (
+						<Form name={name} key={key}>
+							<Input name="hello" value={value.hello} />
+							<Input name="world" value={value.world} />
+						</Form>
+					))
+				}
 			/>
 		</Form>
 	);
-	wrapper.find(Form).get(0).submit();
+	wrapper
+		.find(Form)
+		.get(0)
+		.submit();
 	const data = handleSubmit.mock.calls[0][0];
 	expect(data.array).toEqual(value);
 });
@@ -59,16 +69,21 @@ test('should work after value changed', async () => {
 			<ArrayOf
 				name="array"
 				value={value}
-				render={(items) => items.map(({ value, key, name }) =>
-					<Input name={name} value={value} key={key} />
-				)}
+				render={(items) =>
+					items.map(({ value, key, name }) => (
+						<Input name={name} value={value} key={key} />
+					))
+				}
 			/>
 		</Form>
 	);
 	const input = wrapper.find('input').first();
 	input.node.value = 'c';
 	input.simulate('change');
-	wrapper.find(Form).get(0).submit();
+	wrapper
+		.find(Form)
+		.get(0)
+		.submit();
 	const data = handleSubmit.mock.calls[0][0];
 	expect(data.array).toEqual(['c', 'b']);
 });
@@ -81,19 +96,25 @@ test('should `push` work', async () => {
 			<ArrayOf
 				name="array"
 				value={value}
-				render={(items, instance) =>
+				render={(items, instance) => (
 					<div>
-						{items.map(({ value, key, name }) =>
+						{items.map(({ value, key, name }) => (
 							<Input name={name} value={value} key={key} />
-						)}
+						))}
 						<span onClick={() => instance.push('c')} />
 					</div>
-				}
+				)}
 			/>
 		</Form>
 	);
-	wrapper.find('span').first().simulate('click');
-	wrapper.find(Form).get(0).submit();
+	wrapper
+		.find('span')
+		.first()
+		.simulate('click');
+	wrapper
+		.find(Form)
+		.get(0)
+		.submit();
 	const data = handleSubmit.mock.calls[0][0];
 	expect(data.array).toEqual(['a', 'b', 'c']);
 });
@@ -106,19 +127,25 @@ test('should `push` work if defaults to empty array', async () => {
 			<ArrayOf
 				name="array"
 				value={value}
-				render={(items, instance) =>
+				render={(items, instance) => (
 					<div>
-						{items.map(({ value, key, name }) =>
+						{items.map(({ value, key, name }) => (
 							<Input name={name} value={value} key={key} />
-						)}
+						))}
 						<span onClick={() => instance.push('c')} />
 					</div>
-				}
+				)}
 			/>
 		</Form>
 	);
-	wrapper.find('span').first().simulate('click');
-	wrapper.find(Form).get(0).submit();
+	wrapper
+		.find('span')
+		.first()
+		.simulate('click');
+	wrapper
+		.find(Form)
+		.get(0)
+		.submit();
 	const data = handleSubmit.mock.calls[0][0];
 	expect(data.array).toEqual(['c']);
 });
@@ -131,19 +158,25 @@ test('should `pop` work', async () => {
 			<ArrayOf
 				name="array"
 				value={value}
-				render={(items, instance) =>
+				render={(items, instance) => (
 					<div>
-						{items.map(({ value, key, name }) =>
+						{items.map(({ value, key, name }) => (
 							<Input name={name} value={value} key={key} />
-						)}
+						))}
 						<span onClick={instance.pop} />
 					</div>
-				}
+				)}
 			/>
 		</Form>
 	);
-	wrapper.find('span').first().simulate('click');
-	wrapper.find(Form).get(0).submit();
+	wrapper
+		.find('span')
+		.first()
+		.simulate('click');
+	wrapper
+		.find(Form)
+		.get(0)
+		.submit();
 	const data = handleSubmit.mock.calls[0][0];
 	expect(data.array).toEqual(['a']);
 });
@@ -156,19 +189,25 @@ test('should `shift` work', async () => {
 			<ArrayOf
 				name="array"
 				value={value}
-				render={(items, instance) =>
+				render={(items, instance) => (
 					<div>
-						{items.map(({ value, key, name }) =>
+						{items.map(({ value, key, name }) => (
 							<Input name={name} value={value} key={key} />
-						)}
+						))}
 						<span onClick={instance.shift} />
 					</div>
-				}
+				)}
 			/>
 		</Form>
 	);
-	wrapper.find('span').first().simulate('click');
-	wrapper.find(Form).get(0).submit();
+	wrapper
+		.find('span')
+		.first()
+		.simulate('click');
+	wrapper
+		.find(Form)
+		.get(0)
+		.submit();
 	const data = handleSubmit.mock.calls[0][0];
 	expect(data.array).toEqual(['b']);
 });
@@ -181,19 +220,25 @@ test('should `unshift` work', async () => {
 			<ArrayOf
 				name="array"
 				value={value}
-				render={(items, instance) =>
+				render={(items, instance) => (
 					<div>
-						{items.map(({ value, key, name }) =>
+						{items.map(({ value, key, name }) => (
 							<Input name={name} value={value} key={key} />
-						)}
+						))}
 						<span onClick={() => instance.unshift('c')} />
 					</div>
-				}
+				)}
 			/>
 		</Form>
 	);
-	wrapper.find('span').first().simulate('click');
-	wrapper.find(Form).get(0).submit();
+	wrapper
+		.find('span')
+		.first()
+		.simulate('click');
+	wrapper
+		.find(Form)
+		.get(0)
+		.submit();
 	const data = handleSubmit.mock.calls[0][0];
 	expect(data.array).toEqual(['c', 'a', 'b']);
 });
@@ -206,19 +251,25 @@ test('should `splice` work', async () => {
 			<ArrayOf
 				name="array"
 				value={value}
-				render={(items, instance) =>
+				render={(items, instance) => (
 					<div>
-						{items.map(({ value, key, name }) =>
+						{items.map(({ value, key, name }) => (
 							<Input name={name} value={value} key={key} />
-						)}
+						))}
 						<span onClick={() => instance.splice(1, 2, 'd', 'e')} />
 					</div>
-				}
+				)}
 			/>
 		</Form>
 	);
-	wrapper.find('span').first().simulate('click');
-	wrapper.find(Form).get(0).submit();
+	wrapper
+		.find('span')
+		.first()
+		.simulate('click');
+	wrapper
+		.find(Form)
+		.get(0)
+		.submit();
 	const data = handleSubmit.mock.calls[0][0];
 	expect(data.array).toEqual(['a', 'd', 'e']);
 });
@@ -231,19 +282,25 @@ test('should `dropAll` work', async () => {
 			<ArrayOf
 				name="array"
 				value={value}
-				render={(items, instance) =>
+				render={(items, instance) => (
 					<div>
-						{items.map(({ value, key, name }) =>
+						{items.map(({ value, key, name }) => (
 							<Input name={name} value={value} key={key} />
-						)}
+						))}
 						<span onClick={instance.dropAll} />
 					</div>
-				}
+				)}
 			/>
 		</Form>
 	);
-	wrapper.find('span').first().simulate('click');
-	wrapper.find(Form).get(0).submit();
+	wrapper
+		.find('span')
+		.first()
+		.simulate('click');
+	wrapper
+		.find(Form)
+		.get(0)
+		.submit();
 	const data = handleSubmit.mock.calls[0][0];
 	expect(data.array).toEqual([]);
 });
@@ -255,17 +312,20 @@ test('should value be an empty array if pristine value is an empty array', async
 			<ArrayOf
 				name="array"
 				value={[]}
-				render={(items) =>
+				render={(items) => (
 					<div>
-						{items.map(({ value, key, name }) =>
+						{items.map(({ value, key, name }) => (
 							<Input name={name} value={value} key={key} />
-						)}
+						))}
 					</div>
-				}
+				)}
 			/>
 		</Form>
 	);
-	wrapper.find(Form).get(0).submit();
+	wrapper
+		.find(Form)
+		.get(0)
+		.submit();
 	const data = handleSubmit.mock.calls[0][0];
 	expect(data.array).toEqual([]);
 });
@@ -275,17 +335,20 @@ test('should ignore value if pristine value is undefined', async () => {
 		<Form onSubmit={handleSubmit}>
 			<ArrayOf
 				name="array"
-				render={(items) =>
+				render={(items) => (
 					<div>
-						{items.map(({ value, key, name }) =>
+						{items.map(({ value, key, name }) => (
 							<Input name={name} value={value} key={key} />
-						)}
+						))}
 					</div>
-				}
+				)}
 			/>
 		</Form>
 	);
-	wrapper.find(Form).get(0).submit();
+	wrapper
+		.find(Form)
+		.get(0)
+		.submit();
 	const data = handleSubmit.mock.calls[0][0];
 	expect(typeof data.array).toBe('undefined');
 });

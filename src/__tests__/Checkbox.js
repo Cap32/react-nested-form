@@ -28,8 +28,7 @@ test('submitting with checked', function (done) {
 		try {
 			expect(data.hello).toBe('world');
 			done();
-		}
-		catch (err) {
+		} catch (err) {
 			done.fail(err);
 		}
 	};
@@ -38,7 +37,10 @@ test('submitting with checked', function (done) {
 			<Checkbox name="hello" value="world" defaultChecked />
 		</Form>
 	);
-	wrapper.find(Form).get(0).submit();
+	wrapper
+		.find(Form)
+		.get(0)
+		.submit();
 });
 
 test('submitting with unchecked', function (done) {
@@ -46,8 +48,7 @@ test('submitting with unchecked', function (done) {
 		try {
 			expect(typeof data.hello).toBe('undefined');
 			done();
-		}
-		catch (err) {
+		} catch (err) {
 			done.fail(err);
 		}
 	};
@@ -56,7 +57,10 @@ test('submitting with unchecked', function (done) {
 			<Checkbox name="hello" value="world" />
 		</Form>
 	);
-	wrapper.find(Form).get(0).submit();
+	wrapper
+		.find(Form)
+		.get(0)
+		.submit();
 });
 
 test('should default value be "on"', function (done) {
@@ -64,8 +68,7 @@ test('should default value be "on"', function (done) {
 		try {
 			expect(data.hello).toBe('on');
 			done();
-		}
-		catch (err) {
+		} catch (err) {
 			done.fail(err);
 		}
 	};
@@ -74,7 +77,10 @@ test('should default value be "on"', function (done) {
 			<Checkbox name="hello" defaultChecked />
 		</Form>
 	);
-	wrapper.find(Form).get(0).submit();
+	wrapper
+		.find(Form)
+		.get(0)
+		.submit();
 });
 
 test('change check state and submit', function (done) {
@@ -82,8 +88,7 @@ test('change check state and submit', function (done) {
 		try {
 			expect(data.hello).toBe('world');
 			done();
-		}
-		catch (err) {
+		} catch (err) {
 			done.fail(err);
 		}
 	};
@@ -95,5 +100,8 @@ test('change check state and submit', function (done) {
 	const input = wrapper.find('input').first();
 	input.node.checked = true;
 	input.simulate('change');
-	wrapper.find(Form).get(0).submit();
+	wrapper
+		.find(Form)
+		.get(0)
+		.submit();
 });

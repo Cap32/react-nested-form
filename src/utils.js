@@ -5,10 +5,7 @@ import warning from 'warning';
 
 const ValidationPropTypeShape = PropTypes.shape({
 	validator: PropTypes.func.isRequired,
-	message: PropTypes.oneOfType([
-		PropTypes.string,
-		PropTypes.func,
-	]),
+	message: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
 });
 
 export const ValidationPropType = PropTypes.oneOfType([
@@ -57,23 +54,25 @@ export const isDate = function isDate(target) {
 };
 
 export const isByte = function isByte(target) {
-	return /^([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)|([0-9a-zA-Z+/]{3}=))?$/.test(target);
+	return /^([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)|([0-9a-zA-Z+/]{3}=))?$/.test(
+		target
+	);
 };
 
 export const isEmpty = (target) =>
-	isUndefined(target) || target === null || target === ''
-;
+	isUndefined(target) || target === null || target === '';
 
 export const padEnd = function padEnd(target, length, fillString) {
-	while (target.length < length) { target += fillString; }
+	while (target.length < length) {
+		target += fillString;
+	}
 	return target;
 };
 
 export const isValidChild = function isValidChild(c) {
 	if (c && c.props && c.nest && c.getValue && c.reset && c.setAsPristine) {
 		return true;
-	}
-	else {
+	} else {
 		warning(false, '[ReactNestedForm]: child is INVALID.');
 		return false;
 	}
@@ -90,15 +89,20 @@ export const globalDefaultErrorMessages = {
 
 	maximum: (expected) => `Must less than or exactly equal to \`${expected}\``,
 
-	exclusiveMaximum: (expected) => `Must strictly less than (not equal to) \`${expected}\``,
+	exclusiveMaximum: (expected) =>
+		`Must strictly less than (not equal to) \`${expected}\``,
 
-	minimum: (expected) => `Must greater than or exactly equal to \`${expected}\``,
+	minimum: (expected) =>
+		`Must greater than or exactly equal to \`${expected}\``,
 
-	exclusiveMinimum: (expected) => `Must strictly greater than (not equal to) \`${expected}\``,
+	exclusiveMinimum: (expected) =>
+		`Must strictly greater than (not equal to) \`${expected}\``,
 
-	maxLength: (expected) => `The length of value must less than, or equal to \`${expected}\``,
+	maxLength: (expected) =>
+		`The length of value must less than, or equal to \`${expected}\``,
 
-	minLength: (expected) => `The length of value must greater than, or equal to \`${expected}\``,
+	minLength: (expected) =>
+		`The length of value must greater than, or equal to \`${expected}\``,
 
 	enum: (expected) => `Must equal to one of [${expected.join(', ')}]`,
 
@@ -114,16 +118,14 @@ export function setGlobalErrorMessages(messages) {
 		Object.keys(messages).forEach((key) => {
 			if (validationKeys.indexOf(key) < 0) {
 				warning(false, `[ReactNestedForm]: key "${key}" is INVALID.`);
-			}
-			else {
+			} else {
 				globalDefaultErrorMessages[key] = messages[key];
 			}
 		});
-	}
-	else {
+	} else {
 		warning(
 			false,
-			`[ReactNestedForm]: "messages" MUST be object, but received "${typeof messages}"`,
+			`[ReactNestedForm]: "messages" MUST be object, but received "${typeof messages}"`
 		);
 	}
 }

@@ -1,33 +1,37 @@
-
 import {
-	isFunction, isUndefined, isString, isEmpty,
-	globalDefaultErrorMessages, validationKeys,
+	isFunction,
+	isUndefined,
+	isString,
+	isEmpty,
+	globalDefaultErrorMessages,
+	validationKeys,
 } from './utils';
 import find from 'array-find';
 import warning from 'warning';
 
-const createValidator = (type, expected) => function schemaValidator(received) {
-	switch (type) {
-		case 'maximum':
-			return received <= expected;
-		case 'exclusiveMaximum':
-			return received < expected;
-		case 'minimum':
-			return received >= expected;
-		case 'exclusiveMinimum':
-			return received > expected;
-		case 'maxLength':
-			return (received + '').length <= expected;
-		case 'minLength':
-			return (received + '').length >= expected;
-		case 'pattern':
-			return expected.test(received);
-		case 'enum':
-			return expected.indexOf(received) > -1;
-		default:
-			return expected(received);
-	}
-};
+const createValidator = (type, expected) =>
+	function schemaValidator(received) {
+		switch (type) {
+			case 'maximum':
+				return received <= expected;
+			case 'exclusiveMaximum':
+				return received < expected;
+			case 'minimum':
+				return received >= expected;
+			case 'exclusiveMinimum':
+				return received > expected;
+			case 'maxLength':
+				return (received + '').length <= expected;
+			case 'minLength':
+				return (received + '').length >= expected;
+			case 'pattern':
+				return expected.test(received);
+			case 'enum':
+				return expected.indexOf(received) > -1;
+			default:
+				return expected(received);
+		}
+	};
 
 export default class Validation {
 	constructor(props) {
@@ -69,8 +73,9 @@ export default class Validation {
 
 		let validations = [].concat(propValidations);
 
-		if (required) { this.required = true; }
-		else {
+		if (required) {
+			this.required = true;
+		} else {
 			const requiredValidation = validations.find((v) => v && v.required);
 			if (requiredValidation) {
 				this.required = true;
@@ -83,20 +88,20 @@ export default class Validation {
 
 		validations = validations
 			.filter(Boolean)
-			.map((validator) => isFunction(validator) ? { validator } : validator)
+			.map((validator) => (isFunction(validator) ? { validator } : validator))
 			.reduce((flatten, validation) => {
 				const { message } = validation;
-				Object
-					.keys(validation)
+				Object.keys(validation)
 					.filter((key) => key !== 'message')
 					.forEach((key) => {
 						if (validationKeys.indexOf(key) < 0) {
 							warning(
 								false,
-								`[ReactNestedForm]: Validation key "${key}" is INVALID. Only [${validationKeys.join(', ')}] or "message" is valid.`
+								`[ReactNestedForm]: Validation key "${key}" is INVALID. Only [${validationKeys.join(
+									', '
+								)}] or "message" is valid.`
 							);
-						}
-						else {
+						} else {
 							const expected = validation[key];
 							flatten.push({
 								validator: createValidator(key, expected),
@@ -104,18 +109,17 @@ export default class Validation {
 								__expected: expected,
 							});
 						}
-					})
-				;
+					});
 				return flatten;
-			}, [])
-		;
+			}, []);
 
 		const add = (key, expected) => {
-			!isUndefined(expected) && validations.unshift({
-				message: _errors[key],
-				validator: createValidator(key, expected),
-				__expected: expected,
-			});
+			!isUndefined(expected) &&
+				validations.unshift({
+					message: _errors[key],
+					validator: createValidator(key, expected),
+					__expected: expected,
+				});
 		};
 
 		add('maximum', maximum);
@@ -131,16 +135,14 @@ export default class Validation {
 	}
 
 	_getErrorMessage(error, expected) {
-		if (!error) { return ''; }
+		if (!error) {
+			return '';
+		}
 		return isString(error) ? error : error(expected);
 	}
 
 	validate(name, value) {
-		const {
-			_errors,
-			_validations,
-			required,
-		} = this;
+		const { _errors, _validations, required } = this;
 
 		const result = {
 			errorMessage: '',
@@ -152,11 +154,13 @@ export default class Validation {
 
 		if (required && isEmptyValue) {
 			result.errorMessage = this._getErrorMessage(
-				_errors.required, name, value, 'required',
+				_errors.required,
+				name,
+				value,
+				'required'
 			);
 			result.isRequired = true;
-		}
-		else if (!isEmptyValue) {
+		} else if (!isEmptyValue) {
 			const invalid = find(_validations, ({ validator }) => !validator(value));
 
 			if (invalid) {

@@ -50,13 +50,39 @@ test('update input value prop', function (done) {
 		</Form>
 	);
 	const wrapper = mount(<App value="" />);
-	wrapper.setProps({ value });
-	process.nextTick(() => {
-		wrapper
-			.find(Submit)
-			.first()
-			.simulate('click');
-	});
+	wrapper
+		.setProps({ value })
+		.find(Submit)
+		.first()
+		.simulate('click');
+});
+
+test('update multi values', function (done) {
+	const foo = 'foo';
+	const bar = 'bar';
+	const handleSubmit = (data) => {
+		try {
+			expect(data.foo).toBe(foo);
+			expect(data.bar).toBe(bar);
+			done();
+		} catch (err) {
+			done.fail(err);
+		}
+	};
+	const App = ({ foo, bar }) => (
+		<Form onSubmit={handleSubmit}>
+			<Input name="foo" value={foo} />
+			<Input name="bar" value={bar} />
+			<Submit />
+		</Form>
+	);
+	const wrapper = mount(<App foo="" bar="" />);
+	wrapper
+		.setProps({ foo })
+		.setProps({ bar })
+		.find(Submit)
+		.first()
+		.simulate('click');
 });
 
 test('submit by pressed `enter` key', function (done) {

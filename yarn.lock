@@ -1849,9 +1849,9 @@ escodegen@^1.6.1:
   optionalDependencies:
     source-map "~0.2.0"
 
-eslint-config-cantonjs@^0.0.0:
-  version "0.0.0"
-  resolved "http://registry.npm.taobao.org/eslint-config-cantonjs/download/eslint-config-cantonjs-0.0.0.tgz#51022983404e3a3da1e476897382d9fb8b462977"
+eslint-config-cantonjs@^0.2.0:
+  version "0.2.0"
+  resolved "http://registry.npm.taobao.org/eslint-config-cantonjs/download/eslint-config-cantonjs-0.2.0.tgz#7af28449ef91f27196951fa38a10d0e88af44921"
   dependencies:
     babel-eslint "^8.1.2"
     eslint-config-standard "^11.0.0-beta.0"

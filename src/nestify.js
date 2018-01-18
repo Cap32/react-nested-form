@@ -32,7 +32,7 @@ export default function nestify(mapProps, options = {}) {
 	return function createNestedComponent(WrappedComponent) {
 		@hoistReactInstanceMethods(
 			(instance) => instance.getWrappedInstance(),
-			hoistMethods
+			hoistMethods,
 		)
 		@getInput
 		@getOutput
@@ -80,7 +80,7 @@ export default function nestify(mapProps, options = {}) {
 				minLength: PropTypes.number,
 				pattern: PropTypes.instanceOf(RegExp),
 				enum: PropTypes.arrayOf(
-					PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+					PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
 				),
 			};
 
@@ -190,7 +190,8 @@ export default function nestify(mapProps, options = {}) {
 					(required || !shouldIgnore(nextValue, pristineValue, props))
 				) {
 					this.attach();
-				} else if (
+				}
+				else if (
 					nest.hasAttached &&
 					!required &&
 					shouldIgnore(nextValue, pristineValue, props)
@@ -207,16 +208,15 @@ export default function nestify(mapProps, options = {}) {
 				const { nest } = this;
 				const nextValue = this._getInput(this._mapper.getValue(value));
 				const hasChanged = nest.value !== nextValue;
-
 				if (hasChanged) {
 					nest.value = nextValue;
 					this._shouldRenew = true;
 					this._shouldValidate = true;
-					this._shouldAttach(this._getOutput(nextValue));
 					this._shouldForceRender = true;
 					this._requestRender();
 					this._setPristine(shouldSetAsPristine);
 					this._requestChange();
+					this._shouldAttach(this._getOutput(nextValue));
 				}
 				return nest.value;
 			}
@@ -351,7 +351,7 @@ export default function nestify(mapProps, options = {}) {
 						},
 					},
 					props,
-					WrappedComponent
+					WrappedComponent,
 				);
 			}
 		}

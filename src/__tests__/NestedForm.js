@@ -13,7 +13,8 @@ test('basic', function (done) {
 		try {
 			expect(data.hello).toBe(value);
 			done();
-		} catch (err) {
+		}
+		catch (err) {
 			done.fail(err);
 		}
 	};
@@ -39,7 +40,8 @@ test('update input value prop', function (done) {
 		try {
 			expect(data.hello).toBe(value);
 			done();
-		} catch (err) {
+		}
+		catch (err) {
 			done.fail(err);
 		}
 	};
@@ -65,7 +67,8 @@ test('update multi values', function (done) {
 			expect(data.foo).toBe(foo);
 			expect(data.bar).toBe(bar);
 			done();
-		} catch (err) {
+		}
+		catch (err) {
 			done.fail(err);
 		}
 	};
@@ -91,7 +94,8 @@ test('submit by pressed `enter` key', function (done) {
 		try {
 			expect(data.hello).toBe(value);
 			done();
-		} catch (err) {
+		}
+		catch (err) {
 			done.fail(err);
 		}
 	};
@@ -112,7 +116,8 @@ test('`remove` field', function (done) {
 		try {
 			expect(data).toEqual({});
 			done();
-		} catch (err) {
+		}
+		catch (err) {
 			done.fail(err);
 		}
 	};
@@ -140,7 +145,8 @@ test('nested data object', function (done) {
 				children: { hello: value },
 			});
 			done();
-		} catch (err) {
+		}
+		catch (err) {
 			done.fail(err);
 		}
 	};
@@ -165,7 +171,8 @@ test('array', function (done) {
 		try {
 			expect(data.list).toEqual(values);
 			done();
-		} catch (err) {
+		}
+		catch (err) {
 			done.fail(err);
 		}
 	};
@@ -188,7 +195,8 @@ test('should ignore empty fields if pristine value is empty', function (done) {
 		try {
 			expect(data).toEqual({});
 			done();
-		} catch (err) {
+		}
+		catch (err) {
 			done.fail(err);
 		}
 	};
@@ -211,7 +219,8 @@ test('format empty value', function (done) {
 		try {
 			expect(data.hello).toEqual(value);
 			done();
-		} catch (err) {
+		}
+		catch (err) {
 			done.fail(err);
 		}
 	};
@@ -233,7 +242,8 @@ test('should not ignore empty fields if pristine value is not empty', function (
 		try {
 			expect(data).toEqual({ hello: '' });
 			done();
-		} catch (err) {
+		}
+		catch (err) {
 			done.fail(err);
 		}
 	};
@@ -258,7 +268,8 @@ test('should not ignore empty fields if required', function (done) {
 		try {
 			expect(data).toEqual({ hello: '' });
 			done();
-		} catch (err) {
+		}
+		catch (err) {
 			done.fail(err);
 		}
 	};
@@ -285,7 +296,8 @@ test('validation', function (done) {
 		try {
 			expect(isInvalid).toBe(true);
 			done();
-		} catch (err) {
+		}
+		catch (err) {
 			done.fail(err);
 		}
 	};
@@ -316,7 +328,8 @@ test('validation after typed', function (done) {
 		try {
 			expect(isInvalid).toBe(false);
 			done();
-		} catch (err) {
+		}
+		catch (err) {
 			done.fail(err);
 		}
 	};
@@ -359,7 +372,7 @@ test('`onValid` if initial state is valid', function (done) {
 				]}
 			/>
 			<Submit />
-		</Form>
+		</Form>,
 	);
 });
 
@@ -377,7 +390,7 @@ test('`onInalid` if initial state is invalid', function (done) {
 				]}
 			/>
 			<Submit />
-		</Form>
+		</Form>,
 	);
 });
 
@@ -405,7 +418,7 @@ test('`onValid` after typed', function (done) {
 				]}
 			/>
 			<Submit />
-		</Form>
+		</Form>,
 	);
 	const input = wrapper.find('input').first();
 	input.node.value = '666666';
@@ -418,7 +431,8 @@ test('reset()', function (done) {
 		try {
 			expect(data.hello).toEqual(value);
 			done();
-		} catch (err) {
+		}
+		catch (err) {
 			done.fail(err);
 		}
 	};
@@ -426,7 +440,7 @@ test('reset()', function (done) {
 		<Form onSubmit={handleSubmit}>
 			<Input name="hello" defaultValue={value} />
 			<Submit />
-		</Form>
+		</Form>,
 	);
 	const input = wrapper.find('input').first();
 	input.node.value = 'updated';
@@ -444,7 +458,8 @@ test('nested forms', function (done) {
 		try {
 			state.stopPropagation();
 			expect(data).toEqual({ b: 'b' });
-		} catch (err) {
+		}
+		catch (err) {
 			done.fail(err);
 		}
 	};
@@ -456,7 +471,8 @@ test('nested forms', function (done) {
 				c: 'c',
 			});
 			done();
-		} catch (err) {
+		}
+		catch (err) {
 			done.fail(err);
 		}
 	};
@@ -469,7 +485,7 @@ test('nested forms', function (done) {
 			</Form>
 			<Input name="c" defaultValue="c" />
 			<Submit />
-		</Form>
+		</Form>,
 	);
 	wrapper
 		.find(Submit)
@@ -486,7 +502,8 @@ test('should ignore nested form if no `name` prop', function (done) {
 		try {
 			state.stopPropagation();
 			expect(data).toEqual({ b: 'b' });
-		} catch (err) {
+		}
+		catch (err) {
 			done.fail(err);
 		}
 	};
@@ -495,7 +512,8 @@ test('should ignore nested form if no `name` prop', function (done) {
 		try {
 			expect(data).toEqual({ c: 'c' }); // notice
 			done();
-		} catch (err) {
+		}
+		catch (err) {
 			done.fail(err);
 		}
 	};
@@ -510,7 +528,7 @@ test('should ignore nested form if no `name` prop', function (done) {
 			</Form>
 			<Input name="c" defaultValue="c" />
 			<Submit />
-		</Form>
+		</Form>,
 	);
 	wrapper
 		.find(Submit)
@@ -528,7 +546,8 @@ test('`onReset()` prop', function (done) {
 		try {
 			expect(data.hello).toEqual(value);
 			done();
-		} catch (err) {
+		}
+		catch (err) {
 			done.fail(err);
 		}
 	};
@@ -536,7 +555,7 @@ test('`onReset()` prop', function (done) {
 		<Form onReset={handleReset}>
 			<Input name="hello" value={value} />
 			<Reset />
-		</Form>
+		</Form>,
 	);
 	const input = wrapper.find('input').first();
 	input.node.value = 'updated';
@@ -548,13 +567,46 @@ test('`onReset()` prop', function (done) {
 		.simulate('click');
 });
 
+test('`onReset()` if original props are empty', function (done) {
+	const handleSubmit = (data) => {
+		try {
+			expect(typeof data.foo).toBe('undefined');
+			expect(typeof data.bar).toBe('undefined');
+			done();
+		}
+		catch (err) {
+			done.fail(err);
+		}
+	};
+	const wrapper = mount(
+		<Form onSubmit={handleSubmit}>
+			<Input name="foo" defaultValue="" />
+			<Input name="bar" defaultValue="" />
+			<Submit />
+		</Form>,
+	);
+	const first = wrapper.find('input').first();
+	first.node.value = 'updated';
+	first.simulate('change');
+	const last = wrapper.find('input').last();
+	last.node.value = 'updated';
+	last.simulate('change');
+	const instance = wrapper.instance();
+	instance.reset();
+	wrapper
+		.find(Submit)
+		.first()
+		.simulate('click');
+});
+
 test('click <Reset /> and submit', function (done) {
 	const value = 'world';
 	const handleSubmit = (data) => {
 		try {
 			expect(data.hello).toEqual(value);
 			done();
-		} catch (err) {
+		}
+		catch (err) {
 			done.fail(err);
 		}
 	};
@@ -563,7 +615,7 @@ test('click <Reset /> and submit', function (done) {
 			<Input name="hello" defaultValue={value} />
 			<Reset />
 			<Submit />
-		</Form>
+		</Form>,
 	);
 	const input = wrapper.find('input').first();
 	input.node.value = 'updated';
@@ -584,7 +636,8 @@ test('outputFilter', function (done) {
 		try {
 			expect(typeof data.hello).toBe('number');
 			done();
-		} catch (err) {
+		}
+		catch (err) {
 			done.fail(err);
 		}
 	};
@@ -598,7 +651,7 @@ test('outputFilter', function (done) {
 		<Form onSubmit={handleSubmit} outputFilter={toNumber}>
 			<Input name="hello" defaultValue={value} />
 			<Submit />
-		</Form>
+		</Form>,
 	);
 	wrapper
 		.find(Submit)
@@ -612,7 +665,8 @@ test('should work after submitted and changed', function (done) {
 		if (submitCounter === 0) {
 			expect(data.hello).toBe('1');
 			submitCounter++;
-		} else {
+		}
+		else {
 			expect(data.hello).toBe('2');
 			done();
 		}
@@ -644,7 +698,7 @@ test('should `isPristine` be `false` after submitted', function (done) {
 		<Form>
 			<Input name="hello" value="world" />
 			<Submit />
-		</Form>
+		</Form>,
 	);
 	const input = wrapper.find('Input').first();
 	expect(input.props().nest.isPristine).toBe(true);
@@ -663,7 +717,8 @@ test('should ignore empty fields with outputFilter', function (done) {
 		try {
 			expect(data).toEqual({});
 			done();
-		} catch (err) {
+		}
+		catch (err) {
 			done.fail(err);
 		}
 	};
@@ -686,7 +741,7 @@ test('should `onChange` work', async () => {
 	const wrapper = mount(
 		<Form onChange={handleChange}>
 			<Input name="test" defaultValue="hello" />
-		</Form>
+		</Form>,
 	);
 	const input = wrapper.find('input').first();
 	input.node.value = 'world';
@@ -703,7 +758,7 @@ test('should nested `onChange` work', async () => {
 			<Form name="nested" onChange={handleNestedChange}>
 				<Input name="test" defaultValue="hello" />
 			</Form>
-		</Form>
+		</Form>,
 	);
 	const input = wrapper.find('input').first();
 	input.node.value = 'world';

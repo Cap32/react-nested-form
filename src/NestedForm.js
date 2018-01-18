@@ -64,6 +64,7 @@ export default class NestedForm extends Component {
 				detach: this.detach,
 				submit: this.submit,
 				reset: this.reset,
+
 				// onRequestValidate: this._requestValid,
 				// onRequestRenew: this._requestRenew,
 				requestChange: this._requestChange,
@@ -131,7 +132,8 @@ export default class NestedForm extends Component {
 			this._requestChange();
 			if (this._hasParent()) {
 				this._contextForm.attach(this);
-			} else {
+			}
+			else {
 				this.validate();
 			}
 		}
@@ -149,7 +151,8 @@ export default class NestedForm extends Component {
 			this._requestChange();
 			if (this._hasParent()) {
 				this._contextForm.detach(this);
-			} else {
+			}
+			else {
 				this.validate();
 			}
 		}
@@ -164,7 +167,8 @@ export default class NestedForm extends Component {
 		this._shouldValidate = true;
 		if (this._hasParent()) {
 			this._contextForm.requestValidate();
-		} else {
+		}
+		else {
 			this.validate();
 		}
 	};
@@ -189,7 +193,7 @@ export default class NestedForm extends Component {
 
 		this._shouldRenew = false;
 
-		const newValue = this._children.reduce((data, child) => {
+		const newValue = this._children.slice().reduce((data, child) => {
 			const { props: { name } } = child;
 
 			if (!name) {
@@ -206,14 +210,16 @@ export default class NestedForm extends Component {
 
 				if (index < 0) {
 					dataValue.push(value);
-				} else {
+				}
+				else {
 					dataValue.splice(index, 0, value);
 				}
-			} else {
+			}
+			else {
 				warning(
 					!dataValue,
 					`[ReactNestedForm]: Multi names called \`${realName}\`! ` +
-						`If you wanna use array, please use \`${realName}[]\` instead.`
+						`If you wanna use array, please use \`${realName}[]\` instead.`,
 				);
 				data[realName] = value;
 			}
@@ -247,18 +253,19 @@ export default class NestedForm extends Component {
 
 			if (isInvalid) {
 				onInvalid();
-			} else {
+			}
+			else {
 				onValid();
 			}
 		}
 	}
 
 	setAsPristine() {
-		this._children.forEach((child) => child.setAsPristine());
+		this._eachChildren((child) => child.setAsPristine());
 	}
 
 	setAsNotPristine() {
-		this._children.forEach((child) => child.setAsNotPristine());
+		this._eachChildren((child) => child.setAsNotPristine());
 	}
 
 	_getEventState() {
@@ -274,8 +281,15 @@ export default class NestedForm extends Component {
 		return state;
 	}
 
+	_eachChildren(iterator) {
+
+		// prevent detach
+		const children = this._children.slice();
+		children.forEach(iterator);
+	}
+
 	reset = (callback = emptyFunction) => {
-		this._children.forEach((child) => child.reset());
+		this._eachChildren((child) => child.reset());
 
 		const eventState = this._getEventState();
 		const value = this.getValue();
@@ -290,7 +304,7 @@ export default class NestedForm extends Component {
 	submit = (callback = emptyFunction) => {
 		const eventState = this._getEventState();
 		const value = this.getValue();
-		this._children.forEach((child) => child.setAsNotPristine());
+		this._eachChildren((child) => child.setAsNotPristine());
 		this.props.onSubmit(value, eventState);
 		callback(value, eventState);
 

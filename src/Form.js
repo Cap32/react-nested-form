@@ -59,16 +59,15 @@ export default class Form extends Component {
 	};
 
 	getChildContext() {
+		const { getValue, setValue, getPath, attach, detach, emitChange } = this;
 		return {
 			[CONTEXT_NAME]: {
-				getValue: this.getValue,
-				getPath: this.getPath,
-				attach: this.attach,
-				detach: this.detach,
-				emitChange: this.emitChange,
-
-				// submit: this.submit,
-				// reset: this.reset,
+				getValue,
+				setValue,
+				getPath,
+				attach,
+				detach,
+				emitChange,
 			},
 		};
 	}
@@ -98,6 +97,10 @@ export default class Form extends Component {
 			data = this._form.getValue(this.props.name);
 		}
 		return name && data ? data[name] : data;
+	};
+
+	setValue = (name, val) => {
+		return (this.nest.value[name] = val);
 	};
 
 	getPath = (...paths) => {

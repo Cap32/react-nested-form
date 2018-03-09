@@ -62,6 +62,8 @@ export const isByte = function isByte(target) {
 export const isEmpty = (target) =>
 	isUndefined(target) || target === null || target === '';
 
+export const isPlainObject = (obj) => !!(obj && isObject(obj) && isDate(obj));
+
 export const padEnd = function padEnd(target, length, fillString) {
 	while (target.length < length) {
 		target += fillString;
@@ -93,8 +95,7 @@ export const globalDefaultErrorMessages = {
 	exclusiveMaximum: (expected) =>
 		`Must strictly less than (not equal to) \`${expected}\``,
 
-	minimum: (expected) =>
-		`Must greater than or exactly equal to \`${expected}\``,
+	minimum: (expected) => `Must greater than or exactly equal to \`${expected}\``,
 
 	exclusiveMinimum: (expected) =>
 		`Must strictly greater than (not equal to) \`${expected}\``,
@@ -157,4 +158,3 @@ export function createValidator(type, expected) {
 		}
 	};
 }
-

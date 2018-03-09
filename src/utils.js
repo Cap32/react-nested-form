@@ -55,7 +55,7 @@ export const isDate = function isDate(target) {
 
 export const isByte = function isByte(target) {
 	return /^([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)|([0-9a-zA-Z+/]{3}=))?$/.test(
-		target
+		target,
 	);
 };
 
@@ -70,9 +70,10 @@ export const padEnd = function padEnd(target, length, fillString) {
 };
 
 export const isValidChild = function isValidChild(c) {
-	if (c && c.props && c.nest && c.getValue && c.reset && c.setAsPristine) {
+	if (c && c.props && isObject(c.nest)) {
 		return true;
-	} else {
+	}
+	else {
 		warning(false, '[ReactNestedForm]: child is INVALID.');
 		return false;
 	}
@@ -118,14 +119,42 @@ export function setGlobalErrorMessages(messages) {
 		Object.keys(messages).forEach((key) => {
 			if (validationKeys.indexOf(key) < 0) {
 				warning(false, `[ReactNestedForm]: key "${key}" is INVALID.`);
-			} else {
+			}
+			else {
 				globalDefaultErrorMessages[key] = messages[key];
 			}
 		});
-	} else {
+	}
+	else {
 		warning(
 			false,
-			`[ReactNestedForm]: "messages" MUST be object, but received "${typeof messages}"`
+			`[ReactNestedForm]: "messages" MUST be object, but received "${typeof messages}"`,
 		);
 	}
 }
+
+export function createValidator(type, expected) {
+	return function schemaValidator(received) {
+		switch (type) {
+			case 'maximum':
+				return received <= expected;
+			case 'exclusiveMaximum':
+				return received < expected;
+			case 'minimum':
+				return received >= expected;
+			case 'exclusiveMinimum':
+				return received > expected;
+			case 'maxLength':
+				return (received + '').length <= expected;
+			case 'minLength':
+				return (received + '').length >= expected;
+			case 'pattern':
+				return expected.test(received);
+			case 'enum':
+				return expected.indexOf(received) > -1;
+			default:
+				return expected(received);
+		}
+	};
+}
+

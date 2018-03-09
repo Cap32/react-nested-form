@@ -16,7 +16,13 @@ const defaultShouldIgnore = (value, pristineValue) =>
 	isEmpty(value) && isEmpty(pristineValue);
 
 export default function ne(options = {}) {
-	const { withRef = false, hoistMethods = [], defaultProps = {} } = options;
+	const {
+		withRef = false,
+		hoistMethods = [],
+		valueProp = 'value',
+		varProp = 'value',
+		defaultProps = {},
+	} = options;
 
 	return function createNestedComponent(WrappedComponent) {
 		@hoistReactInstanceMethods(
@@ -29,6 +35,19 @@ export default function ne(options = {}) {
 				defaultValue: PropTypes.any,
 				value: PropTypes.any,
 				validations: ValidationPropType,
+				onChange: PropTypes.func,
+				onKeyPress: PropTypes.func,
+				onBlur: PropTypes.func,
+				shouldIgnore: PropTypes.func,
+
+				dataType: PropTypes.oneOfType([
+					PropTypes.func,
+					PropTypes.oneOf(DataTypeKeys),
+				]),
+				inputFilter: FilterPropType,
+				outputFilter: FilterPropType,
+				formatEmptyValue: PropTypes.func,
+
 				defaultErrorMessage: PropTypes.oneOfType([
 					PropTypes.string,
 					PropTypes.shape({
@@ -44,18 +63,6 @@ export default function ne(options = {}) {
 						default: ErrorMessagePropType,
 					}),
 				]),
-				onChange: PropTypes.func,
-				onKeyPress: PropTypes.func,
-				onBlur: PropTypes.func,
-				shouldIgnore: PropTypes.func,
-
-				dataType: PropTypes.oneOfType([
-					PropTypes.func,
-					PropTypes.oneOf(DataTypeKeys),
-				]),
-				inputFilter: FilterPropType,
-				outputFilter: FilterPropType,
-				formatEmptyValue: PropTypes.func,
 
 				// JSON Schema Validations
 				required: PropTypes.bool,
@@ -78,7 +85,7 @@ export default function ne(options = {}) {
 			};
 
 			static contextTypes = {
-				[CONTEXT_NAME]: PropTypes.object,
+				[CONTEXT_NAME]: PropTypes.object.isRequired,
 			};
 
 			static childContextTypes = {
@@ -87,23 +94,24 @@ export default function ne(options = {}) {
 
 			getChildContext() {
 				return {
-					[CONTEXT_NAME]: this.nest,
+					[CONTEXT_NAME]: {
+						data: this.nest.data,
+					},
 				};
 			}
 
 			componentWillMount() {
 				const { name } = this.props;
-				const parent = this._createParent();
-				const value = parent.getRaw(name);
+				const form = this._createForm();
+				const value = form.getValue(name);
+				this._form = form;
+				this._validation = this._createValidation(value);
 				this.nest = {
-					parent,
-					isInvalid: false,
-					isRequired: false,
-					isPristine: true,
-					hasAttached: false,
-					errorMessage: '',
 					value,
-					requestChange: this._requestChange,
+					path: form.getPath(name),
+					isTouched: true,
+					isIgnored: false,
+					...this._validation.state,
 				};
 			}
 
@@ -113,10 +121,38 @@ export default function ne(options = {}) {
 				return this.wrappedInstance;
 			}
 
-			// TODO
-			_createParent() {
-				const context = this.context[CONTEXT_NAME];
-				return context;
+			_createForm() {
+				return this.context[CONTEXT_NAME];
+			}
+
+			_createValidation(value) {
+				const {
+					required,
+					validations,
+					maximum,
+					exclusiveMaximum,
+					minimum,
+					exclusiveMinimum,
+					maxLength,
+					minLength,
+					pattern,
+					enum: enumRule,
+					defaultErrorMessage,
+				} = this.props;
+				return new Validation(this, required, validations, defaultErrorMessage)
+					.addRule('maximum', maximum)
+					.addRule('exclusiveMaximum', exclusiveMaximum)
+					.addRule('minimum', minimum)
+					.addRule('exclusiveMinimum', exclusiveMinimum)
+					.addRule('maxLength', maxLength)
+					.addRule('minLength', minLength)
+					.addRule('pattern', pattern)
+					.addRule('enum', enumRule)
+					.validate(value);
+			}
+
+			_handleChange(value) {
+				this._form.emitChange(this.nest.path, value);
 			}
 
 			_input(value) {
@@ -174,11 +210,7 @@ export default function ne(options = {}) {
 			}
 
 			_performValidate(value) {
-				this._tryRun(() => {
-					this._validation.each((validation) => {
-						validation.validate(value);
-					});
-				});
+				this._validation.validate(value);
 			}
 
 			_performSetValue(value) {

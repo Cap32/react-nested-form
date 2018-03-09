@@ -34,16 +34,21 @@ const createValidator = (type, expected) =>
 	};
 
 export default class Validation {
-	constructor(props) {
-		this._props = props;
-		this.required = false;
-		this._errors = this._initErrors();
-		this._validations = this._initValidations();
+	constructor(reactInstance, required, propValidations, defaultErrorMessage) {
+		const validations = [].concat(propValidations);
+		this._reactInstance = reactInstance;
+		this._errors = this._getErrors(defaultErrorMessage);
+		this.state = {
+			hasRequiredProp: this._getRequiredProp(required, validations),
+			errorMessage: '',
+			isValid: true,
+			isRequired: false,
+			isOk: true,
+		};
+		this._validations = this._getValidations(validations);
 	}
 
-	_initErrors() {
-		let { defaultErrorMessage } = this._props;
-
+	_getErrors(defaultErrorMessage) {
 		if (isString(defaultErrorMessage)) {
 			defaultErrorMessage = { other: defaultErrorMessage };
 		}
@@ -54,39 +59,26 @@ export default class Validation {
 		};
 	}
 
-	_initValidations() {
-		const {
-			_props: {
-				validations: propValidations,
-				required,
-				maximum,
-				exclusiveMaximum,
-				minimum,
-				exclusiveMinimum,
-				maxLength,
-				minLength,
-				pattern,
-				enum: _enum,
-			},
-			_errors,
-		} = this;
-
-		let validations = [].concat(propValidations);
-
+	_getRequiredProp(required, propValidations) {
 		if (required) {
-			this.required = true;
-		} else {
-			const requiredValidation = validations.find((v) => v && v.required);
-			if (requiredValidation) {
-				this.required = true;
-				if (requiredValidation.message) {
-					_errors.required = requiredValidation.message;
-				}
-				delete requiredValidation.required;
-			}
+			return true;
 		}
 
-		validations = validations
+		const requiredValidation = propValidations.find((v) => v && v.required);
+		if (requiredValidation) {
+			if (requiredValidation.message) {
+				this._errors.required = requiredValidation.message;
+			}
+			delete requiredValidation.required;
+			return true;
+		}
+		return false;
+	}
+
+	_getValidations(validations) {
+		const { _errors } = this;
+
+		return validations
 			.filter(Boolean)
 			.map((validator) => (isFunction(validator) ? { validator } : validator))
 			.reduce((flatten, validation) => {
@@ -95,13 +87,13 @@ export default class Validation {
 					.filter((key) => key !== 'message')
 					.forEach((key) => {
 						if (validationKeys.indexOf(key) < 0) {
+							const validationKeysText = validationKeys.join(', ');
 							warning(
 								false,
-								`[ReactNestedForm]: Validation key "${key}" is INVALID. Only [${validationKeys.join(
-									', '
-								)}] or "message" is valid.`
+								`[ReactNestedForm]: Validation key "${key}" is INVALID. Only [${validationKeysText}] or "message" is valid.`,
 							);
-						} else {
+						}
+						else {
 							const expected = validation[key];
 							flatten.push({
 								validator: createValidator(key, expected),
@@ -112,26 +104,17 @@ export default class Validation {
 					});
 				return flatten;
 			}, []);
+	}
 
-		const add = (key, expected) => {
-			!isUndefined(expected) &&
-				validations.unshift({
-					message: _errors[key],
-					validator: createValidator(key, expected),
-					__expected: expected,
-				});
-		};
-
-		add('maximum', maximum);
-		add('exclusiveMaximum', exclusiveMaximum);
-		add('minimum', minimum);
-		add('exclusiveMinimum', exclusiveMinimum);
-		add('maxLength', maxLength);
-		add('minLength', minLength);
-		add('pattern', pattern);
-		add('enum', _enum);
-
-		return validations;
+	addRule(key, expected) {
+		if (!isUndefined(expected)) {
+			this._validations.unshift({
+				message: this._errors[key],
+				validator: createValidator(key, expected),
+				__expected: expected,
+			});
+		}
+		return this;
 	}
 
 	_getErrorMessage(error, expected) {
@@ -141,36 +124,57 @@ export default class Validation {
 		return isString(error) ? error : error(expected);
 	}
 
-	validate(name, value) {
-		const { _errors, _validations, required } = this;
-
-		const result = {
-			errorMessage: '',
-			isInvalid: false,
-			isRequired: false,
+	_setState(state) {
+		const instance = this._reactInstance;
+		const { nest } = instance;
+		let changed = false;
+		const merge = function merge(prop) {
+			const val = state[prop];
+			if (nest[prop] !== val) {
+				changed = true;
+				nest[prop] = val;
+			}
 		};
+		Object.keys(state).forEach(merge);
+		if (changed) {
+			instance.forceUpdate();
+		}
+	}
 
+	validate(value) {
+		const { _errors, _validations, state } = this;
 		const isEmptyValue = isEmpty(value);
 
-		if (required && isEmptyValue) {
-			result.errorMessage = this._getErrorMessage(
-				_errors.required,
-				name,
-				value,
-				'required'
-			);
-			result.isRequired = true;
-		} else if (!isEmptyValue) {
+		state.errorMessage = '';
+		state.isValid = true;
+		state.isRequired = false;
+
+		if (state.hasRequiredProp && isEmptyValue) {
+			state.errorMessage = _errors.required || 'required';
+			state.isRequired = true;
+		}
+		else if (!isEmptyValue) {
 			const invalid = find(_validations, ({ validator }) => !validator(value));
 
 			if (invalid) {
 				const message = invalid.message;
 				const expected = invalid.__expected || '[Validator Function]';
-				result.isInvalid = true;
-				result.errorMessage = this._getErrorMessage(message, expected);
+				state.isValid = false;
+				state.errorMessage = this._getErrorMessage(message, expected);
 			}
 		}
 
-		return result;
+		state.ok = state.isValid && !state.isRequired;
+		return this;
+	}
+
+	throw(error) {
+		if (error) {
+			this._setState({
+				errorMessage: error.reason || error.message,
+				isValid: false,
+				ok: false,
+			});
+		}
 	}
 }

@@ -6,7 +6,6 @@ import { DataTypeKeys } from './DataTypes';
 import warning from 'warning';
 import {
 	isEmpty,
-	isPlainObject,
 	isFunction,
 	isValidChild,
 	ComponentPropType,
@@ -20,19 +19,20 @@ const defaultShouldIgnore = (value, pristineValue) =>
 
 export default class Nested extends Component {
 	static propTypes = {
-		name: PropTypes.string,
 		children: PropTypes.func,
 		render: PropTypes.func,
 		component: ComponentPropType,
 
 		defaultValue: PropTypes.any,
 		value: PropTypes.any,
-		validations: ValidationPropType,
 		onChange: PropTypes.func,
 		onKeyPress: PropTypes.func,
 		onBlur: PropTypes.func,
-		shouldIgnore: PropTypes.func,
 
+		name: PropTypes.string,
+		isPlainObject: PropTypes.bool,
+		shouldIgnore: PropTypes.func,
+		validations: ValidationPropType,
 		dataType: PropTypes.oneOfType([
 			PropTypes.func,
 			PropTypes.oneOf(DataTypeKeys),
@@ -99,7 +99,14 @@ export default class Nested extends Component {
 	}
 
 	componentWillMount() {
-		const { name, component, render, children, value: propVal } = this.props;
+		const {
+			name,
+			component,
+			render,
+			children,
+			value: propVal,
+			isPlainObject,
+		} = this.props;
 
 		warning(
 			!(component && render),
@@ -119,7 +126,11 @@ export default class Nested extends Component {
 		const form = this._getForm();
 		const value = form ? form.getValue(name) : propVal;
 		this._form = form;
-		this._children = [];
+
+		if (isPlainObject) {
+			this._children = [];
+		}
+
 		this._validation = this._createValidation(value);
 		this.nest = {
 			value,
@@ -256,6 +267,10 @@ export default class Nested extends Component {
 		return { value, ...state };
 	}
 
+	onChange = (value) => {
+		this._input(value);
+	};
+
 	emitChange = (value) => {
 		if (this._form) {
 			this._form.emitChange(value);
@@ -269,14 +284,20 @@ export default class Nested extends Component {
 	};
 
 	attach = (child) => {
-		if (isValidChild(child) && !~this._children.indexOf(child)) {
+		const { isPlainObject } = this.props;
+		if (
+			isPlainObject &&
+			isValidChild(child) &&
+			!~this._children.indexOf(child)
+		) {
 			this._children.push(child);
 			this._updateValidationState();
 		}
 	};
 
 	detach = (child) => {
-		if (!child) {
+		const { isPlainObject } = this.props;
+		if (!isPlainObject || !child) {
 			return;
 		}
 
@@ -288,15 +309,17 @@ export default class Nested extends Component {
 	};
 
 	_updateValidationState() {
-		const { nest: { onValid, onInvalid }, nest } = this;
-		const ok = this._children.every((child) => child.nest.ok);
-		const prevOk = nest.ok;
-		if (ok !== prevOk) {
-			if (prevOk) {
-				isFunction(onInvalid) && onInvalid();
-			}
-			else {
-				isFunction(onValid) && onValid();
+		if (this.props.isPlainObject) {
+			const { nest: { onValid, onInvalid }, nest } = this;
+			const ok = this._children.every((child) => child.nest.ok);
+			const prevOk = nest.ok;
+			if (ok !== prevOk) {
+				if (prevOk) {
+					isFunction(onInvalid) && onInvalid();
+				}
+				else {
+					isFunction(onValid) && onValid();
+				}
 			}
 		}
 	}
@@ -313,6 +336,7 @@ export default class Nested extends Component {
 				defaultValue,
 				validations,
 				defaultErrorMessage,
+				isPlainObject,
 				shouldIgnore,
 				formatEmptyValue,
 				dataType,

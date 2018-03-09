@@ -1,12 +1,9 @@
-
 const { resolve } = require('path');
 const webpack = require('webpack');
 const { name } = require('./package.json');
 const camelcase = require('lodash.camelcase');
 
 process.env.NODE_ENV = process.env.NODE_ENV || 'development';
-
-// const isDev = process.env.NODE_ENV === 'development';
 
 const PROJECT_PATH = __dirname;
 const inProject = (...args) => resolve(PROJECT_PATH, ...args);
@@ -17,7 +14,6 @@ const testDir = inTest();
 
 module.exports = (webpackEnv = {}) => {
 	const { minify } = webpackEnv;
-
 	const config = {
 		devtool: 'source-map',
 		entry: './src',
@@ -27,6 +23,7 @@ module.exports = (webpackEnv = {}) => {
 			library: camelcase(name),
 			libraryTarget: 'umd',
 		},
+		mode: process.env.NODE_ENV,
 		module: {
 			rules: [
 				{
@@ -34,14 +31,8 @@ module.exports = (webpackEnv = {}) => {
 					include: [srcDir, testDir],
 					loader: 'babel-loader',
 					options: {
-						presets: [
-							['es2015', { modules: false }],
-							'react',
-							'stage-0',
-						],
-						plugins: [
-							'transform-decorators-legacy',
-						],
+						presets: [['es2015', { modules: false }], 'react', 'stage-0'],
+						plugins: ['transform-decorators-legacy'],
 						cacheDirectory: true,
 						babelrc: false,
 					},
@@ -63,14 +54,9 @@ module.exports = (webpackEnv = {}) => {
 		externals: {
 			react: 'React',
 		},
+		optimization: {
+			minimize: !!minify,
+		},
 	};
-
-
-	if (minify) {
-		config.plugins.push(
-			new webpack.optimize.UglifyJsPlugin(),
-		);
-	}
-
 	return config;
 };

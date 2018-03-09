@@ -4,16 +4,12 @@ import React from 'react';
 import { mount } from 'enzyme';
 import { resetBOM } from './utils';
 import Form, { Input, Submit } from '../';
-import padStart from 'lodash.padstart';
+import moment from 'moment';
 
 beforeEach(resetBOM);
 
 const createDateValue = function createDateValue(date) {
-	return date
-		.toLocaleDateString()
-		.split('-')
-		.map((n) => padStart(n, 2, '0'))
-		.join('/');
+	return moment(date).format('YYYY/MM/DD');
 };
 
 test('dataType="integer"', function (done) {
@@ -22,7 +18,8 @@ test('dataType="integer"', function (done) {
 		try {
 			expect(data.test).toBe(value);
 			done();
-		} catch (err) {
+		}
+		catch (err) {
 			done.fail(err);
 		}
 	};
@@ -30,7 +27,7 @@ test('dataType="integer"', function (done) {
 		<Form onSubmit={handleSubmit}>
 			<Input name="test" dataType="integer" defaultValue={`${value}`} />
 			<Submit />
-		</Form>
+		</Form>,
 	);
 	wrapper
 		.find(Submit)
@@ -42,7 +39,7 @@ test('dataType="integer" when value is empty', function () {
 	const wrapper = mount(
 		<Form>
 			<Input name="test" dataType="integer" value="" />
-		</Form>
+		</Form>,
 	);
 	expect(typeof wrapper.find('input').prop('value')).toBe('undefined');
 });
@@ -53,7 +50,8 @@ test('dataType="long"', function (done) {
 		try {
 			expect(data.test).toBe(value);
 			done();
-		} catch (err) {
+		}
+		catch (err) {
 			done.fail(err);
 		}
 	};
@@ -61,7 +59,7 @@ test('dataType="long"', function (done) {
 		<Form onSubmit={handleSubmit}>
 			<Input name="test" dataType="long" defaultValue={`${value}`} />
 			<Submit />
-		</Form>
+		</Form>,
 	);
 	wrapper
 		.find(Submit)
@@ -75,7 +73,8 @@ test('dataType="float"', function (done) {
 		try {
 			expect(data.test).toBe(value);
 			done();
-		} catch (err) {
+		}
+		catch (err) {
 			done.fail(err);
 		}
 	};
@@ -83,7 +82,7 @@ test('dataType="float"', function (done) {
 		<Form onSubmit={handleSubmit}>
 			<Input name="test" dataType="float" defaultValue={`${value}`} />
 			<Submit />
-		</Form>
+		</Form>,
 	);
 	wrapper
 		.find(Submit)
@@ -97,7 +96,8 @@ test('dataType="double"', function (done) {
 		try {
 			expect(data.test).toBe(value);
 			done();
-		} catch (err) {
+		}
+		catch (err) {
 			done.fail(err);
 		}
 	};
@@ -105,7 +105,7 @@ test('dataType="double"', function (done) {
 		<Form onSubmit={handleSubmit}>
 			<Input name="test" dataType="double" defaultValue={`${value}`} />
 			<Submit />
-		</Form>
+		</Form>,
 	);
 	wrapper
 		.find(Submit)
@@ -119,7 +119,8 @@ test('dataType="string"', function (done) {
 		try {
 			expect(data.test).toBe(value);
 			done();
-		} catch (err) {
+		}
+		catch (err) {
 			done.fail(err);
 		}
 	};
@@ -127,7 +128,7 @@ test('dataType="string"', function (done) {
 		<Form onSubmit={handleSubmit}>
 			<Input name="test" dataType="string" defaultValue={+value} />
 			<Submit />
-		</Form>
+		</Form>,
 	);
 	wrapper
 		.find(Submit)
@@ -141,7 +142,8 @@ test('dataType="byte"', function (done) {
 		try {
 			expect(data.test).toBe(value);
 			done();
-		} catch (err) {
+		}
+		catch (err) {
 			done.fail(err);
 		}
 	};
@@ -149,7 +151,7 @@ test('dataType="byte"', function (done) {
 		<Form onSubmit={handleSubmit}>
 			<Input name="test" dataType="byte" defaultValue={value} />
 			<Submit />
-		</Form>
+		</Form>,
 	);
 	wrapper
 		.find(Submit)
@@ -162,7 +164,8 @@ test('dataType="boolean"', function (done) {
 		try {
 			expect(data.test).toBe(true);
 			done();
-		} catch (err) {
+		}
+		catch (err) {
 			done.fail(err);
 		}
 	};
@@ -170,7 +173,7 @@ test('dataType="boolean"', function (done) {
 		<Form onSubmit={handleSubmit}>
 			<Input name="test" dataType="boolean" defaultValue={1} />
 			<Submit />
-		</Form>
+		</Form>,
 	);
 	wrapper
 		.find(Submit)
@@ -185,7 +188,8 @@ test('dataType="date" from date object', function (done) {
 		try {
 			expect(data.test).toBe(value);
 			done();
-		} catch (err) {
+		}
+		catch (err) {
 			done.fail(err);
 		}
 	};
@@ -193,7 +197,7 @@ test('dataType="date" from date object', function (done) {
 		<Form onSubmit={handleSubmit}>
 			<Input name="test" dataType="date" defaultValue={date} />
 			<Submit />
-		</Form>
+		</Form>,
 	);
 	wrapper
 		.find(Submit)
@@ -208,7 +212,8 @@ test('dataType="date" from date string', function (done) {
 		try {
 			expect(data.test).toBe(value);
 			done();
-		} catch (err) {
+		}
+		catch (err) {
 			done.fail(err);
 		}
 	};
@@ -220,7 +225,7 @@ test('dataType="date" from date string', function (done) {
 				defaultValue={date.toLocaleDateString()}
 			/>
 			<Submit />
-		</Form>
+		</Form>,
 	);
 	wrapper
 		.find(Submit)
@@ -235,7 +240,8 @@ test('dataType="date" from timestamp', function (done) {
 		try {
 			expect(data.test).toBe(value);
 			done();
-		} catch (err) {
+		}
+		catch (err) {
 			done.fail(err);
 		}
 	};
@@ -243,7 +249,7 @@ test('dataType="date" from timestamp', function (done) {
 		<Form onSubmit={handleSubmit}>
 			<Input name="test" dataType="date" defaultValue={date.getTime()} />
 			<Submit />
-		</Form>
+		</Form>,
 	);
 	wrapper
 		.find(Submit)
@@ -258,7 +264,8 @@ test('dataType="dateTime" from date object', function (done) {
 		try {
 			expect(data.test).toBe(value);
 			done();
-		} catch (err) {
+		}
+		catch (err) {
 			done.fail(err);
 		}
 	};
@@ -266,7 +273,7 @@ test('dataType="dateTime" from date object', function (done) {
 		<Form onSubmit={handleSubmit}>
 			<Input name="test" dataType="dateTime" defaultValue={date} />
 			<Submit />
-		</Form>
+		</Form>,
 	);
 	wrapper
 		.find(Submit)
@@ -281,7 +288,8 @@ test('dataType="dateTime" from date string', function (done) {
 		try {
 			expect(data.test).toBe(value);
 			done();
-		} catch (err) {
+		}
+		catch (err) {
 			done.fail(err);
 		}
 	};
@@ -293,7 +301,7 @@ test('dataType="dateTime" from date string', function (done) {
 				defaultValue={date.toISOString()}
 			/>
 			<Submit />
-		</Form>
+		</Form>,
 	);
 	wrapper
 		.find(Submit)
@@ -308,7 +316,8 @@ test('dataType="dateTime" from timestamp', function (done) {
 		try {
 			expect(data.test).toBe(value);
 			done();
-		} catch (err) {
+		}
+		catch (err) {
 			done.fail(err);
 		}
 	};
@@ -316,7 +325,7 @@ test('dataType="dateTime" from timestamp', function (done) {
 		<Form onSubmit={handleSubmit}>
 			<Input name="test" dataType="dateTime" defaultValue={date.getTime()} />
 			<Submit />
-		</Form>
+		</Form>,
 	);
 	wrapper
 		.find(Submit)
@@ -330,7 +339,8 @@ test('dataType="password"', function (done) {
 		try {
 			expect(data.test).toBe(value);
 			done();
-		} catch (err) {
+		}
+		catch (err) {
 			done.fail(err);
 		}
 	};
@@ -338,7 +348,7 @@ test('dataType="password"', function (done) {
 		<Form onSubmit={handleSubmit}>
 			<Input name="test" dataType="password" defaultValue={+value} />
 			<Submit />
-		</Form>
+		</Form>,
 	);
 	wrapper
 		.find(Submit)
@@ -352,7 +362,8 @@ test('dataType={customFunction}', function (done) {
 		try {
 			expect(data.test).toBe(true);
 			done();
-		} catch (err) {
+		}
+		catch (err) {
 			done.fail(err);
 		}
 	};
@@ -360,7 +371,7 @@ test('dataType={customFunction}', function (done) {
 		<Form onSubmit={handleSubmit}>
 			<Input name="test" dataType={customFunction} defaultValue="test" />
 			<Submit />
-		</Form>
+		</Form>,
 	);
 	wrapper
 		.find(Submit)

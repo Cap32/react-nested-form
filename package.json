@@ -40,11 +40,11 @@
     "react": "^0.14.9 || ^15.0.0-0 || ^16.0.0-0"
   },
   "devDependencies": {
-    "babel-cli": "^6.11.4",
+    "babel-cli": "^6.26.0",
     "babel-core": "^6.13.2",
     "babel-eslint": "^8.2.1",
     "babel-jest": "^19.0.0",
-    "babel-loader": "^7.0.0",
+    "babel-loader": "^7.1.4",
     "babel-plugin-import": "^1.1.1",
     "babel-plugin-lodash": "^3.2.11",
     "babel-plugin-system-import-transformer": "^3.1.0",
@@ -64,14 +64,15 @@
     "jest": "^19.0.2",
     "jsdom": "^9.11.0",
     "lodash.camelcase": "^4.3.0",
-    "lodash.padstart": "^4.6.1",
     "mkdirp": "^0.5.1",
+    "moment": "^2.21.0",
     "prettier-eslint-cli": "^4.7.0",
     "react": "^15.4.2",
     "react-addons-test-utils": "^15.4.2",
     "react-dom": "^15.4.2",
     "rimraf": "^2.5.4",
-    "webpack": "v2.2.1"
+    "webpack": "^4.1.1",
+    "webpack-cli": "^2.0.10"
   },
   "jest": {
     "collectCoverageFrom": [

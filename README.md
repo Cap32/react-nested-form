@@ -1,16 +1,16 @@
-# react-nested-form [WIP]
+# react-form-mobx [WIP]
 
 ## Installations
 
 ```bash
-yarn add react-nested-form
+yarn add react-form-mobx
 ```
 
 ## WTF
 
 ```js
-import React, { Component } from 'react';
-import { Form, Input, ArrayOf, ObjectOf } from 'react-nested-form';
+import React, { Component, Fragment } from 'react';
+import { Form, Input, ArrayOf, ObjectOf } from 'react-form-mobx';
 
 export default class MyFriend extends Component {
   myData = {
@@ -29,19 +29,18 @@ export default class MyFriend extends Component {
 
   render() {
     return (
-      <Form data={this.myData} onSubmit={this.handleSubmit}>
+      <Form value={this.myData} onSubmit={this.handleSubmit}>
         <Input name="name" />
         <Input name="height" dataType="number" />
         <ArrayOf name="starships">
-          {(starships) => starships.map((starship) =>
-            <Input name={starship.name} key={starship.key} />
+          {(starships, helper) => starships.map((starship) =>
+            <Input name={starship} key={starship} />
           )}
         </ArrayOf>
         <ObjectOf name="colors">
           <Input name="hair" />
           <Input name="skin" />
         </ObjectOf>
-        }
       </Form>
     );
   }
@@ -52,20 +51,22 @@ export default class MyFriend extends Component {
 
 ```js
 import React, { Component } from "react";
-import { Demon } from "react-nested-form";
+import { Demon } from "react-form-mobx";
 
 export default class MyInput extends Component {
   render() {
     return (
-      <Demon props={this.props}>
-        {({ label, isInvalid, errorMessage, ...other }) => (
+      <Demon {...this.props}>
+        {({ label, isRequired, isInvalid, errorMessage, ...other }) => (
           <label>
-            <span>{label}</span>
+            <span>
+              {label} {isRequired ? "*" : ""}
+            </span>
             <input
               style={{ borderColor: isInvalid ? "red" : "green" }}
               {...other}
             />
-            {isInvalid && errorMessage}
+            {isInvalid && <span style={{ color: "red" }}>{errorMessage}</span>}
           </label>
         )}
       </Demon>

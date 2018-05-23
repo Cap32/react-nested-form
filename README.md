@@ -48,6 +48,32 @@ export default class MyFriend extends Component {
 }
 ```
 
+## Creating Custom Input Component
+
+```js
+import React, { Component } from "react";
+import { Demon } from "react-nested-form";
+
+export default class MyInput extends Component {
+  render() {
+    return (
+      <Demon props={this.props}>
+        {({ label, isInvalid, errorMessage, ...other }) => (
+          <label>
+            <span>{label}</span>
+            <input
+              style={{ borderColor: isInvalid ? "red" : "green" }}
+              {...other}
+            />
+            {isInvalid && errorMessage}
+          </label>
+        )}
+      </Demon>
+    );
+  }
+}
+```
+
 ## License
 
 MIT

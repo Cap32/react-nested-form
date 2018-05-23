@@ -1,16 +1,16 @@
-# react-form-mobx [WIP]
+# react-nested-form [WIP]
 
 ## Installations
 
 ```bash
-yarn add react-form-mobx
+yarn add react-nested-form
 ```
 
 ## WTF
 
 ```js
 import React, { Component, Fragment } from 'react';
-import { Form, Input, ArrayOf, ObjectOf } from 'react-form-mobx';
+import { Form, Input, ArrayOf, ObjectOf } from 'react-nested-form';
 
 export default class MyFriend extends Component {
   myData = {
@@ -51,7 +51,7 @@ export default class MyFriend extends Component {
 
 ```js
 import React, { Component } from "react";
-import { Demon } from "react-form-mobx";
+import { Demon } from "react-nested-form";
 
 export default class MyInput extends Component {
   render() {

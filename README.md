@@ -1,52 +1,8 @@
-# react-nested-form [WIP]
+# react-nested-form [DEPRECATED]
 
-## Installations
+[![deprecated](http://badges.github.io/stability-badges/dist/deprecated.svg)](http://github.com/badges/stability-badges)
 
-```bash
-yarn add react-nested-form
-```
-
-## WTF
-
-```js
-import React, { Component } from 'react';
-import { Form, Input, ArrayOf, ObjectOf } from 'react-nested-form';
-
-export default class MyFriend extends Component {
-  myData = {
-    name: 'Luke Skywalker',
-    height: 172,
-    starships: ['X-wing', 'Imperial shuttle'],
-    colors: {
-      hair: 'blond',
-      skin: 'fair',
-    },
-  },
-
-  handleSubmit = (data) => {
-    console.log('data', data);
-  };
-
-  render() {
-    return (
-      <Form data={this.myData} onSubmit={this.handleSubmit}>
-        <Input name="name" />
-        <Input name="height" dataType="number" />
-        <ArrayOf name="starships">
-          {(starships) => starships.map((starship) =>
-            <Input name={starship.name} key={starship.key} />
-          )}
-        </ArrayOf>
-        <ObjectOf name="colors">
-          <Input name="hair" />
-          <Input name="skin" />
-        </ObjectOf>
-        }
-      </Form>
-    );
-  }
-}
-```
+> ### :warning: This module is deprecated. Please use the more powerful and stable one [react-form-mobx](https://github.com/cantonjs/react-form-mobx) instead.
 
 ## License
 
